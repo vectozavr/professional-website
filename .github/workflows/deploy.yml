@@ -18,9 +18,7 @@ concurrency:
 
 jobs:
   build:
-    # Scholar blocks the shared Linux runner pool, while the macOS pool uses a
-    # different egress network for this scheduled, public-profile request.
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -51,6 +49,7 @@ jobs:
         run: npm run metrics
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          SKIP_GOOGLE_SCHOLAR: '1'
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
 
       - name: Run Astro and TypeScript checks

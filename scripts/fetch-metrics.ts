@@ -428,6 +428,13 @@ async function fetchGoogleScholarCitations(
       ? existing.citations
       : null;
 
+  if (process.env.SKIP_GOOGLE_SCHOLAR === '1') {
+    console.warn(
+      '[metrics] Direct Google Scholar refresh is disabled in this environment; preserving the last verified profile snapshot.',
+    );
+    return existingSnapshot;
+  }
+
   try {
     const failures: string[] = [];
     let parsed: ReturnType<typeof parseGoogleScholarMetrics> | null = null;

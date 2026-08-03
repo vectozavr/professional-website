@@ -215,6 +215,8 @@ Google Scholar does not provide a supported public metrics API. The scheduled bu
 
 The parser accepts a refresh only when the expected profile and all three values are present. It can retry the same public profile through a small set of Google Scholar regional domains when one endpoint rejects a data-center request. Google Scholar may still rate-limit automated requests or change its HTML; in either case, the build preserves the last complete verified snapshot instead of publishing missing values or misleading zeros. No Google Scholar API key is required.
 
+Google Scholar currently rejects requests from GitHub-hosted runner networks. The Pages workflow therefore sets `SKIP_GOOGLE_SCHOLAR=1`, refreshes GitHub data, and deploys the last verified Scholar snapshot. Run `npm run metrics` from a trusted local environment to refresh Scholar; committing the generated JSON then triggers the normal Pages deployment. This avoids pretending that a blocked hosted request updated the citation timestamp.
+
 If no verified Google Scholar snapshot is available, the script can calculate a conservative fallback from exact DOI, arXiv, or Semantic Scholar paper identifiers in `semanticScholarPaperIds`:
 
 ```ts
