@@ -97,11 +97,11 @@ export const researchProfileLinks = compactLinks([
 ]);
 
 export const socialMediaLinks = compactLinks([
-  profile.linkedInUrl
+  profile.youtubeUrl
     ? {
-        label: 'LinkedIn',
-        href: profile.linkedInUrl,
-        icon: '/icons/linkedin.svg',
+        label: 'YouTube',
+        href: profile.youtubeUrl,
+        icon: '/icons/youtube.svg',
       }
     : undefined,
   profile.twitterUrl
@@ -111,11 +111,11 @@ export const socialMediaLinks = compactLinks([
         icon: '/icons/x.svg',
       }
     : undefined,
-  profile.youtubeUrl
+  profile.linkedInUrl
     ? {
-        label: 'YouTube',
-        href: profile.youtubeUrl,
-        icon: '/icons/youtube.svg',
+        label: 'LinkedIn',
+        href: profile.linkedInUrl,
+        icon: '/icons/linkedin.svg',
       }
     : undefined,
   profile.telegramUrl
