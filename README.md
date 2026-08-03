@@ -2,21 +2,12 @@
   <img src="public/favicon.svg" width="72" height="72" alt="Ivan Ilin website mark">
   <h1>Ivan Ilin · Academic & Engineering Website</h1>
   <p><strong>Machine learning research, publications, projects, and technical writing in one fast, maintainable website.</strong></p>
-  <p>
-    <a href="https://ivanilyin.org"><strong>Visit the website</strong></a>
-    ·
-    <a href="https://ivanilyin.org/research/">Research</a>
-    ·
-    <a href="https://ivanilyin.org/publications/">Publications</a>
-    ·
-    <a href="https://ivanilyin.org/projects/">Projects</a>
-  </p>
   <p><code>Astro</code> · <code>TypeScript</code> · <code>Content Collections</code> · <code>GitHub Pages</code></p>
 </div>
 
 ![Ivan Ilin website homepage](docs/images/homepage.webp)
 
-This is the source code for [ivanilyin.org](https://ivanilyin.org), the personal website of Ivan Ilin, a machine learning researcher and PhD candidate in Computer Science at KAUST. It brings research areas, verified publications, engineering projects, build-time profile metrics, and Markdown writing into one maintainable Astro codebase.
+This is the source code for the personal website of Ivan Ilin, a machine learning researcher and PhD candidate in Computer Science at KAUST. It brings research areas, verified publications, engineering projects, build-time profile metrics, and Markdown writing into one maintainable Astro codebase.
 
 The site is deliberately static-first: primary content is delivered as HTML, interactive behavior uses small vanilla-JavaScript enhancements, and external metrics are collected securely during the build rather than requested by a visitor's browser.
 
@@ -108,16 +99,7 @@ Edit [`src/data/profile.ts`](src/data/profile.ts) to change the name, role, biog
 
 `profile.siteUrl` is the canonical domain source. `npm run build` runs `scripts/sync-domain.ts`, which derives `public/CNAME` and the sitemap URL in `public/robots.txt` from that value. Do not add an Astro `base` path while the site uses a custom root domain.
 
-Configured now:
-
-- GitHub: `vectozavr`
-- Google Scholar author ID: `elw14gUAAAAJ`
-- ORCID: `0009-0005-6210-378X`
-- public KAUST email
-- YouTube: `https://www.youtube.com/@ilin-ivan`
-- eight verified Semantic Scholar paper identifiers retained as a safe fallback
-
-Intentionally unconfigured: Semantic Scholar author-profile ID, Telegram, and location. The known Semantic Scholar and OpenAlex author profiles are merged with unrelated researchers, so the fallback deliberately uses exact paper identifiers instead of unsafe author-level totals.
+Set `siteUrl` to the deployed origin before publishing. Fill optional profile fields only when their values have been verified; leaving them empty removes the corresponding interface elements.
 
 ## Add a blog post
 
@@ -204,7 +186,7 @@ The publications page sorts by year, filters by type and topic, and exposes a cl
 
 ## Add a CV
 
-The current public PDF is stored at `public/cv/ivan-ilin-cv.pdf` and configured with:
+The CV PDF is stored at `public/cv/ivan-ilin-cv.pdf` and configured with:
 
 ```ts
 cvUrl: '/cv/ivan-ilin-cv.pdf',
@@ -227,7 +209,7 @@ GitHub account data is treated as one atomic snapshot. When pagination, validati
 
 ### Google Scholar citations
 
-The homepage displays the all-time totals from the exact Google Scholar profile configured by `googleScholarAuthorId` and `googleScholarUrl`. The current generated snapshot was verified directly against that profile and contains 129 citations, h-index 4, and i10-index 4.
+The homepage can display citation count, h-index, and i10-index from the exact Google Scholar profile configured by `googleScholarAuthorId` and `googleScholarUrl`.
 
 Google Scholar does not provide a supported public metrics API, so scheduled refreshes use the SerpAPI Google Scholar Author API. Add `SERPAPI_KEY` locally or as a GitHub Actions repository secret. The build sends the exact author ID—never a name search—validates all three values, writes them only after a complete response, and preserves the prior snapshot on any error. The key is available only to the build process and is never bundled into the site.
 
@@ -240,7 +222,7 @@ semanticScholarPaperIds: [
 ],
 ```
 
-The fallback makes one Semantic Scholar batch request, sums work-level citations, and computes h-index and i10-index across the verified set. This avoids name matching, duplicate preprint/published records, and contaminated author profiles. A paper must be added deliberately after its identifier is verified; the KAUST thesis is currently omitted because Semantic Scholar does not resolve its DOI.
+The fallback makes one Semantic Scholar batch request, sums work-level citations, and computes h-index and i10-index across the verified set. This avoids name matching, duplicate preprint/published records, and contaminated author profiles. Add a paper only after verifying its identifier.
 
 An optional `SEMANTIC_SCHOLAR_API_KEY` increases fallback reliability. When either provider is temporarily unavailable, the last compatible complete snapshot is preserved.
 
@@ -264,39 +246,6 @@ Repository configuration:
 1. Push this repository to GitHub with `main` as the default branch.
 2. Open **Settings → Pages**.
 3. Under **Build and deployment**, choose **GitHub Actions** as the source.
-4. Enter `ivanilyin.org` under **Custom domain**. This Settings step is required for a custom Actions workflow; GitHub does not use the artifact's `CNAME` file to configure the domain.
-5. After DNS is valid and GitHub issues the certificate, enable **Enforce HTTPS**.
-
-For an apex domain, configure these `A` records at the DNS provider:
-
-```text
-@  A  185.199.108.153
-@  A  185.199.109.153
-@  A  185.199.110.153
-@  A  185.199.111.153
-```
-
-Add GitHub's matching IPv6 records when the DNS provider supports `AAAA`:
-
-```text
-@  AAAA  2606:50c0:8000::153
-@  AAAA  2606:50c0:8001::153
-@  AAAA  2606:50c0:8002::153
-@  AAAA  2606:50c0:8003::153
-```
-
-An `ALIAS`/`ANAME` to `YOUR-GITHUB-USERNAME.github.io` can replace the apex `A`/`AAAA` set when the DNS provider supports it. Remove conflicting records and do not use a wildcard DNS record. GitHub recommends verifying the domain in the account or organization settings before adding it to the repository, which helps prevent takeover. DNS changes can take up to 24 hours to propagate; the workflow itself cannot perform these external settings.
-
-## Pre-deployment checklist
-
-```bash
-npm ci
-npm run check
-npm run build
-npm run preview
-```
-
-Confirm that `dist/CNAME`, `dist/sitemap-index.xml`, `dist/rss.xml`, `dist/robots.txt`, and `dist/images/og.png` exist. Search `dist/` for any secret names or token values before publishing. Keep optional profile fields empty until their values are verified.
 
 ## License
 
