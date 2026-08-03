@@ -213,7 +213,7 @@ The homepage can display citation count, h-index, and i10-index from the exact G
 
 Google Scholar does not provide a supported public metrics API. The scheduled build therefore requests the public HTML for the exact profile identified by `googleScholarAuthorId`, validates the returned profile name, and reads the all-time values from its metrics table. It never performs an author-name search and never requests Scholar data from a visitor's browser.
 
-The parser accepts a refresh only when the expected profile and all three values are present. Google Scholar may occasionally rate-limit automated requests or change its HTML; in either case, the build preserves the last complete verified snapshot instead of publishing missing values or misleading zeros. No Google Scholar API key is required.
+The parser accepts a refresh only when the expected profile and all three values are present. It can retry the same public profile through a small set of Google Scholar regional domains when one endpoint rejects a data-center request. Google Scholar may still rate-limit automated requests or change its HTML; in either case, the build preserves the last complete verified snapshot instead of publishing missing values or misleading zeros. No Google Scholar API key is required.
 
 If no verified Google Scholar snapshot is available, the script can calculate a conservative fallback from exact DOI, arXiv, or Semantic Scholar paper identifiers in `semanticScholarPaperIds`:
 

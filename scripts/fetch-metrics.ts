@@ -429,21 +429,41 @@ async function fetchGoogleScholarCitations(
       : null;
 
   try {
-    const url = new URL('https://scholar.google.com/citations');
-    url.searchParams.set('user', authorId);
-    url.searchParams.set('hl', 'en');
+    const failures: string[] = [];
+    let parsed: ReturnType<typeof parseGoogleScholarMetrics> | null = null;
 
-    const response = await fetchResponse(url.toString(), {
-      headers: {
-        Accept: 'text/html,application/xhtml+xml',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Cache-Control': 'no-cache',
-        'User-Agent':
-          'Mozilla/5.0 (compatible; IvanIlinWebsiteMetrics/1.0; +https://ivanilin.org/)',
-      },
-    });
-    const html = await response.text();
-    const parsed = parseGoogleScholarMetrics(html);
+    for (const origin of [
+      'https://scholar.google.com',
+      'https://scholar.google.co.uk',
+      'https://scholar.google.de',
+    ]) {
+      try {
+        const url = new URL('/citations', origin);
+        url.searchParams.set('view_op', 'list_works');
+        url.searchParams.set('user', authorId);
+        url.searchParams.set('hl', 'en');
+
+        const response = await fetchResponse(url.toString(), {
+          headers: {
+            Accept: 'text/html,application/xhtml+xml',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Cache-Control': 'no-cache',
+            'User-Agent':
+              'Mozilla/5.0 (compatible; IvanIlinWebsiteMetrics/1.0; +https://ivanilin.org/)',
+          },
+        });
+        parsed = parseGoogleScholarMetrics(await response.text());
+        break;
+      } catch (error) {
+        failures.push(
+          `${new URL(origin).hostname}: ${error instanceof Error ? error.message : 'unknown error'}`,
+        );
+      }
+    }
+
+    if (!parsed) {
+      throw new Error(failures.join('; '));
+    }
 
     return {
       source: 'Google Scholar',
