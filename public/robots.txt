@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vectozavr.github.io/professional-website/sitemap-index.xml
+Sitemap: https://ivanilin.org/sitemap-index.xml
