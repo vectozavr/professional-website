@@ -18,7 +18,9 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Scholar blocks the shared Linux runner pool, while the macOS pool uses a
+    # different egress network for this scheduled, public-profile request.
+    runs-on: macos-15
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
