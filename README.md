@@ -211,9 +211,11 @@ GitHub account data is treated as one atomic snapshot. When pagination, validati
 
 The homepage can display citation count, h-index, and i10-index from the exact Google Scholar profile configured by `googleScholarAuthorId` and `googleScholarUrl`.
 
-Google Scholar does not provide a supported public metrics API, so scheduled refreshes use the SerpAPI Google Scholar Author API. Add `SERPAPI_KEY` locally or as a GitHub Actions repository secret. The build sends the exact author ID—never a name search—validates all three values, writes them only after a complete response, and preserves the prior snapshot on any error. The key is available only to the build process and is never bundled into the site.
+Google Scholar does not provide a supported public metrics API. The scheduled build therefore requests the public HTML for the exact profile identified by `googleScholarAuthorId`, validates the returned profile name, and reads the all-time values from its metrics table. It never performs an author-name search and never requests Scholar data from a visitor's browser.
 
-The script does not scrape Google Scholar directly. If no verified Google Scholar snapshot is available, it can calculate a conservative fallback from exact DOI, arXiv, or Semantic Scholar paper identifiers in `semanticScholarPaperIds`:
+The parser accepts a refresh only when the expected profile and all three values are present. Google Scholar may occasionally rate-limit automated requests or change its HTML; in either case, the build preserves the last complete verified snapshot instead of publishing missing values or misleading zeros. No Google Scholar API key is required.
+
+If no verified Google Scholar snapshot is available, the script can calculate a conservative fallback from exact DOI, arXiv, or Semantic Scholar paper identifiers in `semanticScholarPaperIds`:
 
 ```ts
 semanticScholarPaperIds: [
@@ -231,7 +233,7 @@ An optional `SEMANTIC_SCHOLAR_API_KEY` increases fallback reliability. When eith
 - Run `npm run metrics` directly to see which configured repository failed.
 - Confirm every selected repository uses the `owner/name` format and is public.
 - Set `GITHUB_TOKEN` when unauthenticated rate limits are exhausted.
-- Add `SERPAPI_KEY` as a repository secret to enable scheduled Google Scholar refreshes.
+- If Google Scholar returns a rate-limit response, leave the generated snapshot in place and let the next scheduled build retry.
 - Add `SEMANTIC_SCHOLAR_API_KEY` as a repository secret if Semantic Scholar returns rate-limit responses.
 - Leave the generated JSON in place so a temporary outage can preserve the last successful values.
 - An unavailable API should produce a warning, not fail `npm run build`.

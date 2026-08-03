@@ -347,17 +347,73 @@ function samePaperSet(left: readonly string[], right: readonly string[]) {
   return normalizedLeft.every((id, index) => id === normalizedRight[index]);
 }
 
-function readSerpApiMetric(
-  table: unknown[],
-  key: 'citations' | 'h_index' | 'i10_index',
-) {
-  for (const row of table) {
-    if (!isRecord(row) || !isRecord(row[key])) continue;
-    const value = row[key].all;
-    if (isNonNegativeInteger(value)) return value;
+function decodeScholarText(value: string) {
+  return value
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function parseGoogleScholarMetrics(html: string) {
+  const profileNameMatch = html.match(
+    /<div\b[^>]*id=["']gsc_prf_in["'][^>]*>([\s\S]*?)<\/div>/i,
+  );
+  const profileName = profileNameMatch
+    ? decodeScholarText(profileNameMatch[1] ?? '')
+    : '';
+
+  if (profileName.toLocaleLowerCase('en') !== profile.name.toLocaleLowerCase('en')) {
+    throw new Error(
+      `Google Scholar returned an unexpected profile${profileName ? `: ${profileName}` : ''}`,
+    );
   }
 
-  throw new Error(`SerpAPI response is missing ${key}`);
+  const tableMatch = html.match(
+    /<table\b[^>]*id=["']gsc_rsb_st["'][^>]*>([\s\S]*?)<\/table>/i,
+  );
+  if (!tableMatch) {
+    throw new Error('Google Scholar response is missing the metrics table');
+  }
+
+  const metrics = new Map<string, number>();
+  for (const rowMatch of tableMatch[1]?.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi) ?? []) {
+    const row = rowMatch[1] ?? '';
+    const labelText = decodeScholarText(row).toLocaleLowerCase('en');
+    const label = ['citations', 'h-index', 'i10-index'].find((candidate) =>
+      labelText.includes(candidate),
+    );
+    if (!label) continue;
+
+    const valueMatch = row.match(
+      /<td\b[^>]*class=["'][^"']*\bgsc_rsb_std\b[^"']*["'][^>]*>\s*([\d,\s]+)\s*<\/td>/i,
+    );
+    if (!valueMatch) {
+      throw new Error(`Google Scholar response is missing the all-time ${label}`);
+    }
+
+    const value = Number.parseInt((valueMatch[1] ?? '').replace(/[,\s]/g, ''), 10);
+    if (!isNonNegativeInteger(value)) {
+      throw new Error(`Google Scholar returned an invalid ${label}`);
+    }
+    metrics.set(label, value);
+  }
+
+  const citationCount = metrics.get('citations');
+  const hIndex = metrics.get('h-index');
+  const i10Index = metrics.get('i10-index');
+  if (
+    !isNonNegativeInteger(citationCount) ||
+    !isNonNegativeInteger(hIndex) ||
+    !isNonNegativeInteger(i10Index)
+  ) {
+    throw new Error('Google Scholar response did not contain all three metrics');
+  }
+
+  return { citationCount, hIndex, i10Index };
 }
 
 async function fetchGoogleScholarCitations(
@@ -371,54 +427,29 @@ async function fetchGoogleScholarCitations(
     existing.citations.authorId === authorId
       ? existing.citations
       : null;
-  const apiKey = process.env.SERPAPI_KEY?.trim();
-
-  if (!apiKey) {
-    console.warn(
-      '[metrics] SERPAPI_KEY is not configured; preserving the last verified Google Scholar snapshot.',
-    );
-    return existingSnapshot;
-  }
 
   try {
-    const url = new URL('https://serpapi.com/search.json');
-    url.searchParams.set('engine', 'google_scholar_author');
-    url.searchParams.set('author_id', authorId);
+    const url = new URL('https://scholar.google.com/citations');
+    url.searchParams.set('user', authorId);
     url.searchParams.set('hl', 'en');
-    url.searchParams.set('api_key', apiKey);
 
     const response = await fetchResponse(url.toString(), {
       headers: {
-        Accept: 'application/json',
-        'User-Agent': 'ivan-ilin-website-build',
+        Accept: 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Cache-Control': 'no-cache',
+        'User-Agent':
+          'Mozilla/5.0 (compatible; IvanIlinWebsiteMetrics/1.0; +https://ivanilin.org/)',
       },
     });
-    const payload: unknown = await response.json();
-
-    if (!isRecord(payload)) {
-      throw new Error('Unexpected SerpAPI response');
-    }
-    if (typeof payload.error === 'string') {
-      throw new Error(payload.error);
-    }
-    if (
-      isRecord(payload.search_parameters) &&
-      typeof payload.search_parameters.author_id === 'string' &&
-      payload.search_parameters.author_id !== authorId
-    ) {
-      throw new Error('SerpAPI returned a different Google Scholar author');
-    }
-    if (!isRecord(payload.cited_by) || !Array.isArray(payload.cited_by.table)) {
-      throw new Error('SerpAPI response is missing the cited-by table');
-    }
+    const html = await response.text();
+    const parsed = parseGoogleScholarMetrics(html);
 
     return {
       source: 'Google Scholar',
       authorId,
       url: profile.googleScholarUrl,
-      citationCount: readSerpApiMetric(payload.cited_by.table, 'citations'),
-      hIndex: readSerpApiMetric(payload.cited_by.table, 'h_index'),
-      i10Index: readSerpApiMetric(payload.cited_by.table, 'i10_index'),
+      ...parsed,
       updatedAt: new Date().toISOString(),
     };
   } catch (error) {
