@@ -1,0 +1,80 @@
+---
+import { profile } from '../data/profile';
+
+const pathname = Astro.url.pathname;
+const links = [
+  { label: 'Home', href: '/' },
+  { label: 'Research', href: '/research/' },
+  { label: 'Publications', href: '/publications/' },
+  { label: 'Projects', href: '/projects/' },
+  { label: 'Blog', href: '/blog/' },
+];
+
+if (profile.cvUrl) links.push({ label: 'CV', href: profile.cvUrl });
+
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+
+<header class="site-header" data-site-header>
+  <div class="header-inner shell">
+    <a class="wordmark" href="/" aria-label={`${profile.name}, home`}>
+      <span class="wordmark-mark" aria-hidden="true">
+        <img src="/favicon.svg" alt="" width="33" height="33" />
+      </span>
+      <span class="wordmark-name">{profile.name}</span>
+    </a>
+
+    <div class="header-actions">
+      <nav class="primary-nav" id="primary-navigation" aria-label="Primary" data-navigation>
+        {links.map((link) => (
+          <a
+            href={link.href}
+            class:list={[{ active: isActive(link.href) }]}
+            aria-current={isActive(link.href) ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+
+      <button
+        class="icon-button nav-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-navigation"
+        aria-label="Open navigation"
+        data-nav-toggle
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const navToggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const navigation = document.querySelector<HTMLElement>('[data-navigation]');
+
+  const setNavigation = (open: boolean) => {
+    if (!navToggle || !navigation) return;
+    navToggle.setAttribute('aria-expanded', String(open));
+    navToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+    navigation.classList.toggle('open', open);
+    document.body.classList.toggle('navigation-open', open);
+  };
+
+  navToggle?.addEventListener('click', () => {
+    setNavigation(navToggle.getAttribute('aria-expanded') !== 'true');
+  });
+
+  navigation?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => setNavigation(false));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setNavigation(false);
+  });
+
+</script>

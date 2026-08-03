@@ -1,0 +1,89 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
+);
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+---
+
+<BaseLayout
+  title="Blog"
+  description="Notes on machine learning research, efficient models, open-source projects, and engineering by Ivan Ilin."
+>
+  <header class="page-hero shell">
+    <div class="page-hero-content">
+      <p class="eyebrow">Blog</p>
+      <h1>Notes from the workbench</h1>
+      <p class="page-intro">
+        Short project updates and technical notes about efficient machine learning,
+        research implementation, and open-source engineering.
+      </p>
+    </div>
+  </header>
+
+  <section class="content-section">
+    <div class="shell">
+      <div class="filter-panel" data-blog-filters>
+        <div class="filter-group" aria-label="Filter posts by tag">
+          <button class="filter-button" type="button" aria-pressed="true" data-tag-filter="all">All posts</button>
+          {tags.map((tag) => (
+            <button class="filter-button" type="button" aria-pressed="false" data-tag-filter={tag.toLowerCase()}>{tag}</button>
+          ))}
+        </div>
+        <div class="search-field">
+          <label for="post-search">Search posts</label>
+          <input id="post-search" type="search" placeholder="Title, description, or tag" autocomplete="off" data-post-search />
+        </div>
+      </div>
+
+      <p class="sr-only" aria-live="polite" data-result-count></p>
+      <div class="post-grid" data-post-list>
+        {posts.map((post) => (
+          <div data-post-tags={post.data.tags.join(' ').toLowerCase()} data-post-wrapper>
+            <PostCard post={post} />
+          </div>
+        ))}
+      </div>
+      <p class="empty-state" data-empty-state>No posts match this search.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const filterRoot = document.querySelector<HTMLElement>('[data-blog-filters]');
+  const search = document.querySelector<HTMLInputElement>('[data-post-search]');
+  const wrappers = Array.from(document.querySelectorAll<HTMLElement>('[data-post-wrapper]'));
+  const empty = document.querySelector<HTMLElement>('[data-empty-state]');
+  const resultCount = document.querySelector<HTMLElement>('[data-result-count]');
+  let activeTag = 'all';
+
+  const applyFilters = () => {
+    const query = search?.value.trim().toLowerCase() ?? '';
+    let visible = 0;
+    wrappers.forEach((wrapper) => {
+      const card = wrapper.querySelector<HTMLElement>('[data-filter-item]');
+      const matchesTag = activeTag === 'all' || wrapper.dataset.postTags?.includes(activeTag);
+      const matchesSearch = !query || card?.dataset.search?.includes(query);
+      wrapper.hidden = !(matchesTag && matchesSearch);
+      if (!wrapper.hidden) visible += 1;
+    });
+    empty?.classList.toggle('visible', visible === 0);
+    if (resultCount) resultCount.textContent = `${visible} post${visible === 1 ? '' : 's'} shown`;
+  };
+
+  filterRoot?.querySelectorAll<HTMLButtonElement>('[data-tag-filter]').forEach((button) => {
+    button.addEventListener('click', () => {
+      activeTag = button.dataset.tagFilter ?? 'all';
+      filterRoot.querySelectorAll<HTMLButtonElement>('[data-tag-filter]').forEach((candidate) => {
+        candidate.setAttribute('aria-pressed', String(candidate === button));
+      });
+      applyFilters();
+    });
+  });
+
+  search?.addEventListener('input', applyFilters);
+  applyFilters();
+</script>

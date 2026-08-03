@@ -1,0 +1,104 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { profile } from '../../data/profile';
+import { formatDate, readingTime, tagSlug } from '../../utils/content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) =>
+    import.meta.env.PROD ? !data.draft : true,
+  );
+  const sorted = posts.sort(
+    (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
+  );
+  return sorted.map((post, index) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      olderPost: sorted[index + 1],
+      newerPost: sorted[index - 1],
+    },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  olderPost?: CollectionEntry<'blog'>;
+  newerPost?: CollectionEntry<'blog'>;
+}
+
+const { post, olderPost, newerPost } = Astro.props;
+const { Content } = await render(post);
+const canonical = new URL(`/blog/${post.id}/`, profile.siteUrl).toString();
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.publishDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.publishDate).toISOString(),
+  mainEntityOfPage: canonical,
+  author: {
+    '@type': 'Person',
+    name: profile.name,
+    url: profile.siteUrl,
+  },
+  keywords: post.data.tags,
+};
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  type="article"
+  noindex={post.data.draft}
+  structuredData={structuredData}
+>
+  <article>
+    <header class="article-header">
+      <div class="narrow-shell">
+        <a class="back-link" href="/blog/">← Back to blog</a>
+        {post.data.draft && <p class="eyebrow">Draft preview</p>}
+        <h1>{post.data.title}</h1>
+        <p class="article-description">{post.data.description}</p>
+        <div class="article-meta">
+          <time datetime={post.data.publishDate.toISOString()}>
+            Published {formatDate(post.data.publishDate)}
+          </time>
+          {post.data.updatedDate && (
+            <time datetime={post.data.updatedDate.toISOString()}>
+              Updated {formatDate(post.data.updatedDate)}
+            </time>
+          )}
+          <span>{readingTime(post.body)} min read</span>
+        </div>
+        <div class="tag-row" aria-label="Tags" style="margin-top: 1rem;">
+          {post.data.tags.map((tag) => (
+            <a class="tag" href={`/blog/tags/${tagSlug(tag)}/`}>{tag}</a>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    <div class="article-body narrow-shell">
+      <div class="prose">
+        <Content />
+      </div>
+
+      {(olderPost || newerPost) && (
+        <nav class="article-footer-nav" aria-label="Adjacent posts">
+          {olderPost ? (
+            <a href={`/blog/${olderPost.id}/`}>
+              <span>Older post</span><strong>{olderPost.data.title}</strong>
+            </a>
+          ) : <span></span>}
+          {newerPost && (
+            <a href={`/blog/${newerPost.id}/`}>
+              <span>Newer post</span><strong>{newerPost.data.title}</strong>
+            </a>
+          )}
+        </nav>
+      )}
+    </div>
+  </article>
+</BaseLayout>

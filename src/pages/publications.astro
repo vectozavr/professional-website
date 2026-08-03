@@ -1,0 +1,138 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+
+const publications = (await getCollection('publications')).sort(
+  (a, b) =>
+    (b.data.year ?? 0) - (a.data.year ?? 0) ||
+    a.data.title.localeCompare(b.data.title),
+);
+const types = [...new Set(publications.map((item) => item.data.publicationType))].sort();
+const topics = [...new Set(publications.flatMap((item) => item.data.tags))].sort();
+
+const structuredData = publications.map((publication) => ({
+  '@context': 'https://schema.org',
+  '@type': 'ScholarlyArticle',
+  headline: publication.data.title,
+  author: publication.data.authors.map((name) => ({ '@type': 'Person', name })),
+  datePublished: publication.data.year?.toString(),
+  isPartOf: publication.data.venue
+    ? { '@type': 'CreativeWorkSeries', name: publication.data.venue }
+    : undefined,
+  url: publication.data.paperUrl || publication.data.arxivUrl || undefined,
+  abstract: publication.data.summary,
+  keywords: publication.data.tags,
+}));
+---
+
+<BaseLayout
+  title="Publications"
+  description="Verified publications and preprints by Ivan Ilin on efficient machine learning, optimization, compression, and distributed training."
+  structuredData={structuredData}
+>
+  <header class="page-hero shell">
+    <div class="page-hero-content">
+      <p class="eyebrow">Publications</p>
+      <h1>Papers and preprints</h1>
+      <p class="page-intro">
+        Verified research output spanning model compression, distributed
+        optimization, quantization, and sparse adaptation. Entries are shown newest
+        first; links appear only when a source is available.
+      </p>
+    </div>
+  </header>
+
+  <section class="content-section">
+    <div class="shell">
+      <div class="filter-panel" data-filter-root>
+        <div>
+          <p class="sr-only" id="type-filter-label">Filter by publication type</p>
+          <div class="filter-group" aria-labelledby="type-filter-label">
+            <button class="filter-button" type="button" aria-pressed="true" data-filter-kind="type" data-filter-value="all">All types</button>
+            {types.map((type) => (
+              <button class="filter-button" type="button" aria-pressed="false" data-filter-kind="type" data-filter-value={type.toLowerCase()}>{type}</button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p class="sr-only" id="topic-filter-label">Filter by topic</p>
+          <div class="filter-group" aria-labelledby="topic-filter-label">
+            <button class="filter-button" type="button" aria-pressed="true" data-filter-kind="topic" data-filter-value="all">All topics</button>
+            {topics.map((topic) => (
+              <button class="filter-button" type="button" aria-pressed="false" data-filter-kind="topic" data-filter-value={topic.toLowerCase()}>{topic}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <p class="sr-only" aria-live="polite" data-result-count></p>
+      <div class="publication-list" data-filter-list>
+        {publications.map((publication) => <PublicationItem publication={publication} />)}
+      </div>
+      <p class="empty-state" data-empty-state>No publications match both filters.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-filter-root]');
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-filter-item]'));
+  const empty = document.querySelector<HTMLElement>('[data-empty-state]');
+  const resultCount = document.querySelector<HTMLElement>('[data-result-count]');
+  const active = { type: 'all', topic: 'all' };
+
+  const applyFilters = () => {
+    let visible = 0;
+    items.forEach((item) => {
+      const matchesType = active.type === 'all' || item.dataset.type === active.type;
+      const matchesTopic =
+        active.topic === 'all' || item.dataset.topics?.includes(active.topic);
+      item.hidden = !(matchesType && matchesTopic);
+      if (!item.hidden) visible += 1;
+    });
+    empty?.classList.toggle('visible', visible === 0);
+    if (resultCount) resultCount.textContent = `${visible} publication${visible === 1 ? '' : 's'} shown`;
+  };
+
+  root?.querySelectorAll<HTMLButtonElement>('[data-filter-kind]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const kind = button.dataset.filterKind as 'type' | 'topic';
+      const value = button.dataset.filterValue ?? 'all';
+      active[kind] = value;
+      root
+        .querySelectorAll<HTMLButtonElement>(`[data-filter-kind="${kind}"]`)
+        .forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate === button)));
+      applyFilters();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-bibtex]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const bibtex = button.dataset.bibtex;
+      if (!bibtex) return;
+      try {
+        await navigator.clipboard.writeText(bibtex);
+        button.textContent = 'Copied';
+      } catch {
+        const field = document.createElement('textarea');
+        field.value = bibtex;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.inset = '0 auto auto -9999px';
+        document.body.append(field);
+        field.select();
+        const legacyCopy = (
+          document as unknown as { execCommand(command: string): boolean }
+        ).execCommand.bind(document);
+        button.textContent = legacyCopy('copy') ? 'Copied' : 'Copy failed';
+        field.remove();
+      }
+      window.setTimeout(() => {
+        button.textContent = 'Copy BibTeX';
+      }, 1600);
+    });
+  });
+
+  applyFilters();
+</script>

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+.env
+.env.*
+!.env.example
+npm-debug.log*
+
+# Local drop folder for source media before it is optimized and moved into the site.
+stuff/

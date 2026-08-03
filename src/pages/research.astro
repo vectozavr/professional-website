@@ -1,0 +1,128 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Research"
+  description="Ivan Ilin's research on LLM compression, pruning, sparse fine-tuning, quantization, and pipeline parallelism."
+>
+  <header class="page-hero shell">
+    <div class="page-hero-content">
+      <p class="eyebrow">Research</p>
+      <h1>Efficient models, from parameters to pipelines</h1>
+      <p class="page-intro">
+        My research focuses on making large language models less expensive to
+        train, adapt, and deploy. I study optimization methods that exploit
+        sparsity, low precision, second-order information, and distributed model
+        structure. Alongside theoretical work, I build practical implementations
+        and open-source tools.
+      </p>
+    </div>
+  </header>
+
+  <section class="content-section">
+    <div class="shell research-layout">
+      <nav class="research-toc" aria-label="Research topics">
+        <p>On this page</p>
+        <a href="#overview">Overview</a>
+        <a href="#pruning">LLM pruning</a>
+        <a href="#sparse-fine-tuning">Sparse fine-tuning</a>
+        <a href="#quantization">Quantization</a>
+        <a href="#pipeline-parallelism">Pipeline parallelism</a>
+      </nav>
+
+      <div>
+        <section class="research-chapter" id="overview">
+          <p class="eyebrow">Overview</p>
+          <h2>Compression and efficient optimization</h2>
+          <p>
+            Large models are costly not only because they contain many parameters,
+            but because training and deployment repeatedly move, store, and update
+            those parameters. My work looks for useful structure in that cost: which
+            weights can be removed, which need to change during adaptation, how much
+            numerical precision is necessary, and how optimization behaves when a
+            model is split across pipeline stages.
+          </p>
+        </section>
+
+        <section class="research-chapter" id="pruning">
+          <p class="eyebrow">01 · Sparsity</p>
+          <h2>LLM pruning</h2>
+          <p>
+            Pruning removes model weights that contribute less to a chosen objective.
+            The difficult part is not producing zeros; it is deciding what to remove
+            and compensating for the combined effect. My work studies layer-wise and
+            block-wise methods that use second-order information for this decision.
+          </p>
+          <div class="related-links">
+            <a class="related-link" href="/projects/thanos/">
+              <span>Project</span><strong>Thanos</strong>
+            </a>
+            <a class="related-link" href="https://arxiv.org/abs/2504.05346">
+              <span>Preprint</span><strong>Thanos: A Block-wise Pruning Algorithm</strong>
+            </a>
+          </div>
+        </section>
+
+        <section class="research-chapter" id="sparse-fine-tuning">
+          <p class="eyebrow">02 · Adaptation</p>
+          <h2>Sparse fine-tuning</h2>
+          <p>
+            Sparse fine-tuning updates a selected subset of model parameters while
+            keeping the rest fixed. This turns parameter selection into part of the
+            optimization problem and can reduce the amount of trainable state needed
+            to adapt a model.
+          </p>
+          <div class="related-links">
+            <a class="related-link" href="/projects/sparse-fine-tuning/">
+              <span>Project</span><strong>Sparse Fine-Tuning</strong>
+            </a>
+            <a class="related-link" href="https://arxiv.org/abs/2607.09287">
+              <span>Preprint</span><strong>Super-Tuning</strong>
+            </a>
+          </div>
+        </section>
+
+        <section class="research-chapter" id="quantization">
+          <p class="eyebrow">03 · Low precision</p>
+          <h2>Quantization</h2>
+          <p>
+            Quantization represents model values with fewer bits. Lower precision can
+            reduce storage and memory traffic, but it also introduces approximation
+            error. My research in this area examines optimization methods that control
+            that trade-off without assuming the straight-through estimator is the only
+            available approach.
+          </p>
+          <div class="related-links">
+            <a class="related-link" href="https://aclanthology.org/2025.naacl-long.543/">
+              <span>Paper</span><strong>HIGGS</strong>
+            </a>
+            <a class="related-link" href="https://proceedings.neurips.cc/paper_files/paper/2024/hash/091166620a04a289c555f411d8899049-Abstract-Conference.html">
+              <span>Paper</span><strong>PV-Tuning</strong>
+            </a>
+          </div>
+        </section>
+
+        <section class="research-chapter" id="pipeline-parallelism">
+          <p class="eyebrow">04 · Distributed training</p>
+          <h2>Pipeline parallelism</h2>
+          <p>
+            Pipeline parallelism divides a model into stages that can work on
+            different microbatches concurrently. The resulting delays make its
+            optimization dynamics different from ordinary synchronous training. I
+            study theoretical models that make these delayed updates explicit and
+            allow convergence to be analyzed.
+          </p>
+          <div class="related-links">
+            <a class="related-link" href="/projects/pipeline-parallelism-theory/">
+              <span>Project</span><strong>Pipeline Parallelism Theory</strong>
+            </a>
+            <a class="related-link" href="https://arxiv.org/abs/2606.03498">
+              <span>Preprint</span><strong>Demystifying Pipeline Parallelism</strong>
+            </a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

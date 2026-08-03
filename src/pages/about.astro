@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { professionalLinks, profile } from '../data/profile';
+---
+
+<BaseLayout
+  title="About"
+  description="About Ivan Ilin, a machine learning researcher and PhD candidate in Computer Science at KAUST."
+>
+  <header class="page-hero shell">
+    <div class="page-hero-content">
+      <p class="eyebrow">About</p>
+      <h1>Research with a path to practice</h1>
+      <p class="page-intro">{profile.shortBiography}</p>
+    </div>
+  </header>
+
+  <section class="content-section">
+    <div class="shell about-grid">
+      <article class="prose">
+        <h2>Current focus</h2>
+        <p>
+          I am a PhD candidate in Computer Science at KAUST. My current work
+          examines how large language models can be trained, adapted, and deployed
+          with less computation and memory. The recurring ideas are sparsity, low
+          precision, second-order optimization, and distributed model structure.
+        </p>
+        <p>
+          I am also interested in translating research and machine-learning systems
+          into practical tools. VoiceCut is one example: an open-source project built
+          around a repetitive problem in narration editing.
+        </p>
+        <p>
+          For research details, see the <a href="/research/">research overview</a>,
+          the <a href="/publications/">publication list</a>, or the public
+          <a href="/projects/">project pages</a>.
+        </p>
+      </article>
+
+      <aside class="profile-panel">
+        <h2>Links and contact</h2>
+        <div class="profile-links">
+          {professionalLinks.map((link) => (
+            <a href={link.href} target="_blank" rel="me noreferrer">
+              <span class="profile-link-label">
+                {link.icon && (
+                  <img
+                    class="profile-link-icon"
+                    src={link.icon}
+                    alt=""
+                    width="18"
+                    height="18"
+                    aria-hidden="true"
+                  />
+                )}
+                <span>{link.label}</span>
+              </span>
+            </a>
+          ))}
+          {profile.email && (
+            <a href={`mailto:${profile.email}`}>
+              <span>Email</span>
+            </a>
+          )}
+          {profile.cvUrl && (
+            <a href={profile.cvUrl}>
+              <span>Curriculum vitae</span><span aria-hidden="true">↓</span>
+            </a>
+          )}
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,37 @@
+---
+interface Props {
+  type?: 'audio' | 'matrix' | 'pipeline' | 'sparse';
+  compact?: boolean;
+}
+
+const { type = 'matrix', compact = false } = Astro.props;
+const matrixCells = Array.from({ length: 48 });
+const audioBars = [28, 52, 74, 44, 82, 62, 35, 68, 48, 78, 56, 30, 64, 42, 70, 38];
+---
+
+<div class:list={['project-visual', `visual-${type}`, { compact }]} aria-hidden="true">
+  {type === 'audio' && (
+    <div class="audio-wave">
+      {audioBars.map((height, index) => (
+        <span style={`--bar-height: ${height}%; --bar-index: ${index}`}></span>
+      ))}
+    </div>
+  )}
+
+  {(type === 'matrix' || type === 'sparse') && (
+    <div class="matrix-grid">
+      {matrixCells.map((_, index) => <span style={`--cell-index: ${index}`}></span>)}
+    </div>
+  )}
+
+  {type === 'pipeline' && (
+    <div class="pipeline-visual">
+      {[1, 2, 3, 4].map((stage) => (
+        <>
+          <span class="pipeline-stage">S{stage}</span>
+          {stage < 4 && <span class="pipeline-line"></span>}
+        </>
+      ))}
+    </div>
+  )}
+</div>

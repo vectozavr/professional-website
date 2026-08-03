@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The requested page could not be found on Ivan Ilin's website."
+  noindex
+>
+  <section class="not-found shell">
+    <div>
+      <p class="not-found-code">ERROR 404</p>
+      <h1>This path is sparse.</h1>
+      <p>
+        The page may have moved, or the address may be incomplete. The homepage is
+        a good place to restart.
+      </p>
+      <a class="button" href="/">Return home <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</BaseLayout>

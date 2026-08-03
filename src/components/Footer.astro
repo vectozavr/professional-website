@@ -1,0 +1,26 @@
+---
+import { professionalLinks, profile } from '../data/profile';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div>
+      <a class="footer-name" href="/">{profile.name}</a>
+      <p>
+        Machine learning research on efficient optimization, model compression,
+        and practical open-source tools.
+      </p>
+    </div>
+
+    <nav class="footer-links" aria-label="Professional links">
+      {professionalLinks.map((link) => (
+        <a href={link.href} rel="me noreferrer" target="_blank">{link.label}</a>
+      ))}
+      <a href="/rss.xml">RSS</a>
+    </nav>
+
+    <p class="footer-copyright">© {year} {profile.name}</p>
+  </div>
+</footer>

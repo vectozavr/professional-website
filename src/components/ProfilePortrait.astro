@@ -1,0 +1,18 @@
+---
+import { profile } from '../data/profile';
+---
+
+<figure class="profile-portrait">
+  <div class="portrait-frame">
+    <img
+      src={profile.portraitUrl}
+      alt="Ivan Ilin seated beside a studio microphone"
+      width="960"
+      height="960"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+    />
+  </div>
+  <figcaption class="sr-only">Portrait of Ivan Ilin.</figcaption>
+</figure>

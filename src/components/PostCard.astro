@@ -1,0 +1,29 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate, readingTime, tagSlug } from '../utils/content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+---
+
+<article
+  class="post-card"
+  data-filter-item
+  data-search={`${post.data.title} ${post.data.description} ${post.data.tags.join(' ')}`.toLowerCase()}
+>
+  <div class="post-card-meta">
+    <time datetime={post.data.publishDate.toISOString()}>{formatDate(post.data.publishDate, 'short')}</time>
+    <span aria-hidden="true">·</span>
+    <span>{readingTime(post.body)} min read</span>
+  </div>
+  <h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3>
+  <p>{post.data.description}</p>
+  <div class="tag-row" aria-label="Tags">
+    {post.data.tags.map((tag) => (
+      <a class="tag" href={`/blog/tags/${tagSlug(tag)}/`}>{tag}</a>
+    ))}
+  </div>
+</article>

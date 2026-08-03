@@ -1,0 +1,413 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import ProfilePortrait from '../components/ProfilePortrait.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { metrics } from '../data/metrics';
+import {
+  professionalLinks,
+  profile,
+  researchProfileLinks,
+  socialMediaLinks,
+} from '../data/profile';
+import { researchAreas } from '../data/research';
+import { formatMetricDate } from '../utils/content';
+
+const projects = (await getCollection('projects')).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+const featuredProjects = projects.filter((project) => project.data.featured);
+const publications = (await getCollection('publications')).sort(
+  (a, b) => (b.data.year ?? 0) - (a.data.year ?? 0),
+);
+const featuredPublications = publications
+  .filter((publication) => publication.data.featured)
+  .slice(0, 3);
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
+);
+const latestPosts = posts.slice(0, 3);
+const githubMetricsUpdated = formatMetricDate(
+  metrics.github.account?.updatedAt ?? null,
+);
+const citationMetricsUpdated = formatMetricDate(
+  metrics.citations?.updatedAt ?? null,
+);
+const citationPanelLabel =
+  metrics.citations?.source === 'Google Scholar'
+    ? 'Google Scholar'
+    : 'Publication impact';
+const citationPanelMeta =
+  metrics.citations?.source === 'Google Scholar'
+    ? citationMetricsUpdated && `Updated ${citationMetricsUpdated}`
+    : citationMetricsUpdated && `Semantic Scholar · ${citationMetricsUpdated}`;
+const heroLinkGroups = [
+  { label: 'Research profiles', links: researchProfileLinks },
+  { label: 'Social media', links: socialMediaLinks },
+].filter((group) => group.links.length > 0);
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: profile.name,
+    jobTitle: profile.professionalTitle,
+    description: profile.shortBiography,
+    url: profile.siteUrl,
+    email: profile.email ? `mailto:${profile.email}` : undefined,
+    affiliation: {
+      '@type': 'CollegeOrUniversity',
+      name: 'King Abdullah University of Science and Technology',
+      alternateName: 'KAUST',
+    },
+    sameAs: professionalLinks.map((link) => link.href),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: `${profile.name} — ${profile.professionalTitle}`,
+    url: profile.siteUrl,
+    description:
+      'Research, publications, projects, and writing by Ivan Ilin.',
+    author: { '@type': 'Person', name: profile.name },
+  },
+];
+---
+
+<BaseLayout
+  title={profile.name}
+  description="Ivan Ilin is a machine learning researcher at KAUST working on efficient optimization, pruning, sparse fine-tuning, quantization, and pipeline parallelism."
+  structuredData={structuredData}
+>
+  <section class="hero shell">
+    <div class="hero-content">
+      <div class="hero-identity">
+        <p class="hero-intro">Hi, I’m</p>
+        <h1>{profile.name}</h1>
+        <p class="hero-role">
+          {profile.professionalTitle}<span aria-hidden="true">·</span>
+          {profile.academicStatus}
+        </p>
+        <p class="hero-description">
+          I work on efficient optimization and compression methods for large language
+          models, including pruning, sparse fine-tuning, quantization, and pipeline
+          parallelism.
+        </p>
+        {(profile.email || profile.cvUrl) && (
+          <div class="hero-contact-row">
+            {profile.email && (
+              <div class="hero-email">
+                <span class="hero-email-address">{profile.email}</span>
+                <button
+                  class="hero-email-copy"
+                  type="button"
+                  data-copy-email={profile.email}
+                  aria-label="Copy email address"
+                  aria-describedby="email-copy-status"
+                  title="Copy email address"
+                >
+                  <svg
+                    class="hero-email-copy-icon hero-email-copy-icon-copy"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                  </svg>
+                  <svg
+                    class="hero-email-copy-icon hero-email-copy-icon-check"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6 9 17l-5-5"></path>
+                  </svg>
+                </button>
+                <span class="sr-only" id="email-copy-status" data-email-copy-status aria-live="polite"></span>
+              </div>
+            )}
+            {profile.cvUrl && (
+              <a
+                class="hero-cv-button"
+                href={profile.cvUrl}
+                target="_blank"
+                rel="noreferrer"
+                title="Open CV PDF in a new tab"
+              >
+                <img class="hero-cv-icon" src="/icons/pdf.svg" alt="" width="14" height="16" aria-hidden="true" />
+                <span>View CV</span>
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div class="hero-profile-column">
+        <ProfilePortrait />
+
+        <div class="hero-facts" aria-label="Current position">
+          <div class="hero-fact hero-fact-combined">
+            <div class="hero-fact-item">
+              <span class="hero-fact-label">Status</span>
+              <strong>{profile.academicStatus}</strong>
+            </div>
+            <div class="hero-fact-item">
+              <span class="hero-fact-label">Affiliation</span>
+              <strong>KAUST · Computer Science</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-metric-panels" aria-label="Professional metrics">
+          {metrics.citations ? (
+            <section
+              class="hero-metric-panel"
+              aria-labelledby="research-impact-label"
+              title={
+                metrics.citations.source === 'Google Scholar'
+                  ? 'Current all-time totals from the verified Google Scholar profile'
+                  : 'Calculated from verified publication records in Semantic Scholar'
+              }
+            >
+              <div class="hero-metric-heading">
+                <span id="research-impact-label">{citationPanelLabel}</span>
+                {citationPanelMeta && <small>{citationPanelMeta}</small>}
+              </div>
+              <div class="hero-metric-values">
+                <div>
+                  <strong>{metrics.citations.citationCount}</strong>
+                  <span>Citations</span>
+                </div>
+                <div>
+                  <strong>{metrics.citations.hIndex}</strong>
+                  <span>h-index</span>
+                </div>
+                <div>
+                  <strong>{metrics.citations.i10Index}</strong>
+                  <span>i10-index</span>
+                </div>
+              </div>
+            </section>
+          ) : (
+            <section class="hero-metric-panel" aria-labelledby="research-output-label">
+              <div class="hero-metric-heading">
+                <span id="research-output-label">Research output</span>
+              </div>
+              <div class="hero-metric-values two-values">
+                <div>
+                  <strong>{publications.length}</strong>
+                  <span>Publications</span>
+                </div>
+                <div>
+                  <strong>{projects.length}</strong>
+                  <span>Projects</span>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {metrics.github.account && (
+            <section class="hero-metric-panel" aria-labelledby="github-output-label">
+              <div class="hero-metric-heading">
+                <span id="github-output-label">GitHub</span>
+                {githubMetricsUpdated && <small>Updated {githubMetricsUpdated}</small>}
+              </div>
+              <div class="hero-metric-values">
+                <div>
+                  <strong>{metrics.github.account.totalStars}</strong>
+                  <span>Stars</span>
+                </div>
+                <div>
+                  <strong>{metrics.github.account.followers}</strong>
+                  <span>Followers</span>
+                </div>
+                <div>
+                  <strong>{metrics.github.account.publicRepositories}</strong>
+                  <span>Repos</span>
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
+
+      <div class="hero-details">
+        <div class="profile-link-groups" aria-label="Professional profiles">
+          {heroLinkGroups.map((group) => (
+            <div class="profile-link-group">
+              <p class="profile-link-group-label">{group.label}</p>
+              <div class="hero-links">
+                {group.links.map((link) => (
+                  <a
+                    class="profile-link"
+                    href={link.href}
+                    target="_blank"
+                    rel="me noreferrer"
+                  >
+                    <span class="profile-link-label">
+                      {link.icon && (
+                        <img
+                          class="profile-link-icon"
+                          src={link.icon}
+                          alt=""
+                          width="18"
+                          height="18"
+                          aria-hidden="true"
+                        />
+                      )}
+                      <span>{link.label}</span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="hero-actions">
+          <a class="button" href="/research/">View research <span aria-hidden="true">→</span></a>
+          <a class="button secondary" href="/projects/">Explore projects</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="content-section research-areas-section"
+    aria-labelledby="research-areas-heading"
+  >
+    <div class="shell">
+      <SectionHeading
+        id="research-areas-heading"
+        eyebrow="Research areas"
+        title="Making large models more efficient"
+        description="Four connected directions across model compression, adaptation, and distributed training."
+        href="/research/"
+        linkLabel="Research overview"
+      />
+      <div class="research-grid">
+        {researchAreas.map((area) => (
+          <a class="research-card" href={area.href}>
+            <span class="research-number">{area.number}</span>
+            <h3>{area.title}</h3>
+            <p>{area.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section subtle" aria-labelledby="featured-projects-heading">
+    <div class="shell">
+      <SectionHeading
+        id="featured-projects-heading"
+        eyebrow="Selected work"
+        title="Featured projects"
+        description="Research implementations and open-source tools built around practical constraints."
+        href="/projects/"
+        linkLabel="All projects"
+      />
+      <div class="project-grid">
+        {featuredProjects.map((project) => <ProjectCard project={project} showTopics={false} />)}
+      </div>
+    </div>
+  </section>
+
+  {featuredPublications.length > 0 && (
+    <section class="content-section" aria-labelledby="selected-publications-heading">
+      <div class="shell">
+        <SectionHeading
+          id="selected-publications-heading"
+          eyebrow="Publications"
+          title="Selected publications"
+          description="Peer-reviewed papers and recent preprints in optimization and efficient machine learning."
+          href="/publications/"
+          linkLabel="Publication list"
+        />
+        <div class="publication-list">
+          {featuredPublications.map((publication) => (
+            <PublicationItem publication={publication} compact />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {latestPosts.length > 0 && (
+    <section class="content-section subtle" aria-labelledby="latest-writing-heading">
+      <div class="shell">
+        <SectionHeading
+          id="latest-writing-heading"
+          eyebrow="Writing"
+          title="Latest notes"
+          description="Project updates and technical writing from ongoing work."
+          href="/blog/"
+          linkLabel="Visit the blog"
+        />
+        <div class="post-grid">
+          {latestPosts.map((post) => <PostCard post={post} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+</BaseLayout>
+
+<script>
+  const copyEmailButton = document.querySelector<HTMLButtonElement>('[data-copy-email]');
+  const copyEmailStatus = document.querySelector<HTMLElement>('[data-email-copy-status]');
+
+  copyEmailButton?.addEventListener('click', async () => {
+    const email = copyEmailButton.dataset.copyEmail;
+    if (!email) return;
+
+    let copied = false;
+
+    try {
+      await navigator.clipboard.writeText(email);
+      copied = true;
+    } catch {
+      const field = document.createElement('textarea');
+      field.value = email;
+      field.setAttribute('readonly', '');
+      field.style.position = 'fixed';
+      field.style.inset = '0 auto auto -9999px';
+      document.body.append(field);
+      field.select();
+      const legacyCopy = (
+        document as unknown as { execCommand(command: string): boolean }
+      ).execCommand.bind(document);
+      copied = legacyCopy('copy');
+      field.remove();
+    }
+
+    copyEmailButton.classList.toggle('is-copied', copied);
+    copyEmailButton.setAttribute(
+      'aria-label',
+      copied ? 'Email address copied' : 'Could not copy email address',
+    );
+    if (copyEmailStatus) {
+      copyEmailStatus.textContent = copied
+        ? 'Email address copied to clipboard.'
+        : 'Could not copy the email address.';
+    }
+
+    window.setTimeout(() => {
+      copyEmailButton.classList.remove('is-copied');
+      copyEmailButton.setAttribute('aria-label', 'Copy email address');
+    }, 1800);
+  });
+</script>

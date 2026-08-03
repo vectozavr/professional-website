@@ -1,0 +1,31 @@
+{
+  "name": "ivan-ilin-website",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "metrics": "tsx scripts/fetch-metrics.ts",
+    "sync-domain": "tsx scripts/sync-domain.ts",
+    "build:site": "npm run sync-domain && astro build",
+    "build": "npm run metrics && npm run build:site",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "7.0.5",
+    "@astrojs/markdown-remark": "7.2.2",
+    "@astrojs/rss": "4.0.19",
+    "@astrojs/sitemap": "3.7.3",
+    "astro": "7.1.6",
+    "katex": "0.18.1",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "tsx": "4.23.5",
+    "typescript": "5.9.3"
+  }
+}
