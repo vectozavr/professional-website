@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { formatDate, readingTime, tagSlug } from '../utils/content';
+import { sitePath } from '../utils/urls';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -19,11 +20,11 @@ const { post } = Astro.props;
     <span aria-hidden="true">·</span>
     <span>{readingTime(post.body)} min read</span>
   </div>
-  <h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3>
+  <h3><a href={sitePath(`/blog/${post.id}/`)}>{post.data.title}</a></h3>
   <p>{post.data.description}</p>
   <div class="tag-row" aria-label="Tags">
     {post.data.tags.map((tag) => (
-      <a class="tag" href={`/blog/tags/${tagSlug(tag)}/`}>{tag}</a>
+      <a class="tag" href={sitePath(`/blog/tags/${tagSlug(tag)}/`)}>{tag}</a>
     ))}
   </div>
 </article>

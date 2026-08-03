@@ -1,5 +1,6 @@
 ---
 import { professionalLinks, profile } from '../data/profile';
+import { sitePath } from '../utils/urls';
 
 const year = new Date().getFullYear();
 ---
@@ -7,7 +8,7 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="shell footer-grid">
     <div>
-      <a class="footer-name" href="/">{profile.name}</a>
+      <a class="footer-name" href={sitePath('/')}>{profile.name}</a>
       <p>
         Machine learning research on efficient optimization, model compression,
         and practical open-source tools.
@@ -18,7 +19,7 @@ const year = new Date().getFullYear();
       {professionalLinks.map((link) => (
         <a href={link.href} rel="me noreferrer" target="_blank">{link.label}</a>
       ))}
-      <a href="/rss.xml">RSS</a>
+      <a href={sitePath('/rss.xml')}>RSS</a>
     </nav>
 
     <p class="footer-copyright">© {year} {profile.name}</p>

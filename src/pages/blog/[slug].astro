@@ -3,6 +3,7 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { profile } from '../../data/profile';
 import { formatDate, readingTime, tagSlug } from '../../utils/content';
+import { absoluteSiteUrl, sitePath } from '../../utils/urls';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) =>
@@ -29,7 +30,7 @@ interface Props {
 
 const { post, olderPost, newerPost } = Astro.props;
 const { Content } = await render(post);
-const canonical = new URL(`/blog/${post.id}/`, profile.siteUrl).toString();
+const canonical = absoluteSiteUrl(`/blog/${post.id}/`);
 const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -57,7 +58,7 @@ const structuredData = {
   <article>
     <header class="article-header">
       <div class="narrow-shell">
-        <a class="back-link" href="/blog/">← Back to blog</a>
+        <a class="back-link" href={sitePath('/blog/')}>← Back to blog</a>
         {post.data.draft && <p class="eyebrow">Draft preview</p>}
         <h1>{post.data.title}</h1>
         <p class="article-description">{post.data.description}</p>
@@ -74,7 +75,7 @@ const structuredData = {
         </div>
         <div class="tag-row" aria-label="Tags" style="margin-top: 1rem;">
           {post.data.tags.map((tag) => (
-            <a class="tag" href={`/blog/tags/${tagSlug(tag)}/`}>{tag}</a>
+            <a class="tag" href={sitePath(`/blog/tags/${tagSlug(tag)}/`)}>{tag}</a>
           ))}
         </div>
       </div>
@@ -88,12 +89,12 @@ const structuredData = {
       {(olderPost || newerPost) && (
         <nav class="article-footer-nav" aria-label="Adjacent posts">
           {olderPost ? (
-            <a href={`/blog/${olderPost.id}/`}>
+            <a href={sitePath(`/blog/${olderPost.id}/`)}>
               <span>Older post</span><strong>{olderPost.data.title}</strong>
             </a>
           ) : <span></span>}
           {newerPost && (
-            <a href={`/blog/${newerPost.id}/`}>
+            <a href={sitePath(`/blog/${newerPost.id}/`)}>
               <span>Newer post</span><strong>{newerPost.data.title}</strong>
             </a>
           )}

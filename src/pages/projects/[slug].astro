@@ -5,6 +5,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectVisual from '../../components/ProjectVisual.astro';
 import PublicationItem from '../../components/PublicationItem.astro';
 import { getRepositoryMetric } from '../../data/metrics';
+import { absoluteSiteUrl, sitePath } from '../../utils/urls';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -38,7 +39,7 @@ const structuredData = {
   '@type': isSoftware ? 'SoftwareSourceCode' : 'CreativeWork',
   name: project.data.title,
   description: project.data.shortSummary,
-  url: new URL(`/projects/${project.id}/`, Astro.site),
+  url: absoluteSiteUrl(`/projects/${project.id}/`),
   author: { '@type': 'Person', name: 'Ivan Ilin' },
   dateCreated: project.data.year?.toString(),
   codeRepository: project.data.githubUrl || undefined,
@@ -53,7 +54,7 @@ const structuredData = {
 >
   <header class="detail-hero shell">
     <div>
-      <a class="back-link" href="/projects/">← All projects</a>
+      <a class="back-link" href={sitePath('/projects/')}>← All projects</a>
       <p class="eyebrow">{project.data.category}</p>
       <h1>{project.data.title}</h1>
       <p class="detail-summary">{project.data.shortSummary}</p>

@@ -1,4 +1,6 @@
 ---
+import { sitePath } from '../utils/urls';
+
 interface Props {
   id?: string;
   eyebrow?: string;
@@ -18,7 +20,7 @@ const { id, eyebrow, title, description, href, linkLabel } = Astro.props;
     {description && <p class="section-description">{description}</p>}
   </div>
   {href && linkLabel && (
-    <a class="text-link section-link" href={href}>
+    <a class="text-link section-link" href={sitePath(href)}>
       {linkLabel}<span aria-hidden="true"> ↗</span>
     </a>
   )}

@@ -97,7 +97,7 @@ Collection schemas live in [`src/content.config.ts`](src/content.config.ts). Opt
 
 Edit [`src/data/profile.ts`](src/data/profile.ts) to change the name, role, biography, portrait, site URL, GitHub username, email, professional profiles, CV, or metric sources. Empty optional strings are intentionally hidden. The homepage portrait is stored at `public/images/ivan-ilin.webp` and referenced by `profile.portraitUrl`.
 
-`profile.siteUrl` is the canonical domain source. `npm run build` runs `scripts/sync-domain.ts`, which derives `public/CNAME` and the sitemap URL in `public/robots.txt` from that value. Do not add an Astro `base` path while the site uses a custom root domain.
+`profile.siteUrl` is the canonical deployment URL. Astro derives the required base path from it, so both a GitHub Pages project URL and a later custom root domain work from the same configuration. `npm run build` runs `scripts/sync-domain.ts`, which updates the sitemap URL in `public/robots.txt`, creates `public/CNAME` for a custom root domain, and removes `CNAME` for a standard `github.io` project URL.
 
 Set `siteUrl` to the deployed origin before publishing. Fill optional profile fields only when their values have been verified; leaving them empty removes the corresponding interface elements.
 

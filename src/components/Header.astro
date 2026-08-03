@@ -1,5 +1,6 @@
 ---
 import { profile } from '../data/profile';
+import { sitePath } from '../utils/urls';
 
 const pathname = Astro.url.pathname;
 const links = [
@@ -12,15 +13,17 @@ const links = [
 
 if (profile.cvUrl) links.push({ label: 'CV', href: profile.cvUrl });
 
-const isActive = (href: string) =>
-  href === '/' ? pathname === '/' : pathname.startsWith(href);
+const isActive = (href: string) => {
+  const resolvedHref = sitePath(href);
+  return href === '/' ? pathname === resolvedHref : pathname.startsWith(resolvedHref);
+};
 ---
 
 <header class="site-header" data-site-header>
   <div class="header-inner shell">
-    <a class="wordmark" href="/" aria-label={`${profile.name}, home`}>
+    <a class="wordmark" href={sitePath('/')} aria-label={`${profile.name}, home`}>
       <span class="wordmark-mark" aria-hidden="true">
-        <img src="/favicon.svg" alt="" width="33" height="33" />
+        <img src={sitePath('/favicon.svg')} alt="" width="33" height="33" />
       </span>
       <span class="wordmark-name">{profile.name}</span>
     </a>
@@ -29,7 +32,7 @@ const isActive = (href: string) =>
       <nav class="primary-nav" id="primary-navigation" aria-label="Primary" data-navigation>
         {links.map((link) => (
           <a
-            href={link.href}
+            href={sitePath(link.href)}
             class:list={[{ active: isActive(link.href) }]}
             aria-current={isActive(link.href) ? 'page' : undefined}
           >

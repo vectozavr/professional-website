@@ -15,6 +15,7 @@ import {
 } from '../data/profile';
 import { researchAreas } from '../data/research';
 import { formatMetricDate } from '../utils/content';
+import { sitePath } from '../utils/urls';
 
 const projects = (await getCollection('projects')).sort((a, b) =>
   a.data.title.localeCompare(b.data.title),
@@ -141,12 +142,12 @@ const structuredData = [
             {profile.cvUrl && (
               <a
                 class="hero-cv-button"
-                href={profile.cvUrl}
+                href={sitePath(profile.cvUrl)}
                 target="_blank"
                 rel="noreferrer"
                 title="Open CV PDF in a new tab"
               >
-                <img class="hero-cv-icon" src="/icons/pdf.svg" alt="" width="14" height="16" aria-hidden="true" />
+                <img class="hero-cv-icon" src={sitePath('/icons/pdf.svg')} alt="" width="14" height="16" aria-hidden="true" />
                 <span>View CV</span>
               </a>
             )}
@@ -260,7 +261,7 @@ const structuredData = [
                       {link.icon && (
                         <img
                           class="profile-link-icon"
-                          src={link.icon}
+                          src={sitePath(link.icon)}
                           alt=""
                           width="18"
                           height="18"
@@ -277,8 +278,8 @@ const structuredData = [
         </div>
 
         <div class="hero-actions">
-          <a class="button" href="/research/">View research <span aria-hidden="true">→</span></a>
-          <a class="button secondary" href="/projects/">Explore projects</a>
+          <a class="button" href={sitePath('/research/')}>View research <span aria-hidden="true">→</span></a>
+          <a class="button secondary" href={sitePath('/projects/')}>Explore projects</a>
         </div>
 
       </div>
@@ -300,7 +301,7 @@ const structuredData = [
       />
       <div class="research-grid">
         {researchAreas.map((area) => (
-          <a class="research-card" href={area.href}>
+          <a class="research-card" href={sitePath(area.href)}>
             <span class="research-number">{area.number}</span>
             <h3>{area.title}</h3>
             <p>{area.description}</p>

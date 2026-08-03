@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import ProjectVisual from './ProjectVisual.astro';
+import { sitePath } from '../utils/urls';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -21,7 +22,7 @@ const mediaClass = [
   data-category={project.data.category.toLowerCase()}
   data-search={`${project.data.title} ${project.data.shortSummary} ${project.data.topics.join(' ')}`.toLowerCase()}
 >
-  <a class="project-card-visual" href={`/projects/${project.id}/`} tabindex="-1" aria-hidden="true">
+  <a class="project-card-visual" href={sitePath(`/projects/${project.id}/`)} tabindex="-1" aria-hidden="true">
     {project.data.image ? (
       <Image
         class={mediaClass}
@@ -36,7 +37,7 @@ const mediaClass = [
     )}
   </a>
   <div class="project-card-body">
-    <h3><a href={`/projects/${project.id}/`}>{project.data.title}</a></h3>
+    <h3><a href={sitePath(`/projects/${project.id}/`)}>{project.data.title}</a></h3>
     <p>{project.data.shortSummary}</p>
     {showTopics && project.data.topics.length > 0 && (
       <div class="project-card-footer">

@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
 import { tagSlug } from '../../../utils/content';
+import { sitePath } from '../../../utils/urls';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -27,7 +28,7 @@ const { tag, posts } = Astro.props;
 >
   <header class="page-hero shell">
     <div class="page-hero-content">
-      <a class="back-link" href="/blog/">← All posts</a>
+      <a class="back-link" href={sitePath('/blog/')}>← All posts</a>
       <p class="eyebrow">Blog tag</p>
       <h1>{tag}</h1>
       <p class="page-intro">{posts.length} post{posts.length === 1 ? '' : 's'} in this topic.</p>

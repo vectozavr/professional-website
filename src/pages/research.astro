@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { sitePath } from '../utils/urls';
 ---
 
 <BaseLayout
@@ -55,7 +56,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             block-wise methods that use second-order information for this decision.
           </p>
           <div class="related-links">
-            <a class="related-link" href="/projects/thanos/">
+            <a class="related-link" href={sitePath('/projects/thanos/')}>
               <span>Project</span><strong>Thanos</strong>
             </a>
             <a class="related-link" href="https://arxiv.org/abs/2504.05346">
@@ -74,7 +75,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             to adapt a model.
           </p>
           <div class="related-links">
-            <a class="related-link" href="/projects/sparse-fine-tuning/">
+            <a class="related-link" href={sitePath('/projects/sparse-fine-tuning/')}>
               <span>Project</span><strong>Sparse Fine-Tuning</strong>
             </a>
             <a class="related-link" href="https://arxiv.org/abs/2607.09287">
@@ -114,7 +115,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             allow convergence to be analyzed.
           </p>
           <div class="related-links">
-            <a class="related-link" href="/projects/pipeline-parallelism-theory/">
+            <a class="related-link" href={sitePath('/projects/pipeline-parallelism-theory/')}>
               <span>Project</span><strong>Pipeline Parallelism Theory</strong>
             </a>
             <a class="related-link" href="https://arxiv.org/abs/2606.03498">

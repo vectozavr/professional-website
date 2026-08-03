@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { sitePath } from '../utils/urls';
 
 interface Props {
   publication: CollectionEntry<'publications'>;
@@ -45,7 +46,7 @@ const links = [
     {!compact && data.summary && <p>{data.summary}</p>}
     <div class="publication-actions">
       {links.map((link) => (
-        <a class="text-link" href={link.href} target={link.href.startsWith('http') ? '_blank' : undefined} rel={link.href.startsWith('http') ? 'noreferrer' : undefined}>
+        <a class="text-link" href={sitePath(link.href)} target={link.href.startsWith('http') ? '_blank' : undefined} rel={link.href.startsWith('http') ? 'noreferrer' : undefined}>
           {link.label}<span aria-hidden="true"> ↗</span>
         </a>
       ))}

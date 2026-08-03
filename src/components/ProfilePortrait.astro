@@ -1,11 +1,12 @@
 ---
 import { profile } from '../data/profile';
+import { sitePath } from '../utils/urls';
 ---
 
 <figure class="profile-portrait">
   <div class="portrait-frame">
     <img
-      src={profile.portraitUrl}
+      src={sitePath(profile.portraitUrl)}
       alt="Ivan Ilin seated beside a studio microphone"
       width="960"
       height="960"

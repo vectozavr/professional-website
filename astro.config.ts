@@ -7,8 +7,12 @@ import remarkMath from 'remark-math';
 
 import { profile } from './src/data/profile';
 
+const siteUrl = new URL(profile.siteUrl);
+const base = siteUrl.pathname.replace(/\/$/, '') || '/';
+
 export default defineConfig({
-  site: profile.siteUrl,
+  site: siteUrl.origin,
+  base,
   output: 'static',
   integrations: [mdx(), sitemap()],
   markdown: {

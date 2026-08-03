@@ -1,4 +1,4 @@
-import { writeFile } from 'node:fs/promises';
+import { rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,22 +9,32 @@ const siteUrl = new URL(profile.siteUrl);
 
 if (
   siteUrl.protocol !== 'https:' ||
-  siteUrl.pathname !== '/' ||
   siteUrl.search ||
   siteUrl.hash
 ) {
   throw new Error(
-    'profile.siteUrl must be an HTTPS origin without a path, query, or fragment.',
+    'profile.siteUrl must be an HTTPS URL without a query or fragment.',
   );
 }
 
-await Promise.all([
-  writeFile(path.join(root, 'public/CNAME'), `${siteUrl.hostname}\n`, 'utf8'),
-  writeFile(
-    path.join(root, 'public/robots.txt'),
-    `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl.origin}/sitemap-index.xml\n`,
-    'utf8',
-  ),
-]);
+const cnamePath = path.join(root, 'public/CNAME');
+const usesCustomRootDomain =
+  siteUrl.pathname === '/' && !siteUrl.hostname.endsWith('.github.io');
 
-console.log(`[domain] Synced GitHub Pages files for ${siteUrl.hostname}.`);
+await writeFile(
+  path.join(root, 'public/robots.txt'),
+  `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap-index.xml', siteUrl)}\n`,
+  'utf8',
+);
+
+if (usesCustomRootDomain) {
+  await writeFile(cnamePath, `${siteUrl.hostname}\n`, 'utf8');
+} else {
+  await rm(cnamePath, { force: true });
+}
+
+console.log(
+  `[domain] Synced Pages files for ${siteUrl.href}${
+    usesCustomRootDomain ? ' with a custom-domain CNAME.' : ' without a CNAME.'
+  }`,
+);
