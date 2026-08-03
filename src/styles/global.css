@@ -372,6 +372,7 @@
     display: grid;
     width: 100%;
     min-width: 0;
+    padding-top: clamp(2.5rem, 6vh, 4.5rem);
     grid-template-areas:
       'profile identity'
       'profile details';
@@ -1744,6 +1745,7 @@
   }
 
   .hero-content {
+    padding-top: clamp(1.75rem, 5vw, 3rem);
     grid-template-areas:
       'identity'
       'profile'
