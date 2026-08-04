@@ -2,72 +2,65 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
+import { researchProfileLinks, socialMediaLinks } from '../../data/profile';
+import { sitePath } from '../../utils/urls';
 
 const projects = (await getCollection('projects')).sort(
   (a, b) =>
     Number(b.data.featured) - Number(a.data.featured) ||
     a.data.title.localeCompare(b.data.title),
 );
-const categories = [...new Set(projects.map((project) => project.data.category))].sort();
+const projectProfileLinks = [
+  ...researchProfileLinks,
+  ...socialMediaLinks.filter((link) => link.label === 'YouTube'),
+];
 ---
 
 <BaseLayout
   title="Projects"
   description="Research, open-source software, engineering, hardware, and educational projects by Ivan Ilin."
 >
-  <header class="page-hero shell">
+  <header class="page-hero projects-hero shell">
     <div class="page-hero-content">
       <p class="eyebrow">Projects</p>
       <h1>Research made concrete</h1>
       <p class="page-intro">
         Research implementations, open-source tools, engineering builds, and
         educational projects. Each page preserves public code, articles, videos, and
-        project links when they are available.
+        project links.
       </p>
+      <nav class="page-profile-links" aria-label="Project and research profiles">
+        {projectProfileLinks.map((link) => (
+          <a
+            class="profile-link"
+            href={link.href}
+            target="_blank"
+            rel="me noreferrer"
+          >
+            <span class="profile-link-label">
+              {link.icon && (
+                <img
+                  class="profile-link-icon"
+                  src={sitePath(link.icon)}
+                  alt=""
+                  width="18"
+                  height="18"
+                  aria-hidden="true"
+                />
+              )}
+              <span>{link.label}</span>
+            </span>
+          </a>
+        ))}
+      </nav>
     </div>
   </header>
 
-  <section class="content-section">
+  <section class="content-section projects-index">
     <div class="shell">
-      <div class="filter-panel" data-project-filters>
-        <div class="filter-group" aria-label="Filter projects by category">
-          <button class="filter-button" type="button" aria-pressed="true" data-category-filter="all">All projects</button>
-          {categories.map((category) => (
-            <button class="filter-button" type="button" aria-pressed="false" data-category-filter={category.toLowerCase()}>{category}</button>
-          ))}
-        </div>
-      </div>
-
-      <p class="sr-only" aria-live="polite" data-result-count></p>
       <div class="project-grid">
         {projects.map((project) => <ProjectCard project={project} />)}
       </div>
-      <p class="empty-state" data-empty-state>No projects match this category.</p>
     </div>
   </section>
 </BaseLayout>
-
-<script>
-  const filters = document.querySelector<HTMLElement>('[data-project-filters]');
-  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-filter-item]'));
-  const empty = document.querySelector<HTMLElement>('[data-empty-state]');
-  const resultCount = document.querySelector<HTMLElement>('[data-result-count]');
-
-  filters?.querySelectorAll<HTMLButtonElement>('[data-category-filter]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const category = button.dataset.categoryFilter ?? 'all';
-      let visible = 0;
-      filters.querySelectorAll<HTMLButtonElement>('[data-category-filter]').forEach((candidate) => {
-        candidate.setAttribute('aria-pressed', String(candidate === button));
-      });
-      items.forEach((item) => {
-        item.hidden = category !== 'all' && item.dataset.category !== category;
-        if (!item.hidden) visible += 1;
-      });
-      empty?.classList.toggle('visible', visible === 0);
-      if (resultCount) resultCount.textContent = `${visible} project${visible === 1 ? '' : 's'} shown`;
-    });
-  });
-
-  if (resultCount) resultCount.textContent = `${items.length} projects shown`;
-</script>

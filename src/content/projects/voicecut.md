@@ -1,6 +1,6 @@
 ---
-title: VoiceCut
-shortSummary: An open-source, local-first tool for automatically editing recorded speech.
+title: "VoiceCut — Ultimate Tool for Content Creators"
+shortSummary: An open-source, local-first editor that removes failed takes, repeated phrases, false starts, and unwanted breaths from recorded audio and video.
 status: Active
 category: Open Source / Audio Processing
 topics:
@@ -17,7 +17,7 @@ metricsRepository: vectozavr/voicecut
 relatedPublications: []
 ---
 
-VoiceCut helps remove failed takes, repeated phrases, false starts, and unwanted breaths from recorded audio and video. Its goal is to preserve natural speech while reducing the repetitive manual work involved in selecting good takes and cleaning narration.
+VoiceCut is built for content creators who want to spend less time cleaning narration. It helps remove failed takes, repeated phrases, false starts, and unwanted breaths from recorded audio and video while preserving natural speech from the original recording.
 
 The project is open source and local-first. Source media, transcription, alignment, boundary resolution, and rendering stay on the local machine. Its recommended planning workflow can send transcript text and identifiers—not audio or video—to a configured cloud model, while experimental local planners are also available. VoiceCut does not synthesize replacement speech; it edits selected occurrences from the original recording.
 

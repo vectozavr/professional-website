@@ -20,7 +20,7 @@ const { post } = Astro.props;
     <span aria-hidden="true">·</span>
     <span>{readingTime(post.body)} min read</span>
   </div>
-  <h3><a href={sitePath(`/blog/${post.id}/`)}>{post.data.title}</a></h3>
+  <h3><a class="post-card-link" href={sitePath(`/blog/${post.id}/`)}>{post.data.title}</a></h3>
   <p>{post.data.description}</p>
   <div class="tag-row" aria-label="Tags">
     {post.data.tags.map((tag) => (

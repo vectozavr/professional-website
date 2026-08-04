@@ -1,6 +1,6 @@
 ---
-title: Pipeline Parallelism Theory
-shortSummary: A theoretical study of convergence and delayed updates in randomized PipeDream-style pipeline parallelism.
+title: First Theory for PipeDream
+shortSummary: To our knowledge, we provide the first clean nonconvex convergence guarantee for a PipeDream-style method through Randomized PipeDream.
 year: 2026
 status: Preprint
 category: Research / Distributed Optimization
@@ -19,6 +19,6 @@ relatedPublications:
   - demystifying-pipeline-parallelism
 ---
 
-This project develops a theoretical view of convergence and delayed updates in randomized PipeDream-style pipeline parallelism. It studies how pipeline stages, stale information, and optimization dynamics interact when model updates are distributed across a pipeline.
+This project introduces **Randomized PipeDream (RPD)**, a stale block-SGD abstraction that captures the structured, stage-dependent delays of PipeDream. To our knowledge, it provides the first clean nonconvex convergence guarantee for a PipeDream-style method.
 
-The related preprint, **“Demystifying Pipeline Parallelism: First Theory for PipeDream,”** is accompanied by a public research codebase with synthetic objectives and reproducible experiments.
+The analysis also quantifies how staleness grows with the number of pipeline stages and compares PipeDream with LocalSGD through reproducible simulated-time experiments. The related preprint, **“Demystifying Pipeline Parallelism: First Theory for PipeDream,”** is accompanied by a public research codebase.

@@ -97,6 +97,10 @@ const structuredData = [
           models, including pruning, sparse fine-tuning, quantization, and pipeline
           parallelism.
         </p>
+        <p class="hero-availability">
+          <span class="hero-availability-dot" aria-hidden="true"></span>
+          Open to machine learning research internships
+        </p>
         {(profile.email || profile.cvUrl) && (
           <div class="hero-contact-row">
             {profile.email && (
@@ -295,14 +299,13 @@ const structuredData = [
         id="research-areas-heading"
         eyebrow="Research areas"
         title="Making large models more efficient"
-        description="Four connected directions across model compression, adaptation, and distributed training."
+        description="My research focuses on making large models more efficient through compression, adaptation, and distributed training."
         href="/research/"
         linkLabel="Research overview"
       />
       <div class="research-grid">
         {researchAreas.map((area) => (
           <a class="research-card" href={sitePath(area.href)}>
-            <span class="research-number">{area.number}</span>
             <h3>{area.title}</h3>
             <p>{area.description}</p>
           </a>
@@ -317,7 +320,7 @@ const structuredData = [
         id="featured-projects-heading"
         eyebrow="Selected work"
         title="Featured projects"
-        description="Research implementations and open-source tools built around practical constraints."
+        description="Here are some of my favorite projects, from research implementations to open-source tools."
         href="/projects/"
         linkLabel="All projects"
       />
@@ -335,13 +338,16 @@ const structuredData = [
           eyebrow="Publications"
           title="Selected publications"
           description="Peer-reviewed papers and recent preprints in optimization and efficient machine learning."
-          href="/publications/"
-          linkLabel="Publication list"
         />
         <div class="publication-list">
           {featuredPublications.map((publication) => (
             <PublicationItem publication={publication} compact />
           ))}
+        </div>
+        <div class="publication-list-footer">
+          <a class="button secondary" href={sitePath('/publications/')}>
+            See all publications<span aria-hidden="true">→</span>
+          </a>
         </div>
       </div>
     </section>
@@ -353,7 +359,7 @@ const structuredData = [
         <SectionHeading
           id="latest-writing-heading"
           eyebrow="Writing"
-          title="Latest notes"
+          title="Personal blog"
           description="Project updates and technical writing from ongoing work."
           href="/blog/"
           linkLabel="Visit the blog"

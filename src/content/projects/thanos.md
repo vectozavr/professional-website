@@ -1,6 +1,6 @@
 ---
-title: Thanos
-shortSummary: A method for pruning large language models using second-order information and coordinated weight compensation.
+title: Pruning LLMs with Thanos
+shortSummary: A block-wise algorithm for pruning large language models using second-order information and coordinated weight compensation.
 year: 2025
 status: Preprint
 category: Research / LLM Pruning

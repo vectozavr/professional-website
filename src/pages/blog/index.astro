@@ -13,19 +13,9 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
   title="Blog"
   description="Notes on machine learning research, efficient models, open-source projects, and engineering by Ivan Ilin."
 >
-  <header class="page-hero shell">
-    <div class="page-hero-content">
-      <p class="eyebrow">Blog</p>
-      <h1>Notes from the workbench</h1>
-      <p class="page-intro">
-        Short project updates and technical notes about efficient machine learning,
-        research implementation, and open-source engineering.
-      </p>
-    </div>
-  </header>
-
-  <section class="content-section">
+  <section class="content-section blog-index">
     <div class="shell">
+      <h1 class="sr-only">Personal blog</h1>
       <div class="filter-panel" data-blog-filters>
         <div class="filter-group" aria-label="Filter posts by tag">
           <button class="filter-button" type="button" aria-pressed="true" data-tag-filter="all">All posts</button>

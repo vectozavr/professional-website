@@ -2,14 +2,14 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PublicationItem from '../components/PublicationItem.astro';
+import { researchProfileLinks } from '../data/profile';
+import { sitePath } from '../utils/urls';
 
 const publications = (await getCollection('publications')).sort(
   (a, b) =>
     (b.data.year ?? 0) - (a.data.year ?? 0) ||
     a.data.title.localeCompare(b.data.title),
 );
-const types = [...new Set(publications.map((item) => item.data.publicationType))].sort();
-const topics = [...new Set(publications.flatMap((item) => item.data.tags))].sort();
 
 const structuredData = publications.map((publication) => ({
   '@context': 'https://schema.org',
@@ -31,82 +31,44 @@ const structuredData = publications.map((publication) => ({
   description="Verified publications and preprints by Ivan Ilin on efficient machine learning, optimization, compression, and distributed training."
   structuredData={structuredData}
 >
-  <header class="page-hero shell">
-    <div class="page-hero-content">
-      <p class="eyebrow">Publications</p>
-      <h1>Papers and preprints</h1>
-      <p class="page-intro">
-        Verified research output spanning model compression, distributed
-        optimization, quantization, and sparse adaptation. Entries are shown newest
-        first; links appear only when a source is available.
-      </p>
-    </div>
-  </header>
-
-  <section class="content-section">
+  <section class="content-section publications-index">
     <div class="shell">
-      <div class="filter-panel" data-filter-root>
-        <div>
-          <p class="sr-only" id="type-filter-label">Filter by publication type</p>
-          <div class="filter-group" aria-labelledby="type-filter-label">
-            <button class="filter-button" type="button" aria-pressed="true" data-filter-kind="type" data-filter-value="all">All types</button>
-            {types.map((type) => (
-              <button class="filter-button" type="button" aria-pressed="false" data-filter-kind="type" data-filter-value={type.toLowerCase()}>{type}</button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <p class="sr-only" id="topic-filter-label">Filter by topic</p>
-          <div class="filter-group" aria-labelledby="topic-filter-label">
-            <button class="filter-button" type="button" aria-pressed="true" data-filter-kind="topic" data-filter-value="all">All topics</button>
-            {topics.map((topic) => (
-              <button class="filter-button" type="button" aria-pressed="false" data-filter-kind="topic" data-filter-value={topic.toLowerCase()}>{topic}</button>
-            ))}
-          </div>
-        </div>
+      <header class="publications-intro">
+        <h1>Publications</h1>
+        <p>My complete publication list, newest first.</p>
+      </header>
+      <nav class="publication-profile-links" aria-label="Research profiles">
+        {researchProfileLinks.map((link) => (
+          <a
+            class="profile-link"
+            href={link.href}
+            target="_blank"
+            rel="me noreferrer"
+          >
+            <span class="profile-link-label">
+              {link.icon && (
+                <img
+                  class="profile-link-icon"
+                  src={sitePath(link.icon)}
+                  alt=""
+                  width="18"
+                  height="18"
+                  aria-hidden="true"
+                />
+              )}
+              <span>{link.label}</span>
+            </span>
+          </a>
+        ))}
+      </nav>
+      <div class="publication-list">
+        {publications.map((publication) => <PublicationItem publication={publication} compact />)}
       </div>
-
-      <p class="sr-only" aria-live="polite" data-result-count></p>
-      <div class="publication-list" data-filter-list>
-        {publications.map((publication) => <PublicationItem publication={publication} />)}
-      </div>
-      <p class="empty-state" data-empty-state>No publications match both filters.</p>
     </div>
   </section>
 </BaseLayout>
 
 <script>
-  const root = document.querySelector<HTMLElement>('[data-filter-root]');
-  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-filter-item]'));
-  const empty = document.querySelector<HTMLElement>('[data-empty-state]');
-  const resultCount = document.querySelector<HTMLElement>('[data-result-count]');
-  const active = { type: 'all', topic: 'all' };
-
-  const applyFilters = () => {
-    let visible = 0;
-    items.forEach((item) => {
-      const matchesType = active.type === 'all' || item.dataset.type === active.type;
-      const matchesTopic =
-        active.topic === 'all' || item.dataset.topics?.includes(active.topic);
-      item.hidden = !(matchesType && matchesTopic);
-      if (!item.hidden) visible += 1;
-    });
-    empty?.classList.toggle('visible', visible === 0);
-    if (resultCount) resultCount.textContent = `${visible} publication${visible === 1 ? '' : 's'} shown`;
-  };
-
-  root?.querySelectorAll<HTMLButtonElement>('[data-filter-kind]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const kind = button.dataset.filterKind as 'type' | 'topic';
-      const value = button.dataset.filterValue ?? 'all';
-      active[kind] = value;
-      root
-        .querySelectorAll<HTMLButtonElement>(`[data-filter-kind="${kind}"]`)
-        .forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate === button)));
-      applyFilters();
-    });
-  });
-
   document.querySelectorAll<HTMLButtonElement>('[data-copy-bibtex]').forEach((button) => {
     button.addEventListener('click', async () => {
       const bibtex = button.dataset.bibtex;
@@ -133,6 +95,4 @@ const structuredData = publications.map((publication) => ({
       }, 1600);
     });
   });
-
-  applyFilters();
 </script>
