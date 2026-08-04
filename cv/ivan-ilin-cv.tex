@@ -1,0 +1,235 @@
+% Ivan Ilin - Curriculum Vitae
+% Build from the repository root with:
+%   latexmk -pdf -interaction=nonstopmode -halt-on-error \
+%     -outdir=tmp/pdfs/build cv/ivan-ilin-cv.tex
+
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+
+\geometry{
+  left=0.68in,
+  right=0.68in,
+  top=0.54in,
+  bottom=0.66in,
+  footskip=0.34in
+}
+
+\definecolor{Accent}{HTML}{163B5C}
+\definecolor{Muted}{HTML}{586473}
+\definecolor{Rule}{HTML}{A9B8C5}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Accent,
+  urlcolor=Accent,
+  citecolor=Accent,
+  pdfauthor={Ivan Ilin},
+  pdftitle={Ivan Ilin - Curriculum Vitae},
+  pdfsubject={Machine learning research, publications, experience, and education},
+  pdfkeywords={Ivan Ilin, machine learning, large language models, optimization, compression, KAUST}
+}
+\urlstyle{same}
+
+\input{glyphtounicode}
+\pdfgentounicode=1
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{Muted}Ivan Ilin \textbar{} Curriculum Vitae}
+\fancyfoot[R]{\footnotesize\color{Muted}Updated August 2026 \textbar{} Page \thepage\ of \pageref*{LastPage}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\tabcolsep}{0pt}
+\setlength{\emergencystretch}{2em}
+\raggedbottom
+
+\titleformat{\section}
+  {\large\bfseries\color{Accent}}
+  {}{0pt}{}
+  [\vspace{0.05em}{\color{Rule}\titlerule}]
+\titlespacing*{\section}{0pt}{0.76em}{0.32em}
+
+\newcommand{\contactsep}{\hspace{0.55em}\textcolor{Muted}{\textbar}\hspace{0.55em}}
+
+\newcommand{\cventry}[4]{%
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}X>{\raggedleft\arraybackslash}p{1.52in}@{}}
+    \textbf{#1} & \textcolor{Muted}{#2} \\
+    \textit{#3} & \textit{\textcolor{Muted}{#4}}
+  \end{tabularx}\vspace{0.12em}
+}
+
+\newcommand{\cvdetail}[1]{%
+  {\small #1\par}\vspace{0.30em}
+}
+
+\newenvironment{cvitems}{%
+  \begin{itemize}[
+    leftmargin=1.18em,
+    label=\textcolor{Accent}{\raisebox{0.15ex}{\scriptsize$\bullet$}},
+    itemsep=0.12em,
+    topsep=0.12em,
+    parsep=0pt,
+    partopsep=0pt
+  ]\small
+}{%
+  \end{itemize}\vspace{0.28em}
+}
+
+\newenvironment{publist}{%
+  \begin{enumerate}[
+    leftmargin=1.75em,
+    label=\textcolor{Muted}{[\arabic*]},
+    itemsep=0.34em,
+    topsep=0.12em,
+    parsep=0pt,
+    partopsep=0pt
+  ]\small
+}{%
+  \end{enumerate}
+}
+
+\begin{document}
+
+\begin{center}
+  {\fontsize{24}{27}\selectfont\bfseries\color{Accent} Ivan Ilin}\par
+  \vspace{0.16em}
+  {\large Machine Learning Researcher \textcolor{Muted}{\textbar} PhD Candidate in Computer Science at KAUST}\par
+  \vspace{0.42em}
+  {\small
+    \href{https://ivanilin.org/}{ivanilin.org}\contactsep
+    \href{mailto:ivan.ilin@kaust.edu.sa}{ivan.ilin@kaust.edu.sa}\contactsep
+    \href{https://github.com/vectozavr}{GitHub}\contactsep
+    \href{https://scholar.google.com/citations?user=elw14gUAAAAJ}{Google Scholar}
+    \par
+    \vspace{0.16em}
+    \href{https://orcid.org/0009-0005-6210-378X}{ORCID: 0009-0005-6210-378X}\contactsep
+    \href{https://www.linkedin.com/in/ivan-ilin-452045307/}{LinkedIn}
+  }
+\end{center}
+
+\vspace{-0.35em}
+\section{Research Profile}
+Machine learning researcher developing efficient optimization and compression methods for large language models. My work spans pruning, quantization, sparse fine-tuning, pipeline parallelism, and distributed optimization, with an emphasis on methods that connect rigorous analysis to practical open-source systems.
+
+\section{Education}
+
+\cventry{King Abdullah University of Science and Technology (KAUST)}{Thuwal, Saudi Arabia}{Ph.D. in Computer Science}{Jan 2025--Present}
+\begin{cvitems}
+  \item Advisor: Peter Richt\'arik. Advanced to PhD candidacy after successfully defending the proposal \textit{Efficient Optimization and Compression Methods for Large Language Models}, July 2026.
+\end{cvitems}
+
+\cventry{King Abdullah University of Science and Technology (KAUST)}{Thuwal, Saudi Arabia}{M.S. in Computer Science}{2023--2024}
+\begin{cvitems}
+  \item Thesis: \href{https://repository.kaust.edu.sa/items/2b0d935b-4ce3-4cf7-aab3-e5b3352fa515}{\textit{Efficient and Fast Pruning of Large Language Models}}. Advisor: Peter Richt\'arik. DOI: \href{https://doi.org/10.25781/KAUST-44481}{10.25781/KAUST-44481}.
+\end{cvitems}
+
+\cventry{Novosibirsk State University}{Novosibirsk, Russia}{M.Sc. in Automation of Physical and Technical Research}{2021--2023}
+\cvdetail{GPA: 5.0/5.0.}
+
+\cventry{Novosibirsk State University}{Novosibirsk, Russia}{B.S. in Automation of Physical and Technical Research}{2017--2021}
+\cvdetail{GPA: 4.67/5.0.}
+
+\section{Research and Professional Experience}
+
+\cventry{Optimization and Machine Learning Laboratory, KAUST}{Thuwal, Saudi Arabia}{PhD Researcher}{Jan 2025--Present}
+\begin{cvitems}
+  \item Develop optimization and compression methods for large language models, including block-wise pruning, sparse fine-tuning, and pipeline-parallel training.
+  \item Release reproducible implementations and collaborate on research in LLM quantization and asynchronous distributed optimization.
+\end{cvitems}
+
+\cventry{ExpaSoft}{Novosibirsk, Russia}{Deep Learning Junior Researcher}{2020--2023}
+\begin{cvitems}
+  \item Accelerated a Tacotron 2/WaveGlow speech-generation pipeline with structured pruning and distillation; achieved more than 1.5x speedup with improved quality, or 2x speedup with limited quality loss, on an NVIDIA GTX 1050 Ti.
+\end{cvitems}
+
+\cventry{Budker Institute of Nuclear Physics}{Novosibirsk, Russia}{Undergraduate Research Assistant}{Jan--Aug 2020}
+\begin{cvitems}
+  \item Built automated tests for Belle II electromagnetic-calorimeter electronics and measured 63\% ECL library coverage with gcov.
+\end{cvitems}
+
+\section{Grants and Distinctions}
+
+\cventry{KAUST Small Translational Research Grant (sTRG)}{\$100,000}{TRACE Project}{2026--2027}
+\cvdetail{\textit{Transforming Textbooks into Verified, Interactive Courses using Retrieval-Augmented Generation}. Primary author of the successful proposal and project team member; lead PI: Peter Richt\'arik. Award period: July 2026--June 2027.}
+
+\cvdetail{\textbf{NeurIPS 2024 Oral:} \textit{PV-Tuning: Beyond Straight-Through Estimation for Extreme LLM Compression}.}
+
+\section{Teaching Experience}
+
+\cventry{King Abdullah University of Science and Technology}{Thuwal, Saudi Arabia}{Teaching Assistant, CS 260: Design and Analysis of Algorithms}{Fall 2025}
+\vspace{0.28em}
+
+\textbf{Novosibirsk State University}\hfill\textcolor{Muted}{Novosibirsk, Russia}\\
+\textit{Programming Teacher (Python)}\hfill\textit{\textcolor{Muted}{2022--2023}}
+
+\newpage
+\section{Peer-Reviewed Publications}
+
+\begin{publist}
+  \item Vladimir Malinovskii, Andrei Panferov, \textbf{Ivan Ilin}, Han Guo, Peter Richt\'arik, and Dan Alistarh. \textit{HIGGS: Pushing the Limits of Large Language Model Quantization via the Linearity Theorem}. NAACL 2025 (Long Papers), pp. 10857--10886. \href{https://aclanthology.org/2025.naacl-long.543/}{[paper]} \href{https://doi.org/10.18653/v1/2025.naacl-long.543}{[doi]}
+
+  \item Vladimir Malinovskii, Denis Mazur, \textbf{Ivan Ilin}, Denis Kuznedelev, Konstantin Burlachenko, Kai Yi, Dan Alistarh, and Peter Richt\'arik. \textit{PV-Tuning: Beyond Straight-Through Estimation for Extreme LLM Compression}. NeurIPS 2024 (Oral). \href{https://proceedings.neurips.cc/paper_files/paper/2024/hash/091166620a04a289c555f411d8899049-Abstract-Conference.html}{[paper]} \href{https://neurips.cc/virtual/2024/session/98067}{[oral session]}
+
+  \item Alexander Tyurin, Marta Pozzi, \textbf{Ivan Ilin}, and Peter Richt\'arik. \textit{Shadowheart SGD: Distributed Asynchronous SGD with Optimal Time Complexity Under Arbitrary Computation and Communication Heterogeneity}. NeurIPS 2024. \href{https://papers.nips.cc/paper_files/paper/2024/hash/06e2dd57e90a736a5a1fd3bb2bf95c6c-Abstract-Conference.html}{[paper]}
+
+  \item Jihao Xin, \textbf{Ivan Ilin}, Shunkang Zhang, Marco Canini, and Peter Richt\'arik. \textit{Kimad: Adaptive Gradient Compression with Bandwidth Awareness}. 4th Workshop on Distributed Machine Learning (DistributedML 2023), pp. 35--48. \href{https://doi.org/10.1145/3630048.3630184}{[paper]}
+\end{publist}
+
+\section{Preprints and Technical Reports}
+
+\begin{publist}
+  \item \textbf{Ivan Ilin}, Philip Zmushko, and Peter Richt\'arik. \textit{Super-Tuning: From Activation-Aware Pruning to Sparse Fine-Tuning}. arXiv:2607.09287, 2026. \href{https://arxiv.org/abs/2607.09287}{[paper]} \href{https://github.com/vectozavr/SuperTuning}{[code]}
+
+  \item \textbf{Ivan Ilin} and Peter Richt\'arik. \textit{Demystifying Pipeline Parallelism: First Theory for PipeDream}. arXiv:2606.03498, 2026. \href{https://arxiv.org/abs/2606.03498}{[paper]} \href{https://github.com/vectozavr/randomized-pipedream}{[code]}
+
+  \item Abdurakhmon Sadiev, Artavazd Maranjyan, \textbf{Ivan Ilin}, and Peter Richt\'arik. \textit{Ringmaster LMO: Asynchronous Linear Minimization Oracle Momentum Method}. arXiv:2605.18174, 2026. \href{https://arxiv.org/abs/2605.18174}{[paper]} \href{https://github.com/vectozavr/ringmaster-lmo}{[code]}
+
+  \item \textbf{Ivan Ilin} and Peter Richt\'arik. \textit{Thanos: A Block-wise Pruning Algorithm for Efficient Large Language Model Compression}. arXiv:2504.05346, 2025. \href{https://arxiv.org/abs/2504.05346}{[paper]} \href{https://github.com/vectozavr/thanos}{[code]}
+
+  \item \textbf{Ivan Ilin}. \textit{Hessian of Perplexity for Large Language Models by PyTorch autograd (Open Source)}. arXiv:2504.04520, 2025. \href{https://arxiv.org/abs/2504.04520}{[paper]}
+\end{publist}
+
+\section{Selected Research Presentations}
+
+\cventry{PhD Proposal Defense, KAUST}{Thuwal, Saudi Arabia}{Research proposal defense}{July 2026}
+\cvdetail{\textit{Efficient Optimization and Compression Methods for Large Language Models}.}
+
+\cventry{KAUST Rising Stars in AI Symposium 2025}{Thuwal, Saudi Arabia}{Poster presentation}{April 2025}
+\cvdetail{\textit{Thanos: A Block-wise Pruning Algorithm for Efficient Large Language Model Compression}.}
+
+\cventry{SANDS Seminar Series, KAUST}{Thuwal, Saudi Arabia}{Research seminar}{Nov 2024}
+\cvdetail{\textit{Thanos: A Block-wise Pruning Algorithm for Efficient Large Language Model Compression}.}
+
+\section{Selected Open-Source Software and Outreach}
+
+\cventry{\href{https://github.com/vectozavr/voicecut}{VoiceCut}}{Open source}{Creator and Maintainer}{2025--Present}
+\cvdetail{Local-first audio and video editor that uses machine learning to identify and remove failed takes, repetitions, false starts, and breaths.}
+
+\cventry{\href{https://github.com/vectozavr/thanos}{Thanos}, \href{https://github.com/vectozavr/SuperTuning}{SuperTuning}, and \href{https://github.com/vectozavr/randomized-pipedream}{Randomized PipeDream}}{Open source}{Research Software}{2024--Present}
+\cvdetail{Reproducible implementations for LLM pruning, sparse fine-tuning, and pipeline-parallel optimization.}
+
+\section{Technical Skills}
+
+{\small
+  \textbf{Languages and frameworks:} Python, C, C++, PyTorch. \quad
+  \textbf{Tools:} Git, Linux/Unix, LaTeX, OpenCV, OpenGL.\\
+  \textbf{Methods:} Large language model compression and evaluation; distributed optimization and training.
+}
+
+\end{document}

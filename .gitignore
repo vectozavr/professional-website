@@ -9,3 +9,4 @@ npm-debug.log*
 
 # Local drop folder for source media before it is optimized and moved into the site.
 stuff/
+tmp/

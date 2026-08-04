@@ -186,13 +186,22 @@ The publications page sorts by year, filters by type and topic, and exposes a cl
 
 ## Add a CV
 
-The CV PDF is stored at `public/cv/ivan-ilin-cv.pdf` and configured with:
+The editable LaTeX source is stored at `cv/ivan-ilin-cv.tex`. Build it from the repository root with:
+
+```bash
+mkdir -p tmp/pdfs/build
+latexmk -pdf -interaction=nonstopmode -halt-on-error \
+  -outdir=tmp/pdfs/build cv/ivan-ilin-cv.tex
+cp tmp/pdfs/build/ivan-ilin-cv.pdf public/cv/ivan-ilin-cv.pdf
+```
+
+The generated website PDF is stored at `public/cv/ivan-ilin-cv.pdf` and configured with:
 
 ```ts
 cvUrl: '/cv/ivan-ilin-cv.pdf',
 ```
 
-in `src/data/profile.ts`. Replace the PDF at the same path when publishing an updated CV. The header, homepage, and About-page links appear automatically while `cvUrl` is configured.
+in `src/data/profile.ts`. Commit both the source and generated PDF when publishing an update. The header, homepage, and About-page links appear automatically while `cvUrl` is configured.
 
 ## Build-time metrics
 
