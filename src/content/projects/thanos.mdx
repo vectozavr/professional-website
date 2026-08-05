@@ -1,0 +1,313 @@
+---
+title: Pruning LLMs with Thanos
+shortSummary: A block-wise algorithm for pruning large language models using second-order information and coordinated weight compensation.
+year: 2025
+status: Research project
+category: Research / LLM Pruning
+topics:
+  - LLM pruning
+  - Second-order optimization
+  - Structured sparsity
+featured: true
+githubUrl: https://github.com/vectozavr/thanos
+paperUrl: https://arxiv.org/abs/2504.05346
+image: ../../assets/projects/thanos.webp
+imageAlt: Diagram of coordinated weight pruning and compensation in a model weight matrix
+imageFit: contain
+youtubeVideoId: k4nUw3siA-I
+metricsRepository: vectozavr/thanos
+relatedPublications:
+  - thanos
+---
+
+import ProjectFigure from '../../components/ProjectFigure.astro';
+import slide18 from '../../assets/projects/thanos/slide-18.webp';
+import slide43 from '../../assets/projects/thanos/slide-43.webp';
+import slide52 from '../../assets/projects/thanos/slide-52.webp';
+import slide125 from '../../assets/projects/thanos/slide-125.webp';
+import slide135 from '../../assets/projects/thanos/slide-135.webp';
+import slide146 from '../../assets/projects/thanos/slide-146.webp';
+import slide178 from '../../assets/projects/thanos/slide-178.webp';
+
+Large language models make text generation look deceptively simple: a prompt goes in, a probability distribution comes out, and one token is added at a time. Inside the model, however, each token passes through many transformer blocks, and most of the learned parameters live in their linear layers.
+
+That makes the large weight matrices in those layers a natural target for compression. But useful pruning is not simply a matter of finding small numbers and replacing them with zeros. The real question is:
+
+> After several weights disappear, how should the surviving weights move together so that the layer's output changes as little as possible?
+
+Thanos treats pruning as this **coordinated reconstruction problem**. It combines calibration data, second-order information, and a direct block-wise compensation rule. For unstructured sparsity, it also uses a dynamic global pruning budget.
+
+<aside class="article-note" aria-label="Research status">
+  <strong>Research status.</strong> Thanos is an active research project. This page is a conceptual explainer: it makes no publication-status, benchmark-ranking, or production-speed claim. Exact experimental settings and complete tables belong in the linked research manuscript and repository.
+</aside>
+
+## The compression target: linear layers
+
+A transformer block contains attention projections, feed-forward projections, normalization, residual connections, and nonlinearities. Architectures differ in their details, but the large learned matrices repeat throughout the model. Those matrices dominate parameter storage in the dense transformer families studied by this project.
+
+Pruning sets selected entries of a matrix to zero:
+
+- **Unstructured sparsity** allows zeros anywhere. It is flexible, but it needs suitable sparse storage and kernels before zeros translate into faster inference.
+- **Semi-structured $N\!:\!M$ sparsity** constrains each small group of $M$ weights to retain exactly $N$ nonzero entries, such as 2:4 or 4:8. The constraint is less flexible, but it can align better with supported hardware paths.
+
+In both cases, the mathematical task is the same: choose which weights to remove and reconstruct the rest.
+
+## The layer-reconstruction lens
+
+Consider one linear layer. Let
+
+- $W \in \mathbb{R}^{c \times b}$ be its original weight matrix;
+- $X \in \mathbb{R}^{b \times n}$ contain calibration activations, with calibration examples arranged as columns;
+- $\widehat W$ be the matrix after pruning and reconstruction; and
+- $\Delta = \widehat W - W$ be the change applied to the layer.
+
+The original output is $WX$. A local pruning objective asks the new layer to reproduce it:
+
+$$
+\min_{\widehat W}\left\|\widehat W X - WX\right\|_F^2
+=
+\min_{\Delta}\left\|\Delta X\right\|_F^2.
+$$
+
+The Frobenius norm simply adds the squared error over all output coordinates and calibration examples. This objective is useful because it turns the vague instruction "preserve the model" into a concrete local reconstruction problem.
+
+<ProjectFigure
+  src={slide18}
+  alt="Equation comparing the original linear-layer output W X with the pruned output W-hat X and rewriting their Frobenius error as the norm of Delta X."
+  caption="The reconstruction objective measures what pruning changes at the layer output, not just what it changes inside the weight matrix."
+/>
+
+The loss also decomposes over the rows of $W$:
+
+$$
+\left\|\Delta X\right\|_F^2
+=
+\sum_{k=1}^{c}\left\|\Delta_{k,:}X\right\|_2^2.
+$$
+
+That means each output row can be reconstructed independently. The rows share the same activation geometry, however, because they all receive the same $X$. Efficient pruning algorithms are largely about exploiting that shared structure without creating a different expensive solve for every row and every mask.
+
+## Why magnitude alone misses important weights
+
+The cheapest rule ranks weights by $\lvert W_{kq}\rvert$ and removes the smallest. This ignores the feature that each weight multiplies.
+
+Suppose we delete just $W_{kq}$ and freeze every other value in row $k$. The row update has one nonzero entry, $\delta_q=-W_{kq}$, so the exact reconstruction error is
+
+$$
+\left\|\delta X\right\|_2^2
+=
+W_{kq}^2\left\|X_{q,:}\right\|_2^2.
+$$
+
+A small weight can therefore be important when its input feature is consistently active. Conversely, a larger weight may be relatively safe to remove when the corresponding feature is weak on the calibration data.
+
+<ProjectFigure
+  src={slide43}
+  alt="A selected weight in one row of a matrix is linked to the squared weight times the squared norm of its corresponding calibration-activation row."
+  caption="Freezing all surviving weights produces an activation-aware deletion score. Its square root has the same ranking as the score commonly used by Wanda."
+/>
+
+This [Optimal Brain Damage](https://proceedings.neurips.cc/paper_files/paper/1989/hash/6c9882bbac1c7093bd25041881277658-Abstract.html)-style view is also the intuition behind activation-aware methods such as [Wanda](https://arxiv.org/abs/2306.11695), which ranks with $\lvert W_{kq}\rvert\left\|X_{q,:}\right\|_2$. Squaring that expression gives the formula above without changing its ordering.
+
+It is a better ranking signal than magnitude alone, but it still assumes that the retained weights cannot help.
+
+## One deletion with compensation: the OBS view
+
+Now allow every coordinate in the row to change while forcing one chosen weight to zero. The activation Gram matrix is $G=XX^\top$, which is the Hessian of the squared reconstruction loss up to a constant factor. Practical methods usually work with its damped form
+
+$$
+H = G + \lambda I
+=
+XX^\top + \lambda I,
+$$
+
+where $\lambda I$ improves numerical stability. The off-diagonal entries encode correlations between input features. With $H=G$, the solution below exactly minimizes the constrained reconstruction loss. With damping, it exactly minimizes the corresponding damped quadratic surrogate.
+
+[Optimal Brain Surgeon (OBS)](https://papers.nips.cc/paper_files/paper/1992/hash/303ed4c69846ab36c2904d3ba8573050-Abstract.html) solves the one-constraint problem in closed form. Using the inverse of $H$, the compensating row update is
+
+$$
+\delta^\star
+=
+-\frac{W_{kq}}{[H^{-1}]_{qq}}[H^{-1}]_{q,:},
+$$
+
+and the associated increase in the local reconstruction objective is proportional to
+
+$$
+S^{\mathrm{OBS}}_{kq}
+=
+\frac{W_{kq}^2}{[H^{-1}]_{qq}}.
+$$
+
+<ProjectFigure
+  src={slide52}
+  alt="The Optimal Brain Surgeon Lagrangian, followed by its inverse-Hessian update rule and pruning saliency."
+  caption="OBS gives two things at once: a saliency for choosing one deletion and an update that lets correlated surviving weights compensate for it."
+/>
+
+This is the important conceptual shift. Pruning is no longer only a mask-selection problem. It is also a reconstruction problem in which correlations decide how the error can be redistributed.
+
+## The scaling problem, and what SparseGPT changes
+
+A direct row-wise application of OBS is impractical for a large layer. Different rows generally receive different masks. After every deletion, already-pruned coordinates must stay fixed, so each row would appear to need its own sequence of reduced systems.
+
+[SparseGPT](https://arxiv.org/abs/2301.00774) made OBS-style reconstruction practical at LLM scale by synchronizing the work across rows:
+
+1. Process the matrix from left to right.
+2. Handle the current column for every row.
+3. Freeze that completed column for all rows at the same time.
+4. Propagate compensation only into columns that remain active.
+5. Refresh pruning decisions block by block as the unprocessed weights change.
+
+Because every row retires the same column at the same time, the layer can share one sequence of reduced inverse-Hessian systems.
+
+There is a subtle but important distinction here. Correctly conditioned sequential OBS can represent a fixed set of constraints; a direct joint solve is not evidence that sequential optimization is inherently incapable of doing so. The practical approximation in SparseGPT comes from the synchronized column schedule that makes systems reusable across rows.
+
+Thanos starts from two design questions exposed by that schedule:
+
+1. Can the weights selected inside a manageable block be handled directly as one multi-constraint solve?
+2. Can a local block use information about the **remaining global pruning budget**, instead of being forced to match the same sparsity fraction as every other block?
+
+## Contribution one: solve a selected set directly
+
+For one row, let $Q=\{q_1,\ldots,q_s\}$ be the coordinates selected for removal and let
+
+$$
+u = W_{k,Q}
+$$
+
+collect their current values. From the inverse Hessian, take
+
+$$
+R = [H^{-1}]_{Q,:}
+\qquad\text{and}\qquad
+\widehat R = [H^{-1}]_{Q,Q}.
+$$
+
+Here, $R$ contains the rows associated with the selected coordinates, while $\widehat R$ is the small $s\times s$ principal submatrix describing their interactions. The constrained optimum for the row update is
+
+$$
+\delta^\star = -u\widehat R^{-1}R.
+$$
+
+<ProjectFigure
+  src={slide125}
+  alt="The Thanos joint update delta equals minus u times the inverse of a selected interaction submatrix R-hat times R; labels define each quantity."
+  caption="The direct solve couples all selected coordinates through a small interaction matrix. Inverting that s-by-s matrix costs O(s cubed); forming and applying the update also scales with the active row width."
+/>
+
+This update makes every coordinate in $Q$ exactly zero and adjusts the retained coordinates to minimize the local quadratic model represented by $H$. It is exact for the **chosen set of deletions under that layer objective**; it is not a claim of global optimality for the entire network.
+
+Solving one system over the full layer would be too expensive. Thanos therefore works with manageable column blocks. Within a block, each row can remove several selected weights in one coupled update; the resulting compensation is propagated into the still-active part of the row.
+
+<ProjectFigure
+  src={slide135}
+  alt="A weight-matrix row with several red deletion marks inside the active block and green arrows showing a shared compensating update across surviving coordinates."
+  caption="Within the current block, the selected weights are constrained together rather than treated as unrelated one-weight updates."
+/>
+
+Block size is a real trade-off. Larger blocks expose more interactions to the joint solve, but they increase the size and cost of $\widehat R^{-1}$. Smaller blocks are cheaper but make the reconstruction more local.
+
+## Contribution two: keep the budget global and the execution local
+
+A block-wise method still has to decide how many weights each block should lose.
+
+Suppose the layer-wide target is 50% sparsity. Requiring every block to be exactly 50% sparse is stronger than necessary. One block may contain many low-impact weights, while the next may contain relatively important ones. Equal local quotas cannot move pruning capacity between them.
+
+Computing one global mask at the beginning is not enough either: reconstruction changes the unprocessed weights, so their scores can become stale.
+
+Thanos uses a **dynamic residual budget**:
+
+1. Count how many weights still need to be removed to reach the layer-wide target.
+2. Recompute activation-aware scores over the entire active region.
+3. Form a provisional global candidate set containing exactly that many lowest-scoring weights.
+4. Apply only the intersection of that candidate set with the current block.
+5. Perform the joint reconstruction, subtract the deletions from the residual budget, and repeat for the next block.
+
+<ProjectFigure
+  src={slide146}
+  alt="A blue bracket spans all remaining candidate weights while a red bracket selects only the portion that lies inside the current local block."
+  caption="The blue set represents the current global residual decision; only its red, block-local intersection is committed at this step."
+/>
+
+The mask stays responsive to changes caused by earlier reconstruction, yet the final number of zeros still meets the global target. Different blocks are free to receive different sparsity levels.
+
+The semi-structured $N\!:\!M$ variant instead uses local, group-constrained masks. It retains the joint reconstruction step, but not the global residual-mask procedure described above.
+
+## Making irregular row masks batchable
+
+Unstructured pruning introduces an implementation problem. In the same block, one row may select one weight, another two, and another three. Their vectors $u$ and interaction matrices $\widehat R$ then have different shapes, which prevents a straightforward batched solve.
+
+Thanos pads every row to the maximum selected-set size $s_{\max}$ in the batch:
+
+- append zeros to $u$;
+- append zero rows to $R$; and
+- fill the unused part of $\widehat R$ with an identity matrix.
+
+<ProjectFigure
+  src={slide178}
+  alt="The joint-update vector and matrices are padded to a common maximum size using zeros and an identity block."
+  caption="Zero padding is neutral, while the identity block keeps the padded system invertible. Every row can then use the same batched tensor shapes."
+/>
+
+The dummy coordinates contribute no update, but the uniform shapes allow the row systems to run through batched PyTorch operations rather than slow nested loops. This is an implementation detail, but an important one: the value of a more expressive optimization rule depends on whether it maps cleanly to the hardware.
+
+## How the methods differ
+
+The progression is easier to see as a list of capabilities:
+
+| Method | Uses calibration activations | Updates surviving weights | Handles selected sets directly | Mask allocation |
+| --- | --- | --- | --- | --- |
+| Magnitude | No | No | No | One-shot ranking |
+| Wanda | Yes | No | No | Activation-aware ranking |
+| SparseGPT | Yes | Yes | Sequential OBS-style reconstruction | Refreshed in local blocks |
+| Thanos | Yes | Yes | Multi-constraint block solve | Global residual budget for unstructured masks; local group masks for $N\!:\!M$ |
+
+The extra structure is not free. Thanos has to construct and invert small interaction systems, so its practical cost depends on block size, selected-set size, batching efficiency, and the layer dimensions. Wanda remains much cheaper because it does not reconstruct retained weights.
+
+## What the experiments are meant to test
+
+The project evaluates two separate questions:
+
+1. **Reconstruction quality:** after pruning, does the model preserve its language-modeling behavior?
+2. **Pruning cost:** how expensive is the one-time compression procedure itself?
+
+For language modeling, the reported metric is perplexity:
+
+$$
+\operatorname{PPL}
+=
+\exp\left(
+-\frac{1}{N}
+\sum_{t=1}^{N}
+\log p(x_t\mid x_{<t})
+\right).
+$$
+
+Lower perplexity means the model assigns higher probability to the observed next tokens. Perplexity values are only comparable under the same dataset, tokenizer, sequence handling, and evaluation protocol.
+
+The research manuscript studies 50% unstructured pruning as well as semi-structured 4:8 and 2:4 patterns across several OPT- and Llama-family model sizes. This project page intentionally does not reproduce the benchmark table or rank the methods. Instead, the experiments are useful for separating three questions:
+
+- how the methods behave when an unstructured mask has maximum flexibility;
+- how joint reconstruction behaves under regular 4:8 and 2:4 constraints; and
+- how much one-time work the pruning procedure requires in a specific implementation.
+
+Timing in those experiments concerns the **pruning procedure**, not inference latency, and depends on the implementation and hardware. The regular patterns are particularly interesting because joint constraints are unavoidable: several weights in each group must disappear together. Still, a sparse mask alone does not guarantee a smaller or faster deployed model. The storage format, kernels, runtime, and target hardware must support the chosen pattern.
+
+## What this result does—and does not—say
+
+The central result is narrow and useful: for a fixed selected set within a layer block, Thanos computes the exact multi-constraint minimizer of its local quadratic model. The unstructured variant combines those solves with a mask that continually reallocates the remaining global budget; the semi-structured variant uses local group-constrained masks.
+
+Several broader questions remain open:
+
+- How sensitive is the mask to the calibration corpus and sample count?
+- How should damping and block size change across model families?
+- When does lower layer-reconstruction error translate into better downstream quality?
+- Which sparse formats provide real memory or latency benefits on a target stack?
+- Can the block solves be made cheaper for still larger models?
+
+These limitations are part of the research problem, not footnotes to hide. The most durable takeaway is the change in perspective:
+
+> Pruning is not only a decision about which weights to delete. It is a constrained reconstruction problem about how the surviving weights should respond.
+
+That is the problem Thanos is designed to solve. For the complete derivation, experimental protocol, and implementation, see the [research manuscript](https://arxiv.org/abs/2504.05346) and the [open-source repository](https://github.com/vectozavr/thanos).

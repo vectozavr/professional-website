@@ -1632,6 +1632,46 @@
     font-style: italic;
   }
 
+  .prose figure {
+    margin-block: 2.4rem;
+  }
+
+  .prose figure img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .prose figcaption {
+    max-width: 44rem;
+    margin: 0.75rem auto 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  .prose .article-note,
+  .prose .project-note {
+    display: block;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    background: var(--background-subtle);
+    color: var(--muted-strong);
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  .prose .article-note strong,
+  .prose .project-note strong {
+    color: var(--text-strong);
+  }
+
   .prose code:not(pre code) {
     padding: 0.16rem 0.3rem;
     border: 1px solid var(--border);
@@ -1673,6 +1713,62 @@
     padding-block: 0.6rem;
     overflow-x: auto;
     overflow-y: hidden;
+  }
+
+  .prose .project-figure {
+    width: min(calc(100vw - 2.5rem), 64rem);
+    margin-top: 2.4rem;
+    margin-bottom: 2.5rem;
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .prose .project-figure img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .prose .project-figure figcaption {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.7rem 1.25rem;
+    margin-top: 0.7rem;
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+
+  .prose .project-figure-open {
+    flex: 0 0 auto;
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .prose .project-figure-open:hover {
+    text-decoration: underline;
+  }
+
+  .prose .project-callout {
+    padding: 1.1rem 1.2rem;
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+    border-radius: var(--radius-md);
+    background: var(--accent-soft);
+  }
+
+  .prose .project-callout strong {
+    display: block;
+    color: var(--text-strong);
+  }
+
+  .prose .project-callout p {
+    margin-top: 0.35rem;
+    color: var(--muted-strong);
   }
 
   .article-body,
@@ -2008,6 +2104,15 @@
 
   .article-footer-nav a:last-child {
     text-align: left;
+  }
+
+  .prose .project-figure {
+    width: calc(100vw - 2rem);
+  }
+
+  .prose .project-figure figcaption {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 

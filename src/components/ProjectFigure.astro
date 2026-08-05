@@ -1,0 +1,23 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+
+<figure class="project-figure">
+  <Image
+    src={src}
+    alt={alt}
+    widths={[640, 960, 1440]}
+    sizes="(max-width: 52.5rem) calc(100vw - 2rem), 50rem"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>{caption}</figcaption>
+</figure>

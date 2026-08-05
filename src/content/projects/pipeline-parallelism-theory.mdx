@@ -1,0 +1,402 @@
+---
+title: First Theory for PipeDream
+shortSummary: Randomized PipeDream turns PipeDream's structured stale gradients into a tractable block-SGD model, yielding a clean nonconvex guarantee and a pipeline-depth scaling law.
+year: 2026
+status: Preprint
+category: Research / Distributed Optimization
+topics:
+  - Pipeline parallelism
+  - Distributed optimization
+  - Delayed updates
+featured: true
+githubUrl: https://github.com/vectozavr/randomized-pipedream
+paperUrl: https://arxiv.org/abs/2606.03498
+image: ../../assets/projects/pipeline-parallelism-theory.webp
+imageAlt: PipeDream startup and steady-state schedule across four GPU pipeline stages, beneath stale-model notation
+imageFit: contain
+metricsRepository: vectozavr/randomized-pipedream
+relatedPublications:
+  - demystifying-pipeline-parallelism
+---
+
+import { Image } from 'astro:assets';
+import pipelineBubble from '../../assets/projects/rpd/pipeline-bubble.webp';
+import structuredDelay from '../../assets/projects/rpd/structured-delay.webp';
+import rpdConvergenceBound from '../../assets/projects/rpd/rpd-convergence-bound.webp';
+import pipedreamDelayScaling from '../../assets/projects/rpd/pipedream-delay-scaling.webp';
+import pdVsRpdQuadratic from '../../assets/projects/rpd/pd-vs-rpd-quadratic.webp';
+import localSgdTrajectories from '../../assets/projects/rpd/localsgd-trajectories.webp';
+import pdVsLocalSgdObjectives from '../../assets/projects/rpd/pd-vs-localsgd-objectives.webp';
+
+PipeDream creates a striking paradox. After warm-up, every accelerator in a pipeline can be busy, yet an update can be computed from a model that never existed as one coherent parameter vector. Each stage reuses the weights that a microbatch saw during its forward pass, but that microbatch reaches different stages at different moments. By the time backpropagation returns, its stage-local snapshots belong to several points in the training history.
+
+This project asks an optimization question about that schedule: **what does PipeDream's staleness cost, and how does the cost grow as the pipeline becomes deeper?**
+
+In joint work with Peter Richtárik, we introduced **Randomized PipeDream (RPD)**, a stale block-SGD abstraction that keeps the essential stage-wise delay mechanism while removing the scheduling combinatorics. To our knowledge, the resulting [preprint](https://arxiv.org/abs/2606.03498) gives the first clean nonconvex convergence guarantee for a randomized PipeDream-style method. It also derives the delay induced by the deterministic PipeDream schedule and compares the resulting diagnosis with LocalSGD.
+
+The main story has four parts:
+
+1. PipeDream fills idle pipeline bubbles by overlapping microbatches.
+2. Weight stashing makes its gradients depend on a mixed, stage-wise stale model.
+3. In steady state, the worst global-history delay grows quadratically with the number of stages.
+4. LocalSGD replaces that stale-read mechanism with synchronization bubbles and replica drift.
+
+## Why pipeline parallelism has bubbles
+
+Large models are naturally sequences of computational blocks. Pipeline model parallelism partitions those blocks into $S$ ordered stages, places each stage on a different accelerator, and sends activations forward and gradients backward through the chain. This solves a memory problem: no single device needs to hold the entire model.
+
+With only one microbatch in flight, however, the computation is a strict dependency chain. Stage 2 cannot begin until stage 1 produces an activation. The backward pass cannot begin until the final stage produces the loss. In the idealized four-stage schedule below, only one of four GPUs works at each time step: eight useful operations occupy just eight of 32 available device-time cells.
+
+<figure class="project-figure">
+  <Image
+    src={pipelineBubble}
+    alt="Four-stage pipeline timeline with one forward and one backward diagonal; only 8 of 32 GPU-time cells are active"
+    widths={[480, 800, 1200, 1600]}
+    sizes="(max-width: 66rem) calc(100vw - 2rem), 64rem"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>
+    <span>A single microbatch uses 25% of the available GPU-time cells in this equal-cost four-stage model. This is scheduling intuition, not a hardware benchmark.</span>
+    <a class="project-figure-open" href={pipelineBubble.src} target="_blank" rel="noreferrer">Open full size</a>
+  </figcaption>
+</figure>
+
+Real systems also pay for communication, stage imbalance, kernels, and framework overhead. The 25% number is therefore not a universal utilization formula. It isolates the bubble created by the forward/backward dependency structure.
+
+## PipeDream's systems win changes the optimization
+
+PipeDream fills much of this bubble by admitting new microbatches before older ones have finished. After startup, each stage alternates between one forward and one backward operation: the familiar **1F1B** schedule. Under the same equal-cost model, the steady region can be fully occupied. The schedule turns idle time into throughput.
+
+It also changes which parameters are used to compute a gradient.
+
+Suppose a microbatch performs its forward operation on stage 1. PipeDream saves that stage's parameter version and reuses it when the microbatch eventually returns for the backward operation. This mechanism, called **weight stashing**, preserves forward/backward consistency within the stage.
+
+But many other backward operations update the pipeline while the microbatch is in flight. The microbatch also visited each stage at a different time. Its gradient is therefore not naturally associated with one old global checkpoint; it is associated with a mixture of historical stage blocks.
+
+To measure this precisely, let $k$ count **individual backward block updates anywhere in the pipeline**, not pipeline clock ticks. For a four-stage 1F1B simulation, the exact delays settle into a periodic pattern after warm-up:
+
+<figure class="project-figure">
+  <Image
+    src={structuredDelay}
+    alt="Line chart of exact global-history delay for four PipeDream stages; the delays become periodic and stage 1 reaches 14 block updates"
+    widths={[480, 800, 1200, 1600]}
+    sizes="(max-width: 66rem) calc(100vw - 2rem), 64rem"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>
+    <span>Exact delay in a four-stage simulated 1F1B schedule. The first stage can be 14 block updates behind, and the stage-dependent pattern becomes periodic after warm-up.</span>
+    <a class="project-figure-open" href={structuredDelay.src} target="_blank" rel="noreferrer">Open full size</a>
+  </figcaption>
+</figure>
+
+The structure matters. This is not an arbitrary asynchronous system in which any worker may return at any time. The delays are coupled to the forward/backward geometry of the pipeline.
+
+## A mathematical model for a mixed stale read
+
+We study the finite-sum objective
+
+$$
+\min_{w\in\mathbb{R}^d} f(w),
+\qquad
+f(w)=\frac{1}{M}\sum_{m=1}^{M}f_m(w),
+$$
+
+and partition the model into the same $S$ blocks used by the pipeline:
+
+$$
+w=\left(w^{(1)},\ldots,w^{(S)}\right),
+\qquad
+w^{(s)}\in\mathbb{R}^{d_s},
+\qquad
+\sum_{s=1}^{S}d_s=d.
+$$
+
+Let $w_k$ be the current model after $k$ block updates. For each stage $s$, the index $j_k^{(s)}$ records the historical global iteration whose stage block is used in the stale read. The gradient is evaluated at
+
+$$
+z_k=
+\left(
+w_{j_k^{(1)}}^{(1)},
+\ldots,
+w_{j_k^{(S)}}^{(S)}
+\right).
+$$
+
+The essential point is that $z_k$ need not equal any past full iterate $w_t$. It can take stage 1 from one moment, stage 2 from another, and so on. We assume only that every block is at most $\delta$ global block updates old:
+
+$$
+0\le k-j_k^{(s)}\le\delta
+\qquad\text{for every stage }s.
+$$
+
+This stage-wise mixed model is the part of PipeDream that RPD preserves.
+
+## Randomized PipeDream: keep the mechanism, simplify the schedule
+
+Exact PipeDream is difficult to analyze because the active stage, the microbatch identity, and every stage's stale version are jointly coupled by the deterministic 1F1B timeline. RPD removes that combinatorial dependency.
+
+At block-update iteration $k$, RPD first selects a bounded delay vector and forms $z_k$. Conditional on that stale read, it samples a stage $s_k$ and mini-batch $m_k$ uniformly, then updates only the selected block:
+
+$$
+w_{k+1}^{(s_k)}
+=
+w_k^{(s_k)}
+-\gamma\nabla_{w^{(s_k)}}f_{m_k}(z_k),
+$$
+
+while every other block remains unchanged.
+
+The delay vector does **not** need to be uniformly random; it may depend on the history. The crucial ordering is that it is fixed before the current stage/mini-batch draw, its delays are bounded by $\delta$, and the stage/mini-batch pair is conditionally uniform.
+
+RPD is a mathematical proxy, not a proposed systems scheduler. Deterministic PipeDream does not sample its stages and microbatches uniformly. The connection back to PipeDream comes from deriving the delay scale produced by its real scheduling rule.
+
+## The nonconvex convergence guarantee
+
+Assume that $f$ is lower bounded and $L$-smooth, the component block gradients encountered along the stale-read trajectory are bounded by $G$, the delay is at most $\delta$, and $0<\gamma\le 1/L$. If $\Delta_0=f(w_0)-f_\star$, then after $K$ block updates RPD satisfies
+
+$$
+\frac{1}{K}\sum_{k=0}^{K-1}
+\mathbb{E}\!\left[\lVert\nabla f(w_k)\rVert^2\right]
+\le
+\frac{2S\Delta_0}{\gamma K}
++\gamma SLG^2
++\gamma^2L^2\delta^2G^2.
+$$
+
+The three terms have different meanings:
+
+- $2S\Delta_0/(\gamma K)$ is the optimization term; it shrinks with the update budget.
+- $\gamma SLG^2$ is the stochastic single-block update term.
+- $\gamma^2L^2\delta^2G^2$ is the stale-read term, and its quadratic dependence on $\delta$ drives the scaling diagnosis.
+
+<figure class="project-figure">
+  <Image
+    src={rpdConvergenceBound}
+    alt="Randomized PipeDream convergence bound separated into optimization, stochastic, and stale-read terms"
+    widths={[480, 800, 1200, 1600]}
+    sizes="(max-width: 66rem) calc(100vw - 2rem), 64rem"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>
+    <span>The RPD bound isolates the stale-read penalty in blue. The slide's warning is fundamental: this is a theorem for the randomized abstraction, not the exact deterministic schedule.</span>
+    <a class="project-figure-open" href={rpdConvergenceBound.src} target="_blank" rel="noreferrer">Open full size</a>
+  </figcaption>
+</figure>
+
+The proof rests on two useful observations. First, uniform stage/mini-batch sampling makes the selected block update an unbiased full-gradient direction at $z_k$, up to the factor $1/S$. Second, at most $\delta$ intervening updates of length at most $\gamma G$ imply
+
+$$
+\lVert w_k-z_k\rVert\le\gamma\delta G.
+$$
+
+Smoothness turns that parameter discrepancy into a gradient discrepancy; squaring it produces the characteristic $\delta^2$ term.
+
+With the tuned step size
+
+$$
+\gamma=
+\min\!\left\{
+\frac{1}{L},
+\sqrt{\frac{2\Delta_0}{LG^2K}}
+\right\},
+$$
+
+the rate becomes
+
+$$
+\mathcal{O}\!\left(
+\frac{S}{\sqrt{K}}
++\frac{\delta^2}{K}
+\right).
+$$
+
+A small average squared gradient norm means that the iterates are close to first-order stationarity on average. It does not imply that RPD reaches a global optimum of a nonconvex objective.
+
+## PipeDream's delay grows quadratically with pipeline depth
+
+We can now ask what value of $\delta$ corresponds to deterministic PipeDream. In steady-state 1F1B, take a stage-1 forward event and the matching stage-1 backward event. A microbatch must traverse the remaining stages and return, spanning roughly $2S-1$ pipeline slots. Because the global history advances after every backward block update, counting all backward events in that region gives an area-like quantity:
+
+<figure class="project-figure">
+  <Image
+    src={pipedreamDelayScaling}
+    alt="Steady-state PipeDream schedule with an S by 2S minus 1 highlighted region used to count the worst stage delay"
+    widths={[480, 800, 1200, 1600]}
+    sizes="(max-width: 66rem) calc(100vw - 2rem), 64rem"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>
+    <span>The worst stage spans a region of height $S$ and width $2S-1$; about half of its cells are backward updates appended to global history.</span>
+    <a class="project-figure-open" href={pipedreamDelayScaling.src} target="_blank" rel="noreferrer">Open full size</a>
+  </figcaption>
+</figure>
+
+Under the paper's slot-batched global-history embedding, the formal steady-state result is
+
+$$
+\delta_{\mathrm{PD}}
+=
+S^2-\frac{S}{2}+\mathcal{O}(1).
+$$
+
+For even $S$, the identity is exact:
+
+$$
+\delta_{\mathrm{PD}}=S^2-\frac{S}{2}.
+$$
+
+So four stages give a worst delay of $14$ block updates, matching the earlier trace, while eight stages give $60$.
+
+Substituting $\delta_{\mathrm{PD}}=\Theta(S^2)$ into the RPD theorem makes the raw stale-read contribution scale as $\Theta(\gamma^2S^4)$. With the tuned step size, the RPD proxy for PipeDream has the form
+
+$$
+\mathcal{O}\!\left(
+\frac{S}{\sqrt{K}}
++\frac{S^4}{K}
+\right).
+$$
+
+<aside class="project-callout">
+  <strong>Read the quartic term carefully.</strong>
+  <p>It is not an $S^4$ runtime law, an empirical law for every training loss, or a direct convergence theorem for deterministic PipeDream. It is the worst-case stale-read contribution obtained by inserting PipeDream's scheduler-induced delay into the RPD theorem. PipeDream can still provide excellent pipeline utilization.</p>
+</aside>
+
+The theory exposes a tension: deeper pipelines can execute more block operations in parallel, while those operations may be tied to increasingly old global histories.
+
+## Does the randomized proxy resemble deterministic PipeDream?
+
+The theory is useful only if the abstraction retains something important about the original method. We therefore compare a deterministic PipeDream simulation with RPD on a controlled random quadratic objective.
+
+<figure class="project-figure">
+  <Image
+    src={pdVsRpdQuadratic}
+    alt="Log-scale convergence curves for deterministic PipeDream and Randomized PipeDream at eight stages; RPD with delay 60 follows the PipeDream trajectory"
+    widths={[480, 800, 1200, 1600]}
+    sizes="(max-width: 66rem) calc(100vw - 2rem), 64rem"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>
+    <span>On this simple quadratic with $S=8$, RPD at the predicted delay $\delta=60$ tracks the deterministic PD simulation reasonably closely. Much larger delays slow RPD substantially.</span>
+    <a class="project-figure-open" href={pdVsRpdQuadratic.src} target="_blank" rel="noreferrer">Open full size</a>
+  </figcaption>
+</figure>
+
+This is an empirical sanity check, not proof that RPD exactly reproduces every PipeDream trajectory. It supports the narrower claim that the abstraction captures a dominant stale-weight effect in this controlled setting.
+
+## LocalSGD trades stale reads for synchronization
+
+The scaling result suggests a different way to buy utilization. Instead of one cross-stage stale trajectory, maintain $R$ logical full-model trajectories. Each replica performs $H$ local SGD steps, then corresponding stage blocks are averaged:
+
+$$
+\bar{w}_q^{(s)}
+=
+\frac{1}{R}\sum_{r=1}^{R}w_{q,r}^{(s)},
+\qquad
+w_{q,r}^{(s)}\leftarrow\bar{w}_q^{(s)}.
+$$
+
+The logical replicas are partitioned across the same $S$ pipeline stages and interleaved through the schedule. More trajectories create more independent work that can occupy otherwise empty slots:
+
+<figure class="project-figure">
+  <Image
+    src={localSgdTrajectories}
+    alt="Four LocalSGD schedules showing one through four trajectories packed into a four-stage pipeline; utilization rises but synchronization bubbles remain"
+    widths={[480, 800, 1200, 1600]}
+    sizes="(max-width: 66rem) calc(100vw - 2rem), 64rem"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>
+    <span>At $H=1$, interleaving more trajectories makes the schedule denser, but the averaging boundary still creates a synchronization bubble.</span>
+    <a class="project-figure-open" href={localSgdTrajectories.src} target="_blank" rel="noreferrer">Open full size</a>
+  </figcaption>
+</figure>
+
+The synchronization period $H$ is the main knob:
+
+- Small $H$ keeps replicas close, but pays frequent fill-and-drain bubbles.
+- Large $H$ synchronizes less often and improves utilization, but lets replicas drift farther before averaging.
+
+This avoids **PipeDream-style cross-stage staleness**, not every form of delay or error. It also requires memory for $R$ logical model copies. The experiments use $R=S$ to keep the pipeline highly utilized, and their optimization/time comparisons do not charge this extra memory as a separate resource cost.
+
+## Compare failure modes, not universal winners
+
+To compare the theories under a common block-update budget, let $T$ be the number of logical local steps per replica. Since each step updates all $S$ blocks for each of $R$ replicas,
+
+$$
+K=RST.
+$$
+
+With $R=S$, the tuned LocalSGD guarantee becomes
+
+$$
+\mathcal{O}\!\left(
+\sqrt{\frac{S}{K}}
++\frac{S^3H^2}{K}
+\right).
+$$
+
+The two theories isolate different sensitivities:
+
+| Model | Main systems benefit | Main optimization penalty | Additional systems cost |
+| --- | --- | --- | --- |
+| RPD proxy for PD | Dense 1F1B execution | Cross-stage stale reads; $S^4/K$ term | Startup/drain and weight stashing |
+| Stage-distributed LocalSGD | Independent trajectories fill idle slots | Replica drift; $S^3H^2/K$ term | Synchronization bubbles and $R$ logical model copies |
+
+The guarantees also measure different objects. RPD averages gradient norms along one stale block-update trajectory. LocalSGD evaluates the averaged logical model $\bar{w}_q$. A shared block-update budget makes the comparison informative, but the two bounds are not identical mathematical objects and do not prove that one schedule always wins.
+
+The simulated-time experiments make that non-universality visible:
+
+<figure class="project-figure">
+  <Image
+    src={pdVsLocalSgdObjectives}
+    alt="Two simulated-time convergence plots at 16 stages: tuned LocalSGD reaches a lower logistic-regression objective, while tuned PipeDream reaches a lower quadratic objective"
+    widths={[480, 800, 1200, 1600]}
+    sizes="(max-width: 66rem) calc(100vw - 2rem), 64rem"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>
+    <span>At $S=16$ in these best-tuned synthetic runs, LocalSGD reaches the lower logistic-regression objective, while PipeDream is stronger on the tridiagonal quadratic.</span>
+    <a class="project-figure-open" href={pdVsLocalSgdObjectives.src} target="_blank" rel="noreferrer">Open full size</a>
+  </figcaption>
+</figure>
+
+The paper also reports an 11.1M-parameter NanoChat-style Tiny Shakespeare experiment in which tuned PipeDream reaches the lower training loss. That is training-loss evidence for this setup, not a claim about downstream quality or generalization. Across the experiments, the outcome depends on the objective, gradient noise, stage count, memory budget, and synchronization period.
+
+## Reproducing the experiments
+
+The [public research codebase](https://github.com/vectozavr/randomized-pipedream) contains the discrete 1F1B simulators, weight-version tracking, quadratic and logistic-regression objectives, schedule plots, and comparison scripts. A minimal simple-objective workflow is:
+
+```bash
+git clone https://github.com/vectozavr/randomized-pipedream.git
+cd randomized-pipedream
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -e .
+
+python3 -m scripts.run_experiment configs/quadratic_pipedream.yaml
+python3 -m scripts.run_experiment configs/quadratic_gpd.yaml
+python3 -m scripts.make_figure configs/comparison.yaml
+```
+
+The repository's `llm-experiments` branch contains the small character-level Transformer experiments. The simulator records not only convergence curves but also forward/backward weight versions, allowing the delay calculation to be checked against the executed schedule.
+
+## What this project changes
+
+The contribution is not a claim that randomized scheduling should replace PipeDream. It is a way to make PipeDream's optimization mechanism analyzable:
+
+- **RPD isolates the right object:** a block gradient evaluated on a model assembled from stage-wise historical versions.
+- **The theorem exposes the price of delay:** the stale-read term depends on $\delta^2$.
+- **The scheduler supplies the scale:** steady-state PipeDream has $\delta_{\mathrm{PD}}=\Theta(S^2)$ in global block-update history.
+- **The comparison clarifies the design space:** LocalSGD removes that particular stale-version mechanism but introduces synchronization and drift.
+
+The practical question is therefore not, “Which method always wins?” It is:
+
+> **Which imperfection can this training problem afford—idle time, stale reads, or replica drift?**
+
+That is the tradeoff the theory and experiments are designed to make visible.

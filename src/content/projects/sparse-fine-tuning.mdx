@@ -1,0 +1,279 @@
+---
+title: Super-Tuning for LLMs
+shortSummary: We introduce Super, which selects a sparse trainable support using activation-aware pruning scores, and Supra, a matched-budget sparse-plus-LoRA adapter.
+year: 2026
+status: Research project
+category: Research / Efficient Adaptation
+topics:
+  - Sparse fine-tuning
+  - Efficient adaptation
+  - LLM pruning
+featured: true
+githubUrl: https://github.com/vectozavr/SuperTuning
+paperUrl: https://arxiv.org/abs/2607.09287
+image: ../../assets/projects/sparse-fine-tuning.webp
+imageAlt: Comparison of a sparse adapter with a low-rank adapter for fine-tuning
+imageFit: contain
+metricsRepository: vectozavr/SuperTuning
+relatedPublications:
+  - super-tuning
+---
+
+import { Image } from 'astro:assets';
+import dualitySlide from '../../assets/projects/super-tuning/super-tuning-duality.webp';
+import supraSlide from '../../assets/projects/super-tuning/supra-overview.webp';
+import bottomKSlide from '../../assets/projects/super-tuning/wanda-bottom-k.webp';
+import lossSlide from '../../assets/projects/super-tuning/training-validation-loss.webp';
+import oneBResultsSlide from '../../assets/projects/super-tuning/llama-1b-results.webp';
+import eightBResultsSlide from '../../assets/projects/super-tuning/llama-8b-results.webp';
+
+What if the weights that look easiest to prune are also the safest ones to teach?
+
+That question led us from activation-aware pruning to **Super**, a sparse parameter-efficient fine-tuning method, and then to **Supra**, which combines the same fixed sparse update with LoRA. The aim is simple: adapt a language model while training and storing only a tiny fraction of its parameters.
+
+This is the intuition behind our paper, written with Philip Zmushko and Peter Richtárik. This project page builds the method from the adapter view, explains the counterintuitive TopK-versus-BottomK choice, and puts the results in their proper experimental context.
+
+## Fine-tuning is a question about allowed updates
+
+A language model generates one token at a time. At each step, billions of learned weights shape a probability distribution over the next token. Fine-tuning changes those weights so that the distribution becomes more useful for a particular task.
+
+The direct approach is full fine-tuning: let every parameter move. It is conceptually clean, but gradients, optimizer state, checkpoints, and training memory all scale with the full model. When each downstream task needs its own adapted model, storage becomes expensive too.
+
+Parameter-efficient fine-tuning changes the question. Instead of learning a replacement for a pretrained weight matrix $W$, keep $W$ frozen and learn a constrained update $\Delta$:
+
+$$
+\widehat{W}=W+\Delta.
+$$
+
+The constraint on $\Delta$ defines the adapter.
+
+[LoRA](https://arxiv.org/abs/2106.09685), for example, writes the update as a product of two thin matrices:
+
+$$
+\Delta=\gamma LR,
+\qquad
+L\in\mathbb{R}^{c\times r},\quad
+R\in\mathbb{R}^{r\times b}.
+$$
+
+When the rank $r$ is small, the adapter stores $r(c+b)$ trainable scalars instead of the $cb$ entries in a dense update. Every coordinate of the expanded matrix can change, but those changes are coupled through a low-dimensional factorization.
+
+Sparse adaptation imposes a different geometry. It chooses a binary mask $M$ and learns values $U$ only at the selected coordinates:
+
+$$
+\Delta=M\odot U,
+\qquad
+\lVert M\rVert_0=s.
+$$
+
+The support of $M$ is fixed during training. A small set of individual entries can move independently; every other coordinate stays exactly frozen. That can match LoRA's trainable-parameter count, but it creates a new problem that LoRA does not have: **which coordinates should be trainable?**
+
+## Pruning and sparse fine-tuning face complementary masks
+
+Pruning begins with a removal budget and asks which parameters can disappear while preserving the pretrained function. Sparse fine-tuning begins with an update budget and asks which parameters should be allowed to change.
+
+The operations are different—one deletes weights, the other learns task-specific deltas—but both depend on choosing a good mask.
+
+<figure>
+  <Image
+    class="project-slide"
+    src={dualitySlide}
+    alt="Two weight grids comparing parameters removed during pruning with parameters selected for sparse fine-tuning"
+    widths={[640, 960, 1200]}
+    sizes="(max-width: 50rem) calc(100vw - 2rem), 50rem"
+    loading="lazy"
+  />
+  <figcaption>Pruning asks what to remove; sparse fine-tuning asks what to train. The shared problem is mask selection. Slide 18 from the project presentation.</figcaption>
+</figure>
+
+Several sparse fine-tuning methods answer this with gradients. That can make the mask task-aware, but it also introduces a search step that needs backward passes or dense gradient information. Simpler magnitude-based methods show that the pretrained weights themselves can already provide a useful ordering.
+
+Our route was to reuse a signal from pruning.
+
+## Super: turn a Wanda-style score into a training mask
+
+For one linear layer, let $W_{ij}$ be a weight and let $X_{j:}$ collect the calibration activations entering input coordinate $j$. Super scores each coordinate with
+
+$$
+A_{ij}=|W_{ij}|\,\lVert X_{j:}\rVert_2.
+$$
+
+This is the activation-weighted magnitude ordering used by [Wanda](https://arxiv.org/abs/2306.11695). Its squared form has an exact single-weight interpretation. If $W^{(-ij)}$ is $W$ with only coordinate $(i,j)$ zeroed, then
+
+$$
+\left\lVert (W-W^{(-ij)})X\right\rVert_F^2
+=W_{ij}^2\left\lVert X_{j:}\right\rVert_2^2.
+$$
+
+In other words, the score measures the immediate layer-output change caused by deleting that one weight on the calibration activations. For a set of weights, cross-terms between activation rows appear, so independent ranking is a diagonal heuristic rather than an exact global mask optimizer.
+
+Super—short for **Selective Update of Parameters via Extreme Ranking**—reuses this score, not the full Wanda pruning procedure. It ranks all coordinates within each adapted layer, while many pruning implementations impose row-wise budgets. A calibration pass through the frozen model supplies the activation norms; it does not require fine-tuning gradients. In our reported setup, the default mask construction uses 128 C4 calibration samples.
+
+We flatten the scores within each adapted layer, choose a budget $s$, and make one of two masks:
+
+- **TopK** trains the $s$ largest-scoring coordinates.
+- **BottomK** trains the $s$ smallest-scoring coordinates.
+
+The presentation writes the squared Wanda score, $W_{ij}^{2}\lVert X_{j:}\rVert_2^{2}$. Squaring does not change the ordering because the scores are nonnegative.
+
+### Why BottomK is a plausible choice
+
+For pruning, a high Wanda score means that deleting the weight is estimated to disturb the layer output more on the calibration activations. The conventional instinct for fine-tuning might be to update those high-score, influential coordinates.
+
+But the opposite argument is also plausible. High-score weights may carry more of the pretrained function, so changing them could damage useful behavior. Low-score weights may offer less-loaded degrees of freedom that can be repurposed with less interference.
+
+<figure>
+  <Image
+    class="project-slide"
+    src={bottomKSlide}
+    alt="Wanda score branching to faded TopK parameters and highlighted BottomK parameters proposed for fine-tuning"
+    widths={[640, 960, 1100]}
+    sizes="(max-width: 50rem) calc(100vw - 2rem), 50rem"
+    loading="lazy"
+  />
+  <figcaption>The BottomK direction was a hypothesis to test, not a theorem. Slide 26 uses the squared score, which produces the same ordering as the formula above.</figcaption>
+</figure>
+
+That is why we evaluated both ends of the ordering rather than assuming that pruning importance transfers directly. BottomK was the stronger empirical default in the schedule-selected comparisons, but it was not uniformly best in every fixed-schedule run. It should be read as an observed pattern in this setting, not a universal law about where models should learn.
+
+We also tested a magnitude-only ordering, $|W_{ij}|$, in the spirit of PaFi. It needs no activation calibration at all—and, especially on the 8B model, it turned out to be a remarkably strong baseline.
+
+## Supra: combine fixed coordinates with a learned subspace
+
+Sparse and low-rank adapters make different tradeoffs:
+
+- Super learns independent values on a fixed set of coordinates.
+- LoRA learns a task-dependent low-rank subspace whose expanded update can touch every coordinate.
+
+Supra puts both into the same adapted layer:
+
+$$
+\widehat{W}
+=W+M\odot U+\gamma LR.
+$$
+
+The high-level sparse-plus-low-rank structure also appears in [RoSA](https://arxiv.org/abs/2401.04679); we arrived at it independently. Our contribution is not the addition alone. The distinguishing pieces are the pruning-derived fixed support and an explicit rule that keeps the number of trainable scalars matched to a reference LoRA budget.
+
+<figure>
+  <Image
+    class="project-slide"
+    src={supraSlide}
+    alt="Diagram combining a fixed sparse adapter selected by a Wanda score with two LoRA factor matrices"
+    widths={[640, 960, 1200]}
+    sizes="(max-width: 50rem) calc(100vw - 2rem), 50rem"
+    loading="lazy"
+  />
+  <figcaption>Supra combines a fixed coordinate-level update with an adaptive low-rank update. Slide 24 from the project presentation.</figcaption>
+</figure>
+
+Suppose rank-$r_0$ LoRA would use
+
+$$
+T=r_0(c+b)
+$$
+
+trainable scalars for a layer. Super receives approximately that many sparse values. Supra divides the same target budget using a low-rank fraction $\lambda\in[0,1]$:
+
+- $\lambda=0$ gives sparse-only Super.
+- $\lambda=1$ recovers rank-$r_0$ LoRA.
+- intermediate values reserve part of the budget for LoRA and the rest for sparse values.
+
+All main comparisons use $r_0=8$. The point is not that the implementations have identical runtime; it is that they are compared with approximately the same number of trainable and stored adapter scalars.
+
+## How we tested the idea
+
+We fine-tuned two pretrained models—Llama-3.2-1B and Meta-Llama-3-8B—on the 17,172-record Math17K dataset. The adapted layers were the seven standard Llama projections: query, key, value, output, gate, up, and down.
+
+The rank-8-equivalent adapter budgets were approximately:
+
+| Model | Trainable adapter scalars | Share of full model |
+| --- | ---: | ---: |
+| Llama-3.2-1B | 5.64 million | about 0.45% |
+| Meta-Llama-3-8B | 20.97 million | about 0.26% |
+
+For each method and epoch budget, we swept learning rates and selected one using negative log-likelihood on a fixed 120-example Math17K validation split. We then measured exact-answer accuracy on six arithmetic benchmarks: AddSub, MultiArith, SingleEq, GSM8K, AQuA, and SVAMP. Benchmark accuracy was not used to choose the learning rate.
+
+<figure>
+  <Image
+    class="project-slide"
+    src={lossSlide}
+    alt="Training and validation loss curves for LoRA, RoSA, SIFT, Super, and Supra on Llama 3.2 1B"
+    widths={[640, 960, 1200]}
+    sizes="(max-width: 50rem) calc(100vw - 2rem), 50rem"
+    loading="lazy"
+  />
+  <figcaption>Training and validation losses show that the adapters optimize successfully, but exact-answer accuracy is the metric that determines whether the generated result is correct. Slide 32.</figcaption>
+</figure>
+
+The compact charts below choose the better one- or three-epoch schedule for each method. For Super and Supra they also show the strongest observed variant from the tested support and budget-split grid. That makes them useful summaries, but not a claim that one method dominates for every fixed schedule.
+
+## What happened on the 1B model
+
+The frozen 1B model averaged 12.64% exact-answer accuracy. Every serious adaptation method improved it substantially.
+
+The strongest matched-budget adapter in the compact comparison was **Supra BottomK with $\lambda=0.8$**, at **62.23%**. Rank-8 LoRA reached **61.07%**, an observed gap of 1.16 percentage points. Sparse-only Super BottomK reached 55.46%. Full fine-tuning reached 65.70%, but it is an unbudgeted reference that updates roughly 1.24 billion parameters rather than 5.64 million adapter scalars.
+
+<figure>
+  <Image
+    class="project-slide"
+    src={oneBResultsSlide}
+    alt="Bar chart of schedule-selected Math17K average accuracy results for Llama 3.2 1B, highlighting Supra BottomK at 62.23 percent"
+    widths={[640, 960, 1100]}
+    sizes="(max-width: 50rem) calc(100vw - 2rem), 50rem"
+    loading="lazy"
+  />
+  <figcaption>Observed single-seed, schedule-selected averages for Llama-3.2-1B. Adapter methods use the rank-8-equivalent budget; full fine-tuning is an unbudgeted reference. Slide 38.</figcaption>
+</figure>
+
+The interesting result is not merely that a sparse component can work. It is that a hybrid can divide the same scalar budget between fixed coordinates and a low-rank subspace and remain competitive with a pure rank-8 adapter.
+
+## What changed at 8B
+
+The 8B comparison gave a more cautionary—and, to me, more useful—result.
+
+The highest observed average was **Supra-Mag BottomK with $\lambda=0.3$**, at **79.12%**. But magnitude-only BottomK reached **79.02%**. A difference of 0.10 points in a single-seed experiment is best described as essentially tied. The strongest activation-weighted Supra result reached 78.66%.
+
+<figure>
+  <Image
+    class="project-slide"
+    src={eightBResultsSlide}
+    alt="Bar chart of schedule-selected Math17K average accuracy results for Meta Llama 3 8B, highlighting Supra-Mag BottomK at 79.12 percent"
+    widths={[640, 960, 1100]}
+    sizes="(max-width: 50rem) calc(100vw - 2rem), 50rem"
+    loading="lazy"
+  />
+  <figcaption>Observed single-seed, schedule-selected averages for Meta-Llama-3-8B. Supra-Mag and magnitude-only BottomK are effectively tied. Slide 42.</figcaption>
+</figure>
+
+This prevents an overly convenient conclusion. Activation weighting was not uniformly superior. The broader signal is that **low-score supports can be effective**, whether the score is activation-weighted magnitude or pretrained magnitude alone. On this model, the cheap magnitude ordering was particularly hard to beat.
+
+## What the numbers do—and do not—show
+
+There are four qualifications that matter when reading these charts.
+
+1. **They are single-seed observations.** Small gaps are not statistically established improvements.
+2. **The compact view is schedule-selected.** It reports the better one- or three-epoch result for each method and the best tested Super/Supra variant. The paper appendix contains the fixed-schedule grids.
+3. **The task scope is narrow.** These experiments cover two Llama sizes and arithmetic reasoning. They are not a scaling law or evidence about open-ended generation, code, dialogue, or other model families.
+4. **The reported full-snapshot benchmark protocol is not held out from Math17K.** Math17K includes questions drawn from the first 80% of the six packaged benchmark snapshots. The repository now documents this explicitly and includes `supertuning-data-audit` plus disjoint benchmark subsets. The chart values should therefore be read as results for the paper's reproducible packaged protocol, not as unseen-question generalization estimates.
+
+<aside class="project-note">
+  <strong>Why keep the last point prominent?</strong> A useful method claim and a clean evaluation claim are different things. The mask-selection comparison remains reproducible, but future evidence should emphasize disjoint questions, multiple seeds, and more task families.
+</aside>
+
+There is a systems caveat too. Matching trainable scalar counts does not automatically produce equal memory or speed. The current Super/Supra implementation stores sparse values and sparse optimizer state, but its linear layer still forms a dense effective weight and computes a dense gradient before gathering selected coordinates. The short H200 profiler is encouraging—for the 8B model, Super used 46.22 GiB of peak allocated memory versus 54.90 GiB for LoRA—but it is an implementation measurement, not a claim of sparse-kernel acceleration. Super's adapter checkpoint was also larger in that profile: 160.1 MiB versus 80.2 MiB for LoRA, largely because sparse values need indices.
+
+## The takeaway
+
+I see three useful ideas in these experiments.
+
+First, **a fixed sparse support can be competitive without a gradient-based mask search**. One calibration pass—or even pretrained magnitudes alone—can expose useful coordinates for adaptation.
+
+Second, **pruning scores can be repurposed without copying the pruning decision**. A score built to estimate removal damage becomes an ordering over possible training coordinates. The low-score end may offer capacity that is safer to change, although that remains a task- and schedule-dependent empirical hypothesis.
+
+Third, **sparse and low-rank updates offer complementary geometry**. Super gives independent movement on fixed coordinates. LoRA gives coordinated movement through an adaptive low-dimensional parameterization. Supra lets the two share one explicit budget.
+
+The next steps are clear: disjoint evaluation, multiple seeds, broader tasks and architectures, dynamic or row-wise supports, layer-aware budget allocation, and sparse kernels that turn parameter sparsity into reliable systems gains.
+
+The broad claim is deliberately modest: simple orderings inside a pretrained model can reveal surprisingly useful adaptation capacity. That is enough to make the bridge from pruning to fine-tuning worth exploring.
+
+You can read the complete methodology and fixed-schedule tables in the [paper](https://arxiv.org/abs/2607.09287), or reproduce and extend the experiments with the [open-source implementation](https://github.com/vectozavr/SuperTuning).
