@@ -43,6 +43,7 @@ const projects = defineCollection({
       githubUrl: optionalUrl,
       paperUrl: optionalUrl,
       demoUrl: optionalUrl,
+      demoLabel: z.string().optional(),
       image: image().optional(),
       imageAlt: z.string().optional(),
       imageFit: z.enum(['cover', 'contain']).default('cover'),

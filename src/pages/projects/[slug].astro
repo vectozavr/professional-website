@@ -30,7 +30,9 @@ const mediaClass = [
 const links = [
   project.data.githubUrl ? { label: 'GitHub repository', href: project.data.githubUrl } : undefined,
   project.data.paperUrl ? { label: 'Read the paper', href: project.data.paperUrl } : undefined,
-  project.data.demoUrl ? { label: 'Visit project', href: project.data.demoUrl } : undefined,
+  project.data.demoUrl
+    ? { label: project.data.demoLabel ?? 'Visit project', href: project.data.demoUrl }
+    : undefined,
 ].filter((link): link is { label: string; href: string } => Boolean(link));
 
 const isSoftware = Boolean(project.data.githubUrl);

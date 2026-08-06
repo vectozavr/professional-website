@@ -19,6 +19,6 @@ This project covers the development and design of a binary adder. The original w
 
 ## Links
 
-- [Part 1: Theory](http://ilinblog.ru/article.php?id_article=50)
-- [Part 2: Practice](http://ilinblog.ru/article.php?id_article=59)
+- [Part 1: Theory](https://ilinblog.ru/articles/kak-rabotaet-kalkulyator-sozdaem-svoyu-vychislitelnuyu-mashinu-1/)
+- [Part 2: Practice](https://ilinblog.ru/articles/kak-rabotaet-kalkulyator-sozdaem-svoyu-vychislitelnuyu-mashinu-2/)
 - [Watch the project video](https://youtu.be/Cp4fI_i60No)

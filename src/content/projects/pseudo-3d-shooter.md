@@ -21,8 +21,8 @@ I implemented this pseudo-3D shooter from scratch. It supports loading a two-dim
 
 ## Articles
 
-- [Part 1: Preliminaries](http://ilinblog.ru/article.php?id_article=49)
-- [Part 2: Implementation](http://ilinblog.ru/article.php?id_article=63)
+- [Part 1: Preliminaries](https://ilinblog.ru/articles/pishem-shuter-ot-pervogo-litsa-v-konsoli-kak-rabotaet-psevdo-3d-grafika-v-igrah-1/)
+- [Part 2: Implementation](https://ilinblog.ru/articles/kak-ya-napisal-onlain-shuter-na-c-za-nedelyu/)
 
 ## Videos and code
 
