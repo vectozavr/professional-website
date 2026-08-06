@@ -23,6 +23,7 @@ const relatedPublications = publications.filter((publication) =>
   project.data.relatedPublications.includes(publication.id),
 );
 const metric = getRepositoryMetric(project.data.metricsRepository);
+const showGitHubStars = metric && metric.stars >= 100;
 const mediaClass = [
   'project-media',
   project.data.imageFit === 'contain' ? 'media-contain' : '',
@@ -63,7 +64,7 @@ const structuredData = {
       <div class="detail-meta">
         <span>{project.data.status}</span>
         {project.data.year && <span>{project.data.year}</span>}
-        {metric && <span>★ {metric.stars} GitHub stars</span>}
+        {showGitHubStars && <span>★ {metric.stars} GitHub stars</span>}
       </div>
       {links.length > 0 && (
         <div class="detail-actions">
@@ -77,14 +78,25 @@ const structuredData = {
     </div>
     <div class="detail-visual">
       {project.data.image ? (
-        <Image
-          class={mediaClass}
-          src={project.data.image}
-          alt={project.data.imageAlt ?? ''}
-          widths={[480, 720, 960, 1280]}
-          sizes="(max-width: 62rem) calc(100vw - 2.5rem), 42rem"
-          loading="eager"
-        />
+        project.data.image.format === 'svg' ? (
+          <Image
+            class={mediaClass}
+            src={project.data.image}
+            alt={project.data.imageAlt ?? ''}
+            width={project.data.image.width}
+            height={project.data.image.height}
+            loading="eager"
+          />
+        ) : (
+          <Image
+            class={mediaClass}
+            src={project.data.image}
+            alt={project.data.imageAlt ?? ''}
+            widths={[480, 720, 960, 1280]}
+            sizes="(max-width: 62rem) calc(100vw - 2.5rem), 42rem"
+            loading="eager"
+          />
+        )
       ) : (
         <ProjectVisual type={project.data.visual ?? 'matrix'} />
       )}
@@ -94,17 +106,20 @@ const structuredData = {
   <section class="project-body content-section">
     <div class="narrow-shell">
       {project.data.youtubeVideoId && (
-        <div class="project-video-frame">
-          <iframe
-            class="project-video"
-            src={`https://www.youtube-nocookie.com/embed/${project.data.youtubeVideoId}`}
-            title={`${project.data.title} video overview`}
-            loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          ></iframe>
-        </div>
+        <>
+          <p class="project-video-intro">Prefer a visual introduction? Watch our video for a walkthrough of Thanos:</p>
+          <div class="project-video-frame">
+            <iframe
+              class="project-video"
+              src={`https://www.youtube-nocookie.com/embed/${project.data.youtubeVideoId}`}
+              title={`${project.data.title} video overview`}
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </>
       )}
       <article class="prose">
         <Content />

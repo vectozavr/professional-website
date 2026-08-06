@@ -24,14 +24,25 @@ const mediaClass = [
 >
   <a class="project-card-visual" href={sitePath(`/projects/${project.id}/`)} tabindex="-1" aria-hidden="true">
     {project.data.image ? (
-      <Image
-        class={mediaClass}
-        src={project.data.image}
-        alt={project.data.imageAlt ?? ''}
-        widths={[320, 640, 960]}
-        sizes="(max-width: 48rem) calc(100vw - 2rem), 36rem"
-        loading="lazy"
-      />
+      project.data.image.format === 'svg' ? (
+        <Image
+          class={mediaClass}
+          src={project.data.image}
+          alt={project.data.imageAlt ?? ''}
+          width={project.data.image.width}
+          height={project.data.image.height}
+          loading="lazy"
+        />
+      ) : (
+        <Image
+          class={mediaClass}
+          src={project.data.image}
+          alt={project.data.imageAlt ?? ''}
+          widths={[320, 640, 960]}
+          sizes="(max-width: 48rem) calc(100vw - 2rem), 36rem"
+          loading="lazy"
+        />
+      )
     ) : (
       <ProjectVisual type={project.data.visual ?? 'matrix'} />
     )}

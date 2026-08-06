@@ -1,0 +1,237 @@
+---
+title: "VoiceCut"
+shortSummary: An open-source, local-first tool that turns retake-heavy narration into a clean audio or video edit while preserving the speaker's real voice.
+status: Beta
+category: Open Source / Audio Processing
+topics:
+  - Audio processing
+  - Speech editing
+  - Open source
+featured: true
+githubUrl: https://github.com/vectozavr/voicecut
+demoUrl: https://vectozavr.github.io/voicecut/
+demoLabel: Explore examples
+image: ../../assets/projects/voicecut-cover.svg
+imageAlt: VoiceCut pipeline from fragmented source takes through semantic word selection and aligned cut boundaries to one clean audio and video edit
+imageFit: cover
+metricsRepository: vectozavr/voicecut
+relatedPublications: []
+---
+
+Anyone who records narration knows the pattern: begin a sentence, stumble, stop, say it again, leave a note to yourself, and continue. The final take is in there—but finding it means repeatedly scrubbing through a timeline, comparing near-identical phrases, and cutting around words and breaths by hand.
+
+**VoiceCut automates that edit.** Give it one audio or video file and it finds false starts, abandoned takes, corrections, repetitions, and recording directions. It keeps the intended source occurrences, resolves safe boundaries around the actual speech, and produces a clean edit beside the original.
+
+It never invents a replacement voice. Every retained word comes from the recording you made.
+
+<aside class="project-callout voicecut-principle">
+  <strong>The central idea</strong>
+  <p>Decide <em>what</em> to keep using language, then decide <em>where</em> to cut using acoustic alignment. Those are different problems, and VoiceCut gives each one to the right tool.</p>
+</aside>
+
+## Hear the difference
+
+The three public examples below were produced by the production VoiceCut pipeline without manual repair. They cover English narration, Russian narration, and narration-driven video editing.
+
+<div class="voicecut-results" role="figure" aria-label="Published end-to-end VoiceCut examples">
+  <div class="voicecut-result-grid">
+    <section class="voicecut-result-card">
+      <div class="voicecut-result-heading">
+        <h4>English narration</h4>
+        <strong>−28.1%</strong>
+      </div>
+      <div class="voicecut-result-row">
+        <span>Original</span>
+        <progress class="original" max="40" value="38" aria-label="Original English recording: 38 seconds">38.00 seconds</progress>
+        <b>38.00s</b>
+      </div>
+      <div class="voicecut-result-row">
+        <span>VoiceCut</span>
+        <progress class="edited" max="40" value="27.34" aria-label="Edited English recording: 27.34 seconds">27.34 seconds</progress>
+        <b>27.34s</b>
+      </div>
+    </section>
+
+    <section class="voicecut-result-card">
+      <div class="voicecut-result-heading">
+        <h4>Russian narration</h4>
+        <strong>−38.2%</strong>
+      </div>
+      <div class="voicecut-result-row">
+        <span>Original</span>
+        <progress class="original" max="40" value="35.07" aria-label="Original Russian recording: 35.07 seconds">35.07 seconds</progress>
+        <b>35.07s</b>
+      </div>
+      <div class="voicecut-result-row">
+        <span>VoiceCut</span>
+        <progress class="edited" max="40" value="21.68" aria-label="Edited Russian recording: 21.68 seconds">21.68 seconds</progress>
+        <b>21.68s</b>
+      </div>
+    </section>
+
+    <section class="voicecut-result-card">
+      <div class="voicecut-result-heading">
+        <h4>Video narration</h4>
+        <strong>−21.4%</strong>
+      </div>
+      <div class="voicecut-result-row">
+        <span>Original</span>
+        <progress class="original" max="40" value="30.25" aria-label="Original video: 30.25 seconds">30.25 seconds</progress>
+        <b>30.25s</b>
+      </div>
+      <div class="voicecut-result-row">
+        <span>VoiceCut</span>
+        <progress class="edited" max="40" value="23.78" aria-label="Edited video: 23.78 seconds">23.78 seconds</progress>
+        <b>23.78s</b>
+      </div>
+    </section>
+  </div>
+
+  <p class="voicecut-results-note">These percentages are duration reductions reported in the <a href="https://github.com/vectozavr/voicecut/blob/main/examples/demo_manifest.json">published demo manifest</a>, not editing-quality scores. They describe three short demonstrations, not a benchmark over a larger dataset.</p>
+</div>
+
+### English and Russian audio
+
+The English recording contains an abandoned opening and a repeated phrase. VoiceCut keeps the later coherent take. The Russian example exercises Cyrillic grounding and Russian phone alignment, including mixed-script technical terms.
+
+<div class="voicecut-demo-grid">
+  <article class="voicecut-demo-card">
+    <header>
+      <span>English narration</span>
+      <h4>False starts become one clean take</h4>
+    </header>
+    <section class="voicecut-player" aria-labelledby="voicecut-en-original">
+      <div><strong id="voicecut-en-original">Original</strong><span>38.00s</span></div>
+      <audio controls preload="metadata" aria-labelledby="voicecut-en-original">
+        <source src="https://vectozavr.github.io/voicecut/media/audio/example_en.wav" type="audio/wav" />
+        <a href="https://vectozavr.github.io/voicecut/media/audio/example_en.wav">Open the original English audio.</a>
+      </audio>
+    </section>
+    <section class="voicecut-player edited" aria-labelledby="voicecut-en-edited">
+      <div><strong id="voicecut-en-edited">VoiceCut edit</strong><span>27.34s</span></div>
+      <audio controls preload="metadata" aria-labelledby="voicecut-en-edited">
+        <source src="https://vectozavr.github.io/voicecut/media/audio/example_en_edited.wav" type="audio/wav" />
+        <a href="https://vectozavr.github.io/voicecut/media/audio/example_en_edited.wav">Open the edited English audio.</a>
+      </audio>
+    </section>
+  </article>
+
+  <article class="voicecut-demo-card">
+    <header>
+      <span>Russian narration</span>
+      <h4>Repeated attempts become one explanation</h4>
+    </header>
+    <section class="voicecut-player" aria-labelledby="voicecut-ru-original">
+      <div><strong id="voicecut-ru-original">Original</strong><span>35.07s</span></div>
+      <audio controls preload="metadata" aria-labelledby="voicecut-ru-original">
+        <source src="https://vectozavr.github.io/voicecut/media/audio/example_ru.wav" type="audio/wav" />
+        <a href="https://vectozavr.github.io/voicecut/media/audio/example_ru.wav">Open the original Russian audio.</a>
+      </audio>
+    </section>
+    <section class="voicecut-player edited" aria-labelledby="voicecut-ru-edited">
+      <div><strong id="voicecut-ru-edited">VoiceCut edit</strong><span>21.68s</span></div>
+      <audio controls preload="metadata" aria-labelledby="voicecut-ru-edited">
+        <source src="https://vectozavr.github.io/voicecut/media/audio/example_ru_edited.wav" type="audio/wav" />
+        <a href="https://vectozavr.github.io/voicecut/media/audio/example_ru_edited.wav">Open the edited Russian audio.</a>
+      </audio>
+    </section>
+  </article>
+</div>
+
+### The same idea works for video
+
+For video, VoiceCut follows the selected speech intervals with direct picture cuts. It does not insert frozen frames or artificial holds to imitate the semantic pauses used for audio-only narration.
+
+<article class="voicecut-demo-card voicecut-video-demo">
+  <div class="voicecut-video-grid">
+    <section class="voicecut-video-panel" aria-labelledby="voicecut-video-original">
+      <div><strong id="voicecut-video-original">Original</strong><span>30.25s</span></div>
+      <video controls playsinline preload="metadata" poster="https://vectozavr.github.io/voicecut/assets/video-before.jpg" aria-labelledby="voicecut-video-original">
+        <source src="https://vectozavr.github.io/voicecut/media/video/video.mp4" type="video/mp4" />
+        <a href="https://vectozavr.github.io/voicecut/media/video/video.mp4">Open the original video.</a>
+      </video>
+    </section>
+    <section class="voicecut-video-panel edited" aria-labelledby="voicecut-video-edited">
+      <div><strong id="voicecut-video-edited">VoiceCut edit</strong><span>23.78s</span></div>
+      <video controls playsinline preload="metadata" poster="https://vectozavr.github.io/voicecut/assets/video-after.jpg" aria-labelledby="voicecut-video-edited">
+        <source src="https://vectozavr.github.io/voicecut/media/video/video_edited.mp4" type="video/mp4" />
+        <a href="https://vectozavr.github.io/voicecut/media/video/video_edited.mp4">Open the edited video.</a>
+      </video>
+    </section>
+  </div>
+</article>
+
+All media above is streamed from the VoiceCut project's own GitHub Pages site; this website does not store duplicate copies.
+
+## Why this is not a silence trimmer
+
+A long pause is not necessarily a mistake, and a fluent sentence is not necessarily the take the speaker wants. Someone might say:
+
+> “The model has eight layers—no, let me restart—the model has eighteen layers.”
+
+A silence detector can find the gaps, but it cannot understand that the first statement was abandoned. VoiceCut instead works with a chronological transcript in which every occurrence has its own immutable source ID. A semantic planner chooses the exact occurrences that form the intended narration—even when the same words appear several times.
+
+That choice is then checked deterministically. Returned IDs must exist, remain chronological, avoid overlap, match their declared boundary words, and support the claimed sentence. The planner may normalize punctuation or an acoustically plausible transcription error; it cannot add words that were never spoken.
+
+## One semantic plan, one final render
+
+<figure class="project-figure voicecut-remote-figure">
+  <img
+    src="https://vectozavr.github.io/voicecut/assets/pipeline.svg"
+    alt="VoiceCut pipeline from source audio or video through transcription, semantic selection, grounding, phone alignment, pause handling, an immutable plan, and one final render"
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>VoiceCut decides which source occurrences belong in the narration, proves that the surrounding boundaries are safe, and only then renders from the original recording.</figcaption>
+</figure>
+
+The production path has five broad stages:
+
+1. **Prepare one canonical source.** FFmpeg inspects the real media streams and decodes the speech track into a lossless internal WAV. The signal is not normalized, denoised, or repeatedly re-encoded before analysis.
+2. **Build one chronological transcript.** MLX Whisper gives every word occurrence an ID and an approximate time anchor. Repeated words remain distinct, so VoiceCut can choose the later successful attempt.
+3. **Select the intended take.** The planner receives transcript text and source IDs, then returns the exact ranges to keep. Long recordings are handled in chronological windows with a one-thought look-ahead, so a sentence is not committed just because it sounds complete before the next retake arrives.
+4. **Prove the cuts are safe.** Source grounding checks the semantic plan. WhisperX can veto an incomplete retained word, while Montreal Forced Aligner maps the real source words to phones and owns the final production coordinates.
+5. **Freeze the plan and render once.** Every endpoint, pause, protected speech span, and source interval is written into one immutable boundary plan before output samples are produced. The final audio is sliced once from the canonical source; video uses the same selected timeline.
+
+The separation is deliberate: Whisper timestamps are useful crop anchors, but they are not precise enough to own a final splice. A quiet fricative can look like silence in a waveform. VoiceCut only places a production cut outside retained speech phones confirmed by alignment.
+
+## Audio should still sound like the room it came from
+
+Removing a failed take also removes the pause around it. VoiceCut classifies transitions as a continuation, short pause, thought break, or section break. Existing natural silence counts toward that target rather than being blindly extended.
+
+For English, optional breath cleanup operates only inside MFA-confirmed non-speech. If VoiceCut needs ambience for a pause or breath replacement, it copies verified clean room tone from the same recording. It cannot replace or fade retained phone samples. Russian defaults to breath cleanup off because the current breath model has not been validated for Russian.
+
+If an alignment cannot support a safe cut, VoiceCut does not quietly fall back to an approximate timestamp. It first asks for another source-grounded selection; if that still fails, it preserves more local context or stops rather than guessing a boundary.
+
+## Local media, optional cloud planning
+
+VoiceCut is local-first, but the distinction is precise:
+
+<div class="voicecut-privacy-grid">
+  <section>
+    <span>Stays on your Mac</span>
+    <h3>The recording and every physical edit</h3>
+    <p>Media decoding, waveform analysis, transcription, alignment, boundary resolution, breath evidence, ambience selection, and rendering all run locally.</p>
+  </section>
+  <section>
+    <span>Planner receives</span>
+    <h3>Text and source identifiers</h3>
+    <p>A configured cloud planner sees transcript words, occurrence IDs, thought context, and text-only repair diagnostics. It never receives the source audio or video.</p>
+  </section>
+</div>
+
+Gemini is the recommended planner today; OpenAI and DeepSeek are supported. Local Qwen, Gemma, and custom MLX-LM planners are available experimentally.
+
+## Run it with one command
+
+After installation, the smallest useful invocation is:
+
+<pre><code>voicecut recording.wav</code></pre>
+
+The edit is written beside the input as <code>recording_edited.wav</code>. VoiceCut accepts common audio and video formats through FFmpeg, including WAV, MP3, M4A, FLAC, MOV, and MP4. You can choose an output path, select English or Russian, process video, or retain a work directory containing the transcript, semantic plan, alignment evidence, final boundary plan, and run summary.
+
+Today the supported production setup is an Apple Silicon Mac with Python 3.11 or 3.12. VoiceCut targets one main narrator speaking English or Russian. Video editing is driven by speech timing; it does not understand slide changes, gestures, camera cuts, or visual continuity. The semantic planner can occasionally choose the wrong take, and alignment can still be imperfect around acronyms, technical terms, or tightly connected speech, so every final export should be reviewed.
+
+VoiceCut is beta software, but the design is already useful: choose the right take, ground every word in the source, protect the speech at each boundary, and render only once.
+
+Try the [interactive examples](https://vectozavr.github.io/voicecut/), read the complete [documentation](https://github.com/vectozavr/voicecut#documentation), or explore and contribute to the [open-source repository](https://github.com/vectozavr/voicecut).

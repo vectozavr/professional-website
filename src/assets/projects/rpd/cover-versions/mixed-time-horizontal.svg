@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="pipedream-cover-title pipedream-cover-description">
+  <title id="pipedream-cover-title">PipeDream horizontal mixed-time assembly concept</title>
+  <desc id="pipedream-cover-description">Four historical model snapshots each contribute one different pipeline stage to a mixed-time model, illustrating how a PipeDream gradient can be evaluated using stage weights from several moments in training.</desc>
+
+  <defs>
+    <linearGradient id="stage-one" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#365bc8"/>
+      <stop offset="1" stop-color="#556cda"/>
+    </linearGradient>
+    <linearGradient id="stage-two" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#5269d9"/>
+      <stop offset="1" stop-color="#7077e5"/>
+    </linearGradient>
+    <linearGradient id="stage-three" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#756fe0"/>
+      <stop offset="1" stop-color="#9a70df"/>
+    </linearGradient>
+    <linearGradient id="stage-four" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#e58a58"/>
+      <stop offset="1" stop-color="#df6f60"/>
+    </linearGradient>
+    <filter id="selected-shadow" x="-35%" y="-45%" width="170%" height="210%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="9" stdDeviation="10" flood-color="#34498f" flood-opacity="0.16"/>
+    </filter>
+    <filter id="mixed-shadow" x="-35%" y="-30%" width="170%" height="180%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#34498f" flood-opacity="0.14"/>
+    </filter>
+    <g id="history-slice">
+      <rect width="150" height="50" rx="14" fill="#f0f2f6" stroke="#dfe4ec" stroke-width="2.5"/>
+      <circle cx="75" cy="25" r="4.5" fill="#bec6d3"/>
+    </g>
+  </defs>
+
+  <rect width="1600" height="900" fill="#ffffff"/>
+
+  <text x="130" y="108" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="56" font-weight="760" letter-spacing="4.5" fill="#0d1526">PIPEDREAM</text>
+  <text x="132" y="153" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19" font-weight="700" letter-spacing="2.4" fill="#66738a">ONE MODEL READ · SEVERAL TRAINING MOMENTS</text>
+
+  <g font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <text x="570" y="239" text-anchor="middle" font-size="17" font-weight="750" letter-spacing="2.3" fill="#778398">FULL MODEL SNAPSHOTS</text>
+    <text x="1330" y="223" text-anchor="middle" font-size="17" font-weight="750" letter-spacing="2.3" fill="#5267d0">MIXED-TIME MODEL</text>
+    <text x="1330" y="273" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="49" font-style="italic" fill="#26324a">zₖ</text>
+  </g>
+
+  <!-- Selected stage blocks travel forward in history and assemble into z_k. -->
+  <g fill="none" stroke-width="6" stroke-linecap="round" opacity="0.42">
+    <path d="M300 325H1200" stroke="#4b65d2"/>
+    <path d="M530 385H1200" stroke="#6874df"/>
+    <path d="M760 445H1200" stroke="#8b71df"/>
+    <path d="M990 505H1200" stroke="#df795c"/>
+  </g>
+
+  <!-- Four coherent checkpoints. Only one stage is read from each moment. -->
+  <g>
+    <g>
+      <use href="#history-slice" x="150" y="300"/>
+      <use href="#history-slice" x="150" y="360"/>
+      <use href="#history-slice" x="150" y="420"/>
+      <use href="#history-slice" x="150" y="480"/>
+      <g filter="url(#selected-shadow)">
+        <rect x="150" y="300" width="150" height="50" rx="14" fill="url(#stage-one)" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2"/>
+        <text x="225" y="332" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="760" letter-spacing="1.5" fill="#ffffff">STAGE 1</text>
+      </g>
+    </g>
+
+    <g>
+      <use href="#history-slice" x="380" y="300"/>
+      <use href="#history-slice" x="380" y="360"/>
+      <use href="#history-slice" x="380" y="420"/>
+      <use href="#history-slice" x="380" y="480"/>
+      <g filter="url(#selected-shadow)">
+        <rect x="380" y="360" width="150" height="50" rx="14" fill="url(#stage-two)" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2"/>
+        <text x="455" y="392" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="760" letter-spacing="1.5" fill="#ffffff">STAGE 2</text>
+      </g>
+    </g>
+
+    <g>
+      <use href="#history-slice" x="610" y="300"/>
+      <use href="#history-slice" x="610" y="360"/>
+      <use href="#history-slice" x="610" y="420"/>
+      <use href="#history-slice" x="610" y="480"/>
+      <g filter="url(#selected-shadow)">
+        <rect x="610" y="420" width="150" height="50" rx="14" fill="url(#stage-three)" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2"/>
+        <text x="685" y="452" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="760" letter-spacing="1.5" fill="#ffffff">STAGE 3</text>
+      </g>
+    </g>
+
+    <g>
+      <use href="#history-slice" x="840" y="300"/>
+      <use href="#history-slice" x="840" y="360"/>
+      <use href="#history-slice" x="840" y="420"/>
+      <use href="#history-slice" x="840" y="480"/>
+      <g filter="url(#selected-shadow)">
+        <rect x="840" y="480" width="150" height="50" rx="14" fill="url(#stage-four)" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2"/>
+        <text x="915" y="512" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="760" letter-spacing="1.5" fill="#ffffff">STAGE 4</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- The mixed model contains one block from each historical snapshot. -->
+  <g filter="url(#mixed-shadow)" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <rect x="1180" y="285" width="300" height="264" rx="32" fill="#ffffff" stroke="#e1e5f0" stroke-width="2.5"/>
+    <rect x="1200" y="300" width="260" height="50" rx="14" fill="url(#stage-one)"/>
+    <rect x="1200" y="360" width="260" height="50" rx="14" fill="url(#stage-two)"/>
+    <rect x="1200" y="420" width="260" height="50" rx="14" fill="url(#stage-three)"/>
+    <rect x="1200" y="480" width="260" height="50" rx="14" fill="url(#stage-four)"/>
+
+    <g fill="#ffffff" font-size="18" font-weight="750" letter-spacing="1.2">
+      <text x="1224" y="332">STAGE 1</text>
+      <text x="1224" y="392">STAGE 2</text>
+      <text x="1224" y="452">STAGE 3</text>
+      <text x="1224" y="512">STAGE 4</text>
+    </g>
+    <g fill="#ffffff" fill-opacity="0.82" font-family="Georgia, 'Times New Roman', serif" font-size="19" font-style="italic" text-anchor="end">
+      <text x="1434" y="332">from j₁</text>
+      <text x="1434" y="392">from j₂</text>
+      <text x="1434" y="452">from j₃</text>
+      <text x="1434" y="512">from j₄</text>
+    </g>
+  </g>
+
+  <!-- The historical reads advance toward the present. -->
+  <g font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-style="italic" fill="#536077">
+      <text x="225" y="574">j₁</text>
+      <text x="455" y="574">j₂</text>
+      <text x="685" y="574">j₃</text>
+      <text x="915" y="574">j₄</text>
+    </g>
+    <path d="M150 612H990M978 600L990 612L978 624" fill="none" stroke="#aab3c2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="150" y="646" font-size="14" font-weight="750" letter-spacing="2" fill="#8994a6">OLDER</text>
+    <text x="990" y="646" text-anchor="end" font-size="14" font-weight="750" letter-spacing="2" fill="#8994a6">NEWER</text>
+  </g>
+
+  <line x1="235" y1="690" x2="1365" y2="690" stroke="#edf0f5" stroke-width="2"/>
+
+  <g text-anchor="middle">
+    <text x="800" y="742" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" font-weight="750" letter-spacing="2.4" fill="#738097">PIPELINE DEPTH → STALE-WEIGHT DELAY</text>
+    <text x="800" y="817" font-family="Georgia, 'Times New Roman', serif" font-size="54" font-style="italic" fill="#26324a">δ<tspan baseline-shift="sub" font-size="27">PD</tspan><tspan baseline-shift="baseline" font-style="normal"> = Θ(</tspan><tspan baseline-shift="baseline">S</tspan><tspan baseline-shift="super" font-size="30">2</tspan><tspan baseline-shift="baseline" font-style="normal">)</tspan></text>
+  </g>
+</svg>

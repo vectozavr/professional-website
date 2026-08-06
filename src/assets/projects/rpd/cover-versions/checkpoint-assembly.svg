@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="pipedream-cover-title pipedream-cover-description">
+  <title id="pipedream-cover-title">PipeDream checkpoint-stage assembly concept</title>
+  <desc id="pipedream-cover-description">Four complete historical model snapshots each contribute a different highlighted pipeline stage to one mixed-time block vector z k.</desc>
+
+  <defs>
+    <filter id="selected-shadow" x="-35%" y="-45%" width="170%" height="210%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="9" stdDeviation="10" flood-color="#4059ce" flood-opacity="0.18"/>
+    </filter>
+    <filter id="vector-shadow" x="-18%" y="-50%" width="136%" height="220%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#4059ce" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="#ffffff"/>
+
+  <text x="800" y="101" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="56" font-weight="760" letter-spacing="4.5" fill="#0d1526">PIPEDREAM</text>
+  <text x="800" y="147" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19" font-weight="700" letter-spacing="2.4" fill="#66738a">ONE MODEL READ · FOUR STAGE HISTORIES</text>
+
+  <text x="800" y="204" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" font-weight="750" letter-spacing="2.4" fill="#7b879a">HISTORICAL MODEL VERSIONS</text>
+
+  <!-- Four coherent historical checkpoints. -->
+  <g fill="#f7f8fb" stroke="#dce2eb" stroke-width="3">
+    <rect x="258" y="250" width="184" height="248" rx="27"/>
+    <rect x="558" y="250" width="184" height="248" rx="27"/>
+    <rect x="858" y="250" width="184" height="248" rx="27"/>
+    <rect x="1158" y="250" width="184" height="248" rx="27"/>
+  </g>
+
+  <g stroke="#dce2eb" stroke-width="2.5">
+    <path d="M258 312H442M258 374H442M258 436H442"/>
+    <path d="M558 312H742M558 374H742M558 436H742"/>
+    <path d="M858 312H1042M858 374H1042M858 436H1042"/>
+    <path d="M1158 312H1342M1158 374H1342M1158 436H1342"/>
+  </g>
+
+  <!-- One different stage block is read from each checkpoint. -->
+  <g filter="url(#selected-shadow)" fill="#5269d9" stroke="#ffffff" stroke-opacity="0.82" stroke-width="2">
+    <rect x="251" y="250" width="198" height="62" rx="16"/>
+    <rect x="551" y="312" width="198" height="62" rx="16"/>
+    <rect x="851" y="374" width="198" height="62" rx="16"/>
+    <rect x="1151" y="436" width="198" height="62" rx="16"/>
+  </g>
+
+  <g text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" font-weight="800" letter-spacing="1.4" fill="#ffffff">
+    <text x="350" y="289">S1</text>
+    <text x="650" y="351">S2</text>
+    <text x="950" y="413">S3</text>
+    <text x="1250" y="475">S4</text>
+  </g>
+
+  <g text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="25" font-style="italic" fill="#536077">
+    <text x="350" y="537">jₖ⁽¹⁾</text>
+    <text x="650" y="537">jₖ⁽²⁾</text>
+    <text x="950" y="537">jₖ⁽³⁾</text>
+    <text x="1250" y="537">jₖ⁽⁴⁾</text>
+  </g>
+
+  <!-- The four selected blocks align and assemble into the mixed-time vector. -->
+  <g fill="none" stroke="#94a2df" stroke-width="5" stroke-linecap="round">
+    <path d="M350 555V660"/>
+    <path d="M650 555V660"/>
+    <path d="M950 555V660"/>
+    <path d="M1250 555V660"/>
+  </g>
+
+  <text x="800" y="605" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" font-weight="750" letter-spacing="2.3" fill="#5267d0" stroke="#ffffff" stroke-width="9" stroke-linejoin="round" paint-order="stroke fill">ASSEMBLED MIXED-TIME MODEL</text>
+
+  <text x="126" y="727" font-family="Georgia, 'Times New Roman', serif" font-size="48" font-style="italic" fill="#26324a">zₖ =</text>
+
+  <g filter="url(#vector-shadow)">
+    <rect x="200" y="660" width="1200" height="104" rx="29" fill="#5269d9"/>
+  </g>
+  <g stroke="#ffffff" stroke-width="4" stroke-opacity="0.72">
+    <path d="M500 662V762"/>
+    <path d="M800 662V762"/>
+    <path d="M1100 662V762"/>
+  </g>
+  <g text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="28" font-weight="800" letter-spacing="1.8" fill="#ffffff">
+    <text x="350" y="724">S1</text>
+    <text x="650" y="724">S2</text>
+    <text x="950" y="724">S3</text>
+    <text x="1250" y="724">S4</text>
+  </g>
+
+  <g font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <rect x="410" y="813" width="76" height="34" rx="17" fill="#e9edff"/>
+    <text x="448" y="836" text-anchor="middle" font-size="15" font-weight="800" letter-spacing="1.5" fill="#4059ce">RPD</text>
+    <text x="514" y="839" font-family="Georgia, 'Times New Roman', serif" font-size="27" fill="#26324a">0 ≤ k − jₖ⁽ˢ⁾ ≤ δ</text>
+    <text x="841" y="837" font-size="16" font-weight="750" letter-spacing="1.8" fill="#718096">BOUNDED BLOCK-WISE STALENESS</text>
+  </g>
+</svg>

@@ -11,9 +11,9 @@ topics:
 featured: true
 githubUrl: https://github.com/vectozavr/thanos
 paperUrl: https://arxiv.org/abs/2504.05346
-image: ../../assets/projects/thanos.webp
-imageAlt: Diagram of coordinated weight pruning and compensation in a model weight matrix
-imageFit: contain
+image: ../../assets/projects/thanos-row-update-cover-clean-arrows.svg
+imageAlt: One Thanos row update leaves weights on the left unchanged, sends red arrows to selected weights set to zero in the current block, and sends green update arrows through the current block and weights on its right
+imageFit: cover
 youtubeVideoId: k4nUw3siA-I
 metricsRepository: vectozavr/thanos
 relatedPublications:
@@ -36,10 +36,6 @@ That makes the large weight matrices in those layers a natural target for compre
 > After several weights disappear, how should the surviving weights move together so that the layer's output changes as little as possible?
 
 Thanos treats pruning as this **coordinated reconstruction problem**. It combines calibration data, second-order information, and a direct block-wise compensation rule. For unstructured sparsity, it also uses a dynamic global pruning budget.
-
-<aside class="article-note" aria-label="Research status">
-  <strong>Research status.</strong> Thanos is an active research project. This page is a conceptual explainer: it makes no publication-status, benchmark-ranking, or production-speed claim. Exact experimental settings and complete tables belong in the linked research manuscript and repository.
-</aside>
 
 ## The compression target: linear layers
 
@@ -265,7 +261,7 @@ The progression is easier to see as a list of capabilities:
 
 The extra structure is not free. Thanos has to construct and invert small interaction systems, so its practical cost depends on block size, selected-set size, batching efficiency, and the layer dimensions. Wanda remains much cheaper because it does not reconstruct retained weights.
 
-## What the experiments are meant to test
+## What the experiments show
 
 The project evaluates two separate questions:
 
@@ -286,11 +282,118 @@ $$
 
 Lower perplexity means the model assigns higher probability to the observed next tokens. Perplexity values are only comparable under the same dataset, tokenizer, sequence handling, and evaluation protocol.
 
-The research manuscript studies 50% unstructured pruning as well as semi-structured 4:8 and 2:4 patterns across several OPT- and Llama-family model sizes. This project page intentionally does not reproduce the benchmark table or rank the methods. Instead, the experiments are useful for separating three questions:
+The second metric is average zero-shot accuracy across WinoGrande, OpenBookQA, BoolQ, PIQA, HellaSwag, ARC-easy, and ARC-challenge. Higher is better. The data-aware methods use the same calibration set of 128 sequences sampled from C4. The main [paper tables](https://arxiv.org/pdf/2504.05346) report eight model sizes spanning TinyLlama, LLaMA-2, and LLaMA-3.
 
-- how the methods behave when an unstructured mask has maximum flexibility;
-- how joint reconstruction behaves under regular 4:8 and 2:4 constraints; and
-- how much one-time work the pruning procedure requires in a specific implementation.
+### Thanos versus SparseGPT on LLaMA-3 8B
+
+<div class="project-result-chart" role="figure" aria-labelledby="thanos-result-chart-title">
+  <div class="project-result-chart-header">
+    <span class="project-result-chart-kicker">Tables 2-3 · LLaMA-3 8B</span>
+    <h3 id="thanos-result-chart-title">A direct comparison with the strongest baseline</h3>
+    <p>Each pair uses the reported values directly. Shorter is better for perplexity; longer is better for zero-shot accuracy.</p>
+  </div>
+
+  <div class="project-result-legend" aria-hidden="true">
+    <span><i class="baseline"></i>SparseGPT</span>
+    <span><i class="thanos"></i>Thanos</span>
+  </div>
+
+  <div class="project-result-grid">
+    <section class="project-result-card">
+      <h4>Unstructured 50%</h4>
+      <div class="project-result-metric comparison">
+        <div><span>WikiText-2 PPL ↓</span><strong>Thanos wins</strong></div>
+        <div class="project-result-bar-row">
+          <span>SparseGPT</span><progress class="baseline" max="10" value="9.36" aria-label="SparseGPT perplexity 9.36">9.36</progress><b>9.36</b>
+        </div>
+        <div class="project-result-bar-row">
+          <span>Thanos</span><progress class="thanos" max="10" value="9.32" aria-label="Thanos perplexity 9.32">9.32</progress><b>9.32</b>
+        </div>
+      </div>
+      <div class="project-result-metric comparison zero-shot">
+        <div><span>Average zero-shot ↑</span><strong class="baseline-wins">SparseGPT wins</strong></div>
+        <div class="project-result-bar-row">
+          <span>SparseGPT</span><progress class="baseline" max="70" value="61.21" aria-label="SparseGPT average zero-shot accuracy 61.21 percent">61.21%</progress><b>61.21</b>
+        </div>
+        <div class="project-result-bar-row">
+          <span>Thanos</span><progress class="thanos" max="70" value="60.48" aria-label="Thanos average zero-shot accuracy 60.48 percent">60.48%</progress><b>60.48</b>
+        </div>
+      </div>
+    </section>
+
+    <section class="project-result-card">
+      <h4>Structured 30%</h4>
+      <div class="project-result-metric comparison">
+        <div><span>WikiText-2 PPL ↓</span><strong>Thanos wins</strong></div>
+        <div class="project-result-bar-row">
+          <span>SparseGPT</span><progress class="baseline" max="90" value="82.19" aria-label="SparseGPT perplexity 82.19">82.19</progress><b>82.19</b>
+        </div>
+        <div class="project-result-bar-row">
+          <span>Thanos</span><progress class="thanos" max="90" value="36.61" aria-label="Thanos perplexity 36.61">36.61</progress><b>36.61</b>
+        </div>
+      </div>
+      <div class="project-result-metric comparison zero-shot">
+        <div><span>Average zero-shot ↑</span><strong>Thanos wins</strong></div>
+        <div class="project-result-bar-row">
+          <span>SparseGPT</span><progress class="baseline" max="70" value="38.97" aria-label="SparseGPT average zero-shot accuracy 38.97 percent">38.97%</progress><b>38.97</b>
+        </div>
+        <div class="project-result-bar-row">
+          <span>Thanos</span><progress class="thanos" max="70" value="41.47" aria-label="Thanos average zero-shot accuracy 41.47 percent">41.47%</progress><b>41.47</b>
+        </div>
+      </div>
+    </section>
+
+    <section class="project-result-card">
+      <h4>Semi-structured 4:8</h4>
+      <div class="project-result-metric comparison">
+        <div><span>WikiText-2 PPL ↓</span><strong>Thanos wins</strong></div>
+        <div class="project-result-bar-row">
+          <span>SparseGPT</span><progress class="baseline" max="14" value="12.13" aria-label="SparseGPT perplexity 12.13">12.13</progress><b>12.13</b>
+        </div>
+        <div class="project-result-bar-row">
+          <span>Thanos</span><progress class="thanos" max="14" value="10.97" aria-label="Thanos perplexity 10.97">10.97</progress><b>10.97</b>
+        </div>
+      </div>
+      <div class="project-result-metric comparison zero-shot">
+        <div><span>Average zero-shot ↑</span><strong>Thanos wins</strong></div>
+        <div class="project-result-bar-row">
+          <span>SparseGPT</span><progress class="baseline" max="70" value="56.15" aria-label="SparseGPT average zero-shot accuracy 56.15 percent">56.15%</progress><b>56.15</b>
+        </div>
+        <div class="project-result-bar-row">
+          <span>Thanos</span><progress class="thanos" max="70" value="57.86" aria-label="Thanos average zero-shot accuracy 57.86 percent">57.86%</progress><b>57.86</b>
+        </div>
+      </div>
+    </section>
+
+    <section class="project-result-card">
+      <h4>Semi-structured 2:4</h4>
+      <div class="project-result-metric comparison">
+        <div><span>WikiText-2 PPL ↓</span><strong>Thanos wins</strong></div>
+        <div class="project-result-bar-row">
+          <span>SparseGPT</span><progress class="baseline" max="18" value="16.17" aria-label="SparseGPT perplexity 16.17">16.17</progress><b>16.17</b>
+        </div>
+        <div class="project-result-bar-row">
+          <span>Thanos</span><progress class="thanos" max="18" value="13.92" aria-label="Thanos perplexity 13.92">13.92</progress><b>13.92</b>
+        </div>
+      </div>
+      <div class="project-result-metric comparison zero-shot">
+        <div><span>Average zero-shot ↑</span><strong>Thanos wins</strong></div>
+        <div class="project-result-bar-row">
+          <span>SparseGPT</span><progress class="baseline" max="70" value="52.75" aria-label="SparseGPT average zero-shot accuracy 52.75 percent">52.75%</progress><b>52.75</b>
+        </div>
+        <div class="project-result-bar-row">
+          <span>Thanos</span><progress class="thanos" max="70" value="54.39" aria-label="Thanos average zero-shot accuracy 54.39 percent">54.39%</progress><b>54.39</b>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <p class="project-result-chart-note">The perplexity scale is normalized within each pruning setting because structured pruning produces much larger values. Zero-shot bars share a 0-70 scale. The structured and semi-structured cards use the better Thanos variant, α = 0.1.</p>
+</div>
+
+The full eight-model comparison tells the same broad story. A Thanos variant achieves the best reported perplexity on all eight model sizes for structured 30%, 4:8, and 2:4 pruning; it also leads average zero-shot accuracy on 8/8, 8/8, and 7/8 models respectively. Unstructured pruning is much closer: Thanos, SparseGPT, and Wanda each win different model sizes. On LLaMA-3 8B, for example, Thanos has slightly lower perplexity while SparseGPT retains slightly higher zero-shot accuracy.
+
+The dense LLaMA-3 8B reference scores 6.14 perplexity and 65.63% average zero-shot accuracy. The α = 0.1 variant preserves 10% of rows as outliers. In the 4:8 and 2:4 settings this reduces total sparsity from 50% to 45%, so it should not be read as an equal-sparsity comparison with the baseline rows. With α = 0, Thanos retains the full semi-structured sparsity and scores 12.17 / 56.89% for 4:8 and 16.06 / 52.71% for 2:4 on LLaMA-3 8B.
 
 Timing in those experiments concerns the **pruning procedure**, not inference latency, and depends on the implementation and hardware. The regular patterns are particularly interesting because joint constraints are unavoidable: several weights in each group must disappear together. Still, a sparse mask alone does not guarantee a smaller or faster deployed model. The storage format, kernels, runtime, and target hardware must support the chosen pattern.
 
@@ -311,3 +414,14 @@ These limitations are part of the research problem, not footnotes to hide. The m
 > Pruning is not only a decision about which weights to delete. It is a constrained reconstruction problem about how the surviving weights should respond.
 
 That is the problem Thanos is designed to solve. For the complete derivation, experimental protocol, and implementation, see the [research manuscript](https://arxiv.org/abs/2504.05346) and the [open-source repository](https://github.com/vectozavr/thanos).
+
+## Citation
+
+```bibtex
+@article{ilin2025thanos,
+  title={Thanos: A block-wise pruning algorithm for efficient large language model compression},
+  author={Ilin, Ivan and Richtarik, Peter},
+  journal={arXiv preprint arXiv:2504.05346},
+  year={2025}
+}
+```
