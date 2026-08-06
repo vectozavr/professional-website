@@ -24,18 +24,18 @@
     </g>
     <g id="forward-six">
       <rect width="112" height="112" rx="22" fill="#5269d9" stroke="#ffffff" stroke-opacity="0.84" stroke-width="2"/>
-      <text x="56" y="73" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="48" font-weight="800" fill="#ffffff">F₆</text>
+      <text x="56" y="73" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="48" font-weight="500" fill="#ffffff">F₆</text>
     </g>
     <g id="backward-six">
       <rect width="112" height="112" rx="22" fill="#e58655" stroke="#ffffff" stroke-opacity="0.84" stroke-width="2"/>
-      <text x="56" y="73" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="48" font-weight="800" fill="#ffffff">B₆</text>
+      <text x="56" y="73" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="48" font-weight="500" fill="#ffffff">B₆</text>
     </g>
   </defs>
 
   <rect width="1600" height="900" fill="#ffffff"/>
 
   <g font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
-    <text x="202" y="102" font-size="17" font-weight="750" letter-spacing="2.2" fill="#657188">STEADY 1F1B</text>
+    <text x="202" y="102" font-size="24" font-weight="750" letter-spacing="2.2" fill="#657188">STEADY 1F1B</text>
     <text x="1210" y="102" font-size="22" font-weight="750" letter-spacing="2" fill="#8994a6">TIME</text>
     <path d="M1286 96H1370M1359 85L1370 96L1359 107" fill="none" stroke="#aab3c2" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
 
@@ -44,7 +44,7 @@
     <circle cx="386" cy="171" r="5" fill="#6172d4"/>
     <circle cx="1282" cy="171" r="5" fill="#6172d4"/>
 
-    <g text-anchor="end" font-size="19" font-weight="750" letter-spacing="1.7" fill="#657188">
+    <g text-anchor="end" font-size="25" font-weight="750" letter-spacing="1.7" fill="#657188">
       <text x="292" y="252">STAGE 1</text>
       <text x="292" y="378">STAGE 2</text>
       <text x="292" y="504">STAGE 3</text>
@@ -101,7 +101,7 @@
   </g>
 
   <!-- Exact microbatch identities in this steady-state window. -->
-  <g text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="48" font-weight="760">
+  <g text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="48" font-weight="500">
     <g fill="#9e7258">
       <text x="514" y="252">B₃</text><text x="770" y="252">B₄</text><text x="1026" y="252">B₅</text>
       <text x="386" y="378">B₃</text><text x="642" y="378">B₄</text><text x="898" y="378">B₅</text>
@@ -124,7 +124,7 @@
     <text x="856" y="729" fill="#657188">Backward</text>
   </g>
 
-  <svg x="590" y="756" width="420" height="112" viewBox="-71.581573 -72.136384 55.650475 12.221026" preserveAspectRatio="xMidYMid meet" aria-label="delta sub P D equals theta of S squared">
+  <svg x="610" y="756" width="380" height="112" viewBox="-71.581573 -72.136384 55.650475 12.221026" preserveAspectRatio="xMidYMid meet" aria-label="delta sub P D equals theta of S squared">
     <g fill="#26324a">
       <use x="-72.000004" y="-63.392253" href="#pipe-scale-delta"/>
       <use x="-67.572162" y="-61.897873" href="#pipe-scale-p"/>

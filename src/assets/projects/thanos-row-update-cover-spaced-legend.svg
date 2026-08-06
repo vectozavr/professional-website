@@ -21,7 +21,6 @@
     </marker>
     <g id="updated-cell">
       <rect width="72" height="72" rx="18" fill="url(#updated-fill)" stroke="#72ad8b" stroke-width="3"/>
-      <path d="M23 36H49M42 29L49 36L42 43" fill="none" stroke="#3c8863" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
     <g id="removed-cell">
       <rect width="72" height="72" rx="18" fill="#fff3ef" stroke="#df7567" stroke-width="3.5"/>
@@ -36,14 +35,14 @@
   <rect width="1600" height="900" fill="#ffffff"/>
 
   <text x="800" y="108" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="56" font-weight="760" letter-spacing="5" fill="#0d1526">THANOS</text>
-  <text x="800" y="155" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19" font-weight="700" letter-spacing="2.8" fill="#66738a">JOINT ROW RECONSTRUCTION</text>
+  <text x="800" y="155" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="25" font-weight="700" letter-spacing="2.8" fill="#66738a">JOINT ROW RECONSTRUCTION</text>
 
   <g filter="url(#formula-shadow)">
-    <rect x="526" y="213" width="548" height="114" rx="30" fill="#ffffff" stroke="#e2e6f1" stroke-width="2.5"/>
+    <rect x="526" y="213" width="548" height="122" rx="30" fill="#ffffff" stroke="#e2e6f1" stroke-width="2.5"/>
   </g>
 
   <!-- The joint solve drives both deletion and compensation in one row. -->
-  <path d="M800 327V382" fill="none" stroke="#5267d0" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M800 335V382" fill="none" stroke="#5267d0" stroke-width="4.5" stroke-linecap="round"/>
   <circle cx="800" cy="388" r="7" fill="#5267d0"/>
 
   <!-- Previously processed weights sit to the left of the current block. -->
@@ -81,17 +80,16 @@
 
   <text x="752" y="646" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" font-weight="700" letter-spacing="2.1" fill="#5267d0">CURRENT BLOCK</text>
 
-  <g font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19" font-weight="700" letter-spacing="1.7">
+  <g font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="25" font-weight="700" letter-spacing="1.3">
     <rect x="300" y="690" width="38" height="38" rx="10" fill="#f1f3f6" stroke="#d9dee7" stroke-width="3"/>
     <circle cx="319" cy="709" r="5" fill="#bcc5d2"/>
     <text x="354" y="716" fill="#748097">UNCHANGED</text>
 
-    <rect x="585" y="690" width="38" height="38" rx="10" fill="#fff3ef" stroke="#df7567" stroke-width="3"/>
-    <path d="M596 701L612 717M612 701L596 717" fill="none" stroke="#df6f60" stroke-width="4.5" stroke-linecap="round"/>
-    <text x="639" y="716" fill="#7a5360">SELECTED → ZERO</text>
+    <rect x="566" y="690" width="38" height="38" rx="10" fill="#fff3ef" stroke="#df7567" stroke-width="3"/>
+    <path d="M577 701L593 717M593 701L577 717" fill="none" stroke="#df6f60" stroke-width="4.5" stroke-linecap="round"/>
+    <text x="620" y="716" fill="#7a5360">SELECTED → ZERO</text>
 
     <rect x="900" y="690" width="38" height="38" rx="10" fill="#e8f5ed" stroke="#72ad8b" stroke-width="3"/>
-    <path d="M909 709H929M923 703L929 709L923 715" fill="none" stroke="#3c8863" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
     <text x="954" y="716" fill="#47745e">UPDATED: BLOCK + RIGHT</text>
   </g>
 

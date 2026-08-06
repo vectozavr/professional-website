@@ -29,8 +29,8 @@
   <text x="800" y="126" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="56" font-weight="760" letter-spacing="5" fill="#0d1526">SUPRA</text>
   <text x="800" y="174" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" font-weight="700" letter-spacing="2.8" fill="#66738a">SUPER + LoRA</text>
 
-  <text x="474" y="254" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" font-weight="750" letter-spacing="3" fill="#26324a">SPARSE</text>
-  <text x="1120" y="254" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="22" font-weight="750" letter-spacing="3" fill="#26324a">LOW-RANK</text>
+  <text x="474" y="254" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="40" font-weight="750" letter-spacing="2" fill="#26324a">SPARSE</text>
+  <text x="1120" y="254" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="40" font-weight="750" letter-spacing="2" fill="#26324a">LOW-RANK</text>
 
   <!-- Super: Wanda-selected trainable coordinates. -->
   <g>
@@ -53,7 +53,7 @@
 
   <!-- LoRA: two explicit low-rank factor matrices. -->
   <g transform="matrix(1.2 0 0 1.2 -188 -80)">
-    <text x="874" y="303" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19" font-weight="750" font-style="italic" fill="#536077">L</text>
+    <text x="874" y="303" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="36" font-weight="750" font-style="italic" fill="#536077">L</text>
     <g fill="none" stroke="#68748a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M828 322H818V644H828"/>
       <path d="M920 322H930V644H920"/>
@@ -75,7 +75,7 @@
 
     <path d="M952 466L989 503M989 466L952 503" fill="none" stroke="#657188" stroke-width="6" stroke-linecap="round"/>
 
-    <text x="1198" y="402" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="19" font-weight="750" font-style="italic" fill="#536077">R</text>
+    <text x="1198" y="402" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="36" font-weight="750" font-style="italic" fill="#536077">R</text>
     <g fill="none" stroke="#68748a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M1034 420H1024V522H1034"/>
       <path d="M1352 420H1362V522H1352"/>
@@ -98,7 +98,7 @@
 
   <!-- Wanda activation-weighted magnitude score used to choose the sparse support. -->
   <g>
-    <text x="474" y="746" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" font-weight="700" letter-spacing="2.4" fill="#748097">WANDA SCORE</text>
+    <text x="474" y="746" text-anchor="middle" font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="26" font-weight="700" letter-spacing="1.8" fill="#748097">WANDA SCORE</text>
     <svg x="224" y="770" width="500" height="66" viewBox="-71.651312 -72.000004 79.2357 10.389026" preserveAspectRatio="xMidYMid meet" aria-label="A sub i j equals absolute W sub i j times the L2 norm of X sub j colon">
       <defs>
         <path id="wanda-i" d="M2.259527-4.358655C2.259527-4.470237 2.175841-4.623661 1.980573-4.623661C1.792279-4.623661 1.590037-4.442341 1.590037-4.2401C1.590037-4.121544 1.680697-3.975093 1.868991-3.975093C2.071233-3.975093 2.259527-4.170361 2.259527-4.358655ZM.836862-.81594C.808966-.72528 .774097-.641594 .774097-.523039C.774097-.195268 1.053051 .069738 1.436613 .069738C2.133998 .069738 2.440847-.892653 2.440847-.99726C2.440847-1.08792 2.350187-1.08792 2.329265-1.08792C2.231631-1.08792 2.224658-1.046077 2.196762-.969365C2.036364-.411457 1.729514-.125529 1.457534-.125529C1.318057-.125529 1.283188-.216189 1.283188-.369614C1.283188-.530012 1.332005-.662516 1.39477-.81594C1.464508-1.004234 1.54122-1.192528 1.617933-1.373848C1.680697-1.54122 1.931756-2.175841 1.959651-2.259527C1.980573-2.329265 2.001494-2.412951 2.001494-2.48269C2.001494-2.810461 1.72254-3.075467 1.338979-3.075467C.648568-3.075467 .327771-2.127024 .327771-2.008468C.327771-1.917808 .425405-1.917808 .446326-1.917808C.54396-1.917808 .550934-1.952677 .571856-2.02939C.753176-2.629141 1.060025-2.880199 1.318057-2.880199C1.429639-2.880199 1.492403-2.824408 1.492403-2.636115C1.492403-2.475716 1.45056-2.371108 1.276214-1.93873L.836862-.81594Z"/>
