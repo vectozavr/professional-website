@@ -1,0 +1,92 @@
+---
+title: "ilinblog.ru: A Science Blog Built from Scratch"
+shortSummary: A hand-built 2017 PHP and MySQL science blog that became a workshop for physics, programming, electronics, and learning in public—now preserved as a static archive.
+year: 2017
+status: Archived
+category: Education / Web Development
+topics:
+  - Web development
+  - Science communication
+  - Educational publishing
+featured: false
+demoUrl: https://ilinblog.ru/
+demoLabel: Read the ilinblog archive
+image: ../../assets/projects/ilinblog.webp
+imageAlt: Two tablets displaying the September 2018 ilinblog article feed and an illustrated article about neural networks
+imageFit: contain
+relatedPublications: []
+---
+
+import ProjectFigure from '../../components/ProjectFigure.astro';
+import firstHtmlPrototype from '../../assets/projects/ilinblog/first-html-prototype-redacted.webp';
+import firstDynamicVersion from '../../assets/projects/ilinblog/first-dynamic-version-redacted.webp';
+
+The earliest surviving screenshot of ilinblog is almost comic in its honesty. On July 31, 2017, it was a white page opened directly from a local file on my computer. There was a large “Welcome to my blog!” heading, three social-network buttons, a great deal of empty space—and a formula for centripetal acceleration.
+
+That formula is the part I like most. Before there was a domain, a database, or even a real layout, I was already trying to make mathematics work in a browser. The page had not yet learned how to look like a publication, but it already knew what it wanted to talk about.
+
+<ProjectFigure
+  src={firstHtmlPrototype}
+  alt="The earliest ilinblog prototype in a browser: a plain white page with a Russian welcome heading, a physics formula, and three social-network buttons"
+  caption="The first surviving version, July 31, 2017. It was a local HTML file with almost no layout; the physics formula arrived before the visual design did. Historical contact details in the footer have been removed."
+/>
+
+## Learning web development in public
+
+I did not begin ilinblog by choosing a ready-made publishing platform. I built it one visible layer at a time, learning what the web could do as the site demanded it.
+
+The screenshots preserved in the original history post make that process unusually literal. On the following day, CSS brought a blurred purple-and-blue background, a scripted logo, navigation, and a rounded content panel. A few days later, I divided the page into translucent sections and added search and a message form. Each screenshot is less a redesign than a newly discovered idea.
+
+By August 5, the address bar no longer pointed to an HTML file. It showed a local `ilinsblog.loc` site, with phpMyAdmin open in another tab. The page now had timestamped article cards, author names, excerpts, and small comment and reaction controls. In less than a week, the experiment had moved from a document into a PHP and MySQL application.
+
+<ProjectFigure
+  src={firstDynamicVersion}
+  alt="An early local version of ilinblog with two dated article cards, a message form, a colorful translucent background, and comment and heart controls"
+  caption="The local dynamic version on August 5, 2017. Articles had become records with titles, authors, dates, and their own interface rather than paragraphs on one page. Historical contact details in the footer have been removed."
+/>
+
+<aside class="project-callout">
+  <strong>The project inside the project</strong>
+  <p>ilinblog was ostensibly a place to publish what I was learning. In practice, building the publishing system became another subject I was learning—and every missing feature suggested the next lesson.</p>
+</aside>
+
+## From a page to a small publishing platform
+
+The old database still preserves a compact feature log. On August 30, 2017, authors gained personal publications and the ability to place posts on the home page. In October, profiles gained status and biography fields. In January 2018, I added article editing and LaTeX support for mathematical formulas. By August, the site had comments and a mobile layout.
+
+The first lonely equation in that plain HTML prototype had, in other words, grown into a real authoring feature.
+
+I also wanted ilinblog to become more than a personal notebook. The application supported accounts, profiles, categories, drafts, article editing, media, comments, and view tracking. My invitation to prospective authors was deliberately personal: write to me, introduce yourself, describe the subjects you wanted to cover, and I would create an author account. The surviving public archive contains 17 posts under my name and one by Sonya Ilina—a small but concrete trace of the multi-author platform I imagined.
+
+By September 2018, the interface looked much closer to a technical magazine. It had a compact article feed with images, excerpts, bylines, categories, dates, and view counts; a sidebar carried news and early research papers; and the layout worked on tablets. The two screens in the project image above capture that version: the home page on one side, a long illustrated neural-network article on the other.
+
+## A laboratory for explaining things
+
+The editorial range was wide because the site followed my curiosity rather than a content strategy. I wrote about fractals and diffusion-limited aggregation, neural networks, lasers, electromagnetic induction, numerical simulation, and problems from the International Young Physicists’ Tournament. A bottle-flip challenge became a mechanics derivation. A question about calculators became a transistor-level [four-bit adder](/projects/four-bit-adder/). An experiment with ray casting became a tutorial, then a [pseudo-3D shooter](/projects/pseudo-3d-shooter/).
+
+Publishing changed how I built those projects. A result that worked on my computer was not enough; I needed diagrams, code, equations, and a sequence another person could follow. The blog became a forcing function for turning experiments into explanations.
+
+Some explanations traveled much farther than I expected. The final database snapshot records **334,915 views** across the 18 articles that are now public. The console ray-casting tutorial alone accounts for **102,120** of them. Those numbers are not the reason the project mattered, but they show that a site built as a learning exercise became useful to people I never met.
+
+<aside class="project-note">
+  <strong>About the view counts:</strong> these are the values preserved in the final legacy database, not analytics for the restored archive and not a count of unique readers. They are kept as historical metadata rather than presented as a live metric.
+</aside>
+
+## Restoring the site without rewriting its past
+
+The original dynamic site eventually went offline. In 2026, I brought it back on the same domain with a different goal: not to restart a dated PHP application, but to preserve the work and the context around it.
+
+I migrated the public material from the last SQL snapshot into an Astro site and turned it into a static archive. It contains **18 articles in nine categories from 2017–2020**, together with **seven early research works from 2016–2021**. Original publication dates, authors, illustrations, videos, formulas, code, and historical view totals remain attached to the material. Even old links such as `article.php?id_article=63` are recognized and routed to the corresponding archived article.
+
+What the archive does not contain is just as important. The old PHP application, database, credentials, account data, comments, raw view logs, and live counter are not part of the deployed site. There is no login and no server-side publishing system to maintain. GitHub Pages serves ordinary static files, while the original Russian-language texts remain deliberately unmodernized. A few outside embeds have disappeared, and some explanations are dated; that is part of the record rather than a problem to hide.
+
+The result is not a revival. It is a time capsule that still works as a website.
+
+ilinblog began as a question—could I make my own place on the web?—and answered it twice. The first answer was a hand-built publishing platform that taught me to write software and explain science at the same time. The second was an archive that treats those imperfect beginnings as something worth keeping.
+
+## Links
+
+- [Read the restored ilinblog archive](https://ilinblog.ru/)
+- [See the original visual history and all eight early screenshots](https://ilinblog.ru/articles/informatsiya-o-ilinblog-kak-stat-avtorom/)
+- [Browse the early research archive](https://ilinblog.ru/publications/)
+- [Inspect the static archive and migration code](https://github.com/vectozavr/ilinblog.ru)

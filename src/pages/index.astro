@@ -14,7 +14,6 @@ import {
   socialMediaLinks,
 } from '../data/profile';
 import { researchAreas } from '../data/research';
-import { formatMetricDate } from '../utils/content';
 import { sitePath } from '../utils/urls';
 
 const projects = (await getCollection('projects')).sort((a, b) =>
@@ -26,25 +25,15 @@ const publications = (await getCollection('publications')).sort(
 );
 const featuredPublications = publications
   .filter((publication) => publication.data.featured)
-  .slice(0, 3);
+  .slice(0, 5);
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
 );
 const latestPosts = posts.slice(0, 3);
-const githubMetricsUpdated = formatMetricDate(
-  metrics.github.account?.updatedAt ?? null,
-);
-const citationMetricsUpdated = formatMetricDate(
-  metrics.citations?.updatedAt ?? null,
-);
 const citationPanelLabel =
   metrics.citations?.source === 'Google Scholar'
     ? 'Google Scholar'
     : 'Publication impact';
-const citationPanelMeta =
-  metrics.citations?.source === 'Google Scholar'
-    ? citationMetricsUpdated && `Updated ${citationMetricsUpdated}`
-    : citationMetricsUpdated && `Semantic Scholar · ${citationMetricsUpdated}`;
 const heroLinkGroups = [
   { label: 'Research profiles', links: researchProfileLinks },
   { label: 'Social media', links: socialMediaLinks },
@@ -188,7 +177,6 @@ const structuredData = [
             >
               <div class="hero-metric-heading">
                 <span id="research-impact-label">{citationPanelLabel}</span>
-                {citationPanelMeta && <small>{citationPanelMeta}</small>}
               </div>
               <div class="hero-metric-values">
                 <div>
@@ -227,7 +215,6 @@ const structuredData = [
             <section class="hero-metric-panel" aria-labelledby="github-output-label">
               <div class="hero-metric-heading">
                 <span id="github-output-label">GitHub</span>
-                {githubMetricsUpdated && <small>Updated {githubMetricsUpdated}</small>}
               </div>
               <div class="hero-metric-values">
                 <div>
@@ -318,14 +305,16 @@ const structuredData = [
     <div class="shell">
       <SectionHeading
         id="featured-projects-heading"
-        eyebrow="Selected work"
         title="Featured projects"
         description="Here are some of my favorite projects, from research implementations to open-source tools."
-        href="/projects/"
-        linkLabel="All projects"
       />
       <div class="project-grid">
         {featuredProjects.map((project) => <ProjectCard project={project} showTopics={false} />)}
+      </div>
+      <div class="section-list-footer">
+        <a class="button secondary" href={sitePath('/projects/')}>
+          See all my projects<span aria-hidden="true">→</span>
+        </a>
       </div>
     </div>
   </section>
@@ -335,16 +324,14 @@ const structuredData = [
       <div class="shell">
         <SectionHeading
           id="selected-publications-heading"
-          eyebrow="Publications"
           title="Selected publications"
-          description="Peer-reviewed papers and recent preprints in optimization and efficient machine learning."
         />
         <div class="publication-list">
           {featuredPublications.map((publication) => (
             <PublicationItem publication={publication} compact />
           ))}
         </div>
-        <div class="publication-list-footer">
+        <div class="section-list-footer">
           <a class="button secondary" href={sitePath('/publications/')}>
             See all publications<span aria-hidden="true">→</span>
           </a>
@@ -358,11 +345,10 @@ const structuredData = [
       <div class="shell">
         <SectionHeading
           id="latest-writing-heading"
-          eyebrow="Writing"
           title="Personal blog"
-          description="Project updates and technical writing from ongoing work."
+          description="Research milestones, project updates, thoughts, and talks from recent years."
           href="/blog/"
-          linkLabel="Visit the blog"
+          linkLabel="See other posts"
         />
         <div class="post-grid">
           {latestPosts.map((post) => <PostCard post={post} />)}

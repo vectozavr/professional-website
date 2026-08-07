@@ -10,6 +10,17 @@ const projects = (await getCollection('projects')).sort(
     Number(b.data.featured) - Number(a.data.featured) ||
     a.data.title.localeCompare(b.data.title),
 );
+const vectozavrAcademyIndex = projects.findIndex(
+  (project) => project.id === 'vectozavr-academy',
+);
+if (vectozavrAcademyIndex >= 0) {
+  const [vectozavrAcademy] = projects.splice(vectozavrAcademyIndex, 1);
+  const voiceCutIndex = projects.findIndex((project) => project.id === 'voicecut');
+
+  if (vectozavrAcademy) {
+    projects.splice(voiceCutIndex >= 0 ? voiceCutIndex + 1 : 0, 0, vectozavrAcademy);
+  }
+}
 const projectProfileLinks = [
   ...researchProfileLinks,
   ...socialMediaLinks.filter((link) => link.label === 'YouTube'),
@@ -22,7 +33,9 @@ const projectProfileLinks = [
 >
   <header class="page-hero projects-hero shell">
     <div class="page-hero-content">
-      <p class="eyebrow">Projects</p>
+      <a class="button secondary page-back-button" href={sitePath('/')}>
+        <span aria-hidden="true">←</span> Back to the main page
+      </a>
       <h1>Research made concrete</h1>
       <p class="page-intro">
         Research implementations, open-source tools, engineering builds, and

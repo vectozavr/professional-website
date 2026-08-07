@@ -1,0 +1,157 @@
+---
+title: "A Pseudo-3D Shooter from Scratch"
+shortSummary: A custom C++ ray-casting engine that turned a 2D map into a textured online FPS—with recursive mirrors, reflected gunfire, OBJ maps, and genetic-algorithm bots.
+publishDate: 2020-02-24
+year: 2020
+status: Source available
+category: Game Engine / Computer Graphics
+topics:
+  - C++
+  - Ray casting
+  - Game development
+  - Multiplayer
+featured: false
+githubUrl: https://github.com/vectozavr/pseudo3DEngine
+demoUrl: https://youtu.be/i0IvgmBMFMw
+demoLabel: Watch the build story
+image: ../../assets/projects/pseudo-3d-shooter.webp
+imageAlt: First-person view of the pastel city map rendered by the pseudo-3D shooter
+imageFit: cover
+youtubeVideoId: i0IvgmBMFMw
+metricsRepository: vectozavr/pseudo3DEngine
+relatedPublications: []
+---
+
+import ProjectFigure from '../../components/ProjectFigure.astro';
+import firstTexturedWorld from '../../assets/projects/pseudo-3d-shooter/first-textured-world.webp';
+import recursiveReflections from '../../assets/projects/pseudo-3d-shooter/recursive-reflections.webp';
+import onlineMatch from '../../assets/projects/pseudo-3d-shooter/online-match.webp';
+import playtest from '../../assets/projects/pseudo-3d-shooter/playtest.webp';
+import objMapWorkflow from '../../assets/projects/pseudo-3d-shooter/obj-map-workflow.webp';
+
+The world in this shooter begins flat. Every object has a two-dimensional footprint; height and vertical position are stored as scalar metadata. There are no 3D meshes in the renderer and no game engine quietly supplying the missing dimension. The camera creates that dimension itself, one ray and one vertical strip at a time.
+
+I first explored the idea in 2019 by adapting and explaining OneLoneCoder's compact `CommandLineFPS` ray caster. A 16 × 16 character map and roughly 180 lines of C++ were enough to make a corridor appear inside a 120 × 40 terminal. A year later, I asked a more ambitious question: how far could I push the same idea if I designed the engine and game systems myself?
+
+The answer became a textured first-person shooter with weapons, collision, recursive mirrors, reflected bullets, an online deathmatch mode, imported `.obj` maps, and—eventually—bots evolved with a genetic algorithm.
+
+<aside class="project-callout">
+  <strong>The 15-day sprint</strong>
+  <p>C++ and SFML · custom ray-casting renderer · textured world in 5 days · playable UDP multiplayer by day 15 · no off-the-shelf game engine</p>
+</aside>
+
+## The map stayed two-dimensional
+
+The engine's `World` stores polygons made from points and line segments. The camera has a position, a direction, and a field of view. For every column of the 1,280-pixel-wide output, it casts a ray into that 2D world and collects the intersections it needs to project the visible wall heights.
+
+Distance does the rest. A nearby wall becomes a tall strip; a distant wall becomes a short one. Darkening strips with distance suggests lighting, and placing them side by side creates a convincing first-person view. The central problem is not “draw a 3D triangle,” but “find where this 2D ray crosses this 2D segment.”
+
+A top-down debug view made that geometry visible. When the camera appeared to hit an invisible wall, I could inspect the fan of rays, the intersection points, and the shape winding instead of guessing from the final image. It became the fastest way to separate a mathematical bug from a drawing bug.
+
+<ProjectFigure
+  src={firstTexturedWorld}
+  alt="Early pseudo-3D brick arena with the top-down camera and ray-casting debug view visible in the upper-left corner"
+  caption="The renderer and its explanation in one frame: a flat polygon map in the corner, and a first-person projection across the rest of the window."
+/>
+
+SFML supplied the practical platform layer—window creation, mouse and keyboard input, image and sound loading, primitive drawing, and sockets. The world model, visibility calculations, projection, collision, weapons, and game rules remained explicit in the project's C++ code: I built the initial systems, and contributors later improved them.
+
+After five intensive days of working six to eight hours a day, the renderer had moved beyond flat color. Each wall carried a texture; the engine cut it into vertical samples and chose the sample corresponding to the ray's hit point. A seamless sky scrolled with the camera, distance shading added depth, and later floor texturing replaced the original single-color ground.
+
+## A renderer became a game
+
+A convincing screenshot was only the beginning. Making the scene playable required systems that had to agree on time, space, and state.
+
+The weapon model tracked ammunition, damage, fire cooldown, and animation timing. I separated the shotgun artwork into layers so the hand and barrel could move independently during the firing and cycling animation, then added weapon bob and a muzzle flash. The player collided with walls by projecting movement along surface normals, which allowed the camera to slide past an obstacle instead of stopping abruptly.
+
+Supporting walls of different heights changed the renderer more fundamentally. A ray could no longer stop at one hit. It had to collect every visible surface along its path, then draw them from farthest to nearest—the painter's algorithm—so a short foreground wall did not erase a taller wall behind it.
+
+That richer ray result made one experiment possible that still defines the project.
+
+## Mirrors turned an implementation detail into a mechanic
+
+When a ray reaches a mirror, the engine reflects it across the wall's normal and continues tracing through the scene. A fixed recursion limit prevents two facing mirrors from sending the call stack toward infinity, while the far-to-near drawing order keeps the nested result coherent.
+
+<ProjectFigure
+  src={recursiveReflections}
+  alt="First-person view of a corridor repeated through two facing mirrors in the pseudo-3D engine"
+  caption="Two facing mirrors create a corridor of recursive reflections. The effect comes from continuing the same 2D ray after each reflected hit."
+/>
+
+The satisfying part was not only visual. Shooting already used the same ray-casting function as rendering: cast from the player, find what it intersects, then apply damage. Once mirrors worked in the shared ray logic, bullets began reflecting too. A player could hit an opponent by firing into a mirror, with damage falling as the total path grew longer.
+
+<aside class="project-callout">
+  <strong>One geometric abstraction, three jobs</strong>
+  <p>The same ray/segment intersection powered visibility, weapon hits, and mirror bounces. Improving the renderer created a new combat mechanic without building a separate projectile system.</p>
+</aside>
+
+## Getting several players into the same flat world
+
+For multiplayer, I added a client/server layer over UDP. The first test looked terrible: a circle moving on the server appeared seconds late on the client. The network was not actually taking seconds. I was producing state packets faster than the client consumed them, so it kept displaying stale positions from its receive queue. Draining the queue and applying the newest available state made the movement responsive.
+
+From there, the prototype grew into a small deathmatch. Players could join the same arena, see one another, shoot, lose health, and respawn at the starting point. The later networking rewrite also tracked kills and deaths. Health affected movement speed, making a wounded player retreat until regeneration made another attack viable.
+
+<ProjectFigure
+  src={onlineMatch}
+  alt="Online pseudo-3D match with several players, mirrored geometry, and health bars visible in one arena"
+  caption="The later multiplayer build synchronizes several players and their health while the local renderer handles textured walls, reflections, and the weapon view."
+/>
+
+The first real playtest lasted about an hour—long enough that my friends and I stopped noticing the time. More importantly, it became a live design loop. During the session, my friends suggested regenerating health; I added it and we kept playing, immediately feeling how it changed the pace of taking cover and re-entering a fight.
+
+<ProjectFigure
+  src={playtest}
+  alt="A player testing the pseudo-3D shooter on a laptop during the first multiplayer session"
+  caption="The outcome that mattered most after the sprint: people were not merely inspecting the renderer; they were absorbed in playing the game."
+/>
+
+## The engine kept growing after the sprint
+
+The original arena was assembled directly from points and segments. Later, I built an import path for maps authored in a conventional 3D editor: export an `.obj` file, read its vertical faces, and turn them into the 2D wall segments and height data the ray caster understands. The workflow kept the renderer unusual without forcing level design to happen inside C++ source files.
+
+<ProjectFigure
+  src={objMapWorkflow}
+  alt="Cinema 4D level geometry beside the pastel city produced after importing its OBJ file into the shooter"
+  caption="The Russian text in the original development image reads “Exporting .obj files into the game.” The external editor produced the geometry; the engine supplied the importer and pseudo-3D rendering."
+/>
+
+The public code also gained floor texturing, vertical movement and jumping, health and ammunition pickups, multithreaded ray calculations, and a larger city map. A contributor, Neirokan, later rewrote the networking layer and added fisheye correction, improved circular collision and wall heights, reflection containment, focus-aware input, frame limiting, resource fixes, and optimizations. Stepan Neretin (`dura0ok`) later added Linux build support.
+
+The most experimental extension was a population of neural-network bots trained through selection, crossover, and mutation. Each bot received eight radial distance readings, the distance and angle to a visible opponent, and its ammunition state. Four outputs controlled strafing, forward movement, turning, and firing. The checkpoint committed to the repository reached generation 2,489; the video experiment continued for thousands more generations before its score plateaued.
+
+<aside class="project-note">
+  <strong>About the bots:</strong> they were a later research playground, not a polished default game mode. Their execution is disabled in the current entry point, but the network, genetic algorithm, and saved checkpoint remain in the repository.
+</aside>
+
+## What came out of the project
+
+- **A playable networked FPS.** The first custom renderer, collision, weapons, mirrors, damage, and multiplayer all landed within a roughly 15-day development window.
+- **A reusable body of engine code.** The public repository grew to roughly 6,000 lines across 53 C++ source and header files, with more than 80 commits documenting its evolution.
+- **An audience for the explanation.** The two original Russian articles record more than **125,000 historical page views** together. The three development videos—console ray casting, the online shooter, and genetic-algorithm bots—have passed **2.8 million views combined**.
+- **A small open development community.** The repository has attracted more than **180 GitHub stars** and **30 forks**, plus contributions that improved networking, collision, rendering, portability, and day-to-day usability.
+- **A platform for further experiments.** The same deliberately simple world supported recursive optics, unusual combat, multiplayer synchronization, map importing, CPU parallelism, and evolutionary AI.
+
+<aside class="project-note">
+  <strong>About the numbers:</strong> article counters are preserved by the ilinblog archive; video and repository milestones are rounded snapshots as of August 2026. The repository publishes its source, but it currently has no license file.
+</aside>
+
+## What the flat world taught me
+
+- **A small representation can support surprisingly rich behavior.** Keeping the world in 2D made visibility easy to inspect while leaving room for textures, height, reflections, collisions, and game rules.
+- **Shared abstractions create unexpected features.** Reflected gunfire was not planned as a separate system; it emerged because rendering and shooting trusted the same ray logic.
+- **A playable game is a better test than a renderer demo.** Multiplayer exposed timing, state, collision, and usability problems that a beautiful still frame could hide.
+- **Debug views are part of the design.** Showing the camera and its rays shortened the path from “this looks wrong” to the exact intersection or normal that caused it.
+- **Publishing the process invites continuation.** Articles and videos brought an audience; public code brought fixes, a Linux build, forks, and ideas I would not have reached alone.
+
+The project never tried to out-render a modern 3D engine. Its value was almost the opposite: every illusion remained small enough to understand. I could trace a line from a segment on a flat map to a column of pixels, from that column to a mirror, and from the mirror to a shot that surprised another player across the network.
+
+## My project logs and source code
+
+I originally documented this project in Russian through two articles and three build videos. This page brings that work together in English and adds details from the later repository history.
+
+- [Part 1: how console ray casting creates pseudo-3D](https://ilinblog.ru/articles/pishem-shuter-ot-pervogo-litsa-v-konsoli-kak-rabotaet-psevdo-3d-grafika-v-igrah-1/)
+- [Part 2: building the textured online shooter](https://ilinblog.ru/articles/kak-ya-napisal-onlain-shuter-na-c-za-nedelyu/)
+- [Watch the console ray-casting explanation](https://youtu.be/Q9zkiOClyEo)
+- [Watch the complete online-shooter build](https://youtu.be/i0IvgmBMFMw)
+- [Watch the neural-network bot experiment](https://youtu.be/zRZrEv4NAZA)
+- [Explore the source and development history](https://github.com/vectozavr/pseudo3DEngine)

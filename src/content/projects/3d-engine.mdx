@@ -1,0 +1,106 @@
+---
+title: "3Dzavr: A 3D Engine from Scratch"
+shortSummary: A custom CPU-rendering experiment that grew from a C++ course project into a lightweight game engine and a downloadable online FPS.
+year: 2021
+status: Open source
+category: Engineering / Computer Graphics
+topics:
+  - Computer graphics
+  - Game engine
+  - C++
+  - Multiplayer
+featured: false
+githubUrl: https://github.com/vectozavr/3dzavr
+demoUrl: https://github.com/vectozavr/shooter/releases/tag/0.1.0
+demoLabel: Download the 2022 FPS
+image: ../../assets/projects/3d-engine.webp
+imageAlt: A textured 3D environment rendered in 3Dzavr with the engine's object editor and lighting controls open
+imageFit: cover
+youtubeVideoId: R61rhdDyiOE
+metricsRepository: vectozavr/3dzavr
+relatedPublications: []
+---
+
+import ProjectFigure from '../../components/ProjectFigure.astro';
+import earlyTerrain from '../../assets/projects/3d-engine/early-terrain.webp';
+import shooterGameplay from '../../assets/projects/3d-engine/shooter-gameplay.webp';
+import rendererComparison from '../../assets/projects/3d-engine/renderer-comparison.webp';
+
+The question behind 3Dzavr predates the code. When I first played *Sonic Adventure DX* as a child, I kept wondering what existed beyond the part of the world I could see. How did a game turn points and shapes into a place the player could move through? What was the engine doing behind the screen?
+
+In 2021, an undergraduate C++ course gave me an excuse to find out. For the final project, I decided to build a small 3D engine myself. I used SFML for the things I did not want to reinvent—opening a window, reading input, playing sound, and drawing 2D primitives—but kept the 3D mathematics and scene logic inside my own code.
+
+The assignment ended; the project did not. A renderer became a reusable engine, the engine became the foundation of an online first-person shooter, and the shooter became a downloadable open-source release. Later, 3Dzavr moved from SFML to SDL and grew an editor, a richer lighting system, and a more complete CPU-rendering pipeline.
+
+<aside class="project-callout">
+  <strong>The central constraint</strong>
+  <p>Use a multimedia library as the window and canvas, but make the 3D world understandable: transformations, projection, clipping, cameras, meshes, animation, collision, and the game loop should all be visible in code I could trace.</p>
+</aside>
+
+## Building the pipeline one abstraction at a time
+
+The first useful output was not a game. It was a set of mathematical building blocks: vectors, matrices, triangles, coordinate transformations, and a camera. From there I could project a 3D point onto a 2D plane, move the camera, clip triangles against its view, and decide what should be drawn.
+
+Each new scene exposed another missing layer. Loading `.obj` files required a mesh representation and resource handling. Moving objects cleanly led to a shared timeline and smooth Bézier-curve animations. Composing objects into scenes needed hierarchy and lifecycle rules. Interaction required ray casting and collision detection rather than geometry that merely looked correct.
+
+The early SFML version deliberately kept the final drawing step simple: after 3Dzavr transformed and projected the scene on the CPU, SFML drew the resulting 2D geometry. That made the pipeline unusually easy to inspect. A bug in a matrix, clipping plane, or triangle order appeared directly on screen rather than disappearing inside a graphics API.
+
+<ProjectFigure
+  src={earlyTerrain}
+  alt="A pale low-poly mountain landscape rendered by an early version of 3Dzavr, with frame rate and triangle throughput shown in the corner"
+  caption="An early CPU-rendered terrain test. The scene was simple, but it already joined camera transforms, projection, clipping, triangle ordering, and basic lighting into one visible result."
+/>
+
+## A playable game is a ruthless integration test
+
+A spinning model can make a renderer look finished. A first-person shooter quickly proves that it is not.
+
+To turn 3Dzavr into a game, I had to connect the low-level graphics work to systems a player could actually feel: first-person movement, map loading, collision, ray-cast shooting, weapon switching and reloading, health and pickups, sound, animation, a scoreboard, and a slow-motion ability. The game also needed a client/server layer so several players could join the same match.
+
+I kept the [shooter in its own repository](https://github.com/vectozavr/shooter) and included 3Dzavr as the engine underneath it. That separation was useful pressure on the design. Game code could no longer depend on every internal detail of the renderer, and changes to the engine had to preserve a real application rather than a collection of isolated test scenes.
+
+The result was a small, playable online FPS with separate macOS and Windows builds. It was not trying to compete with a commercial shooter. Its job was more valuable for the project: force the engine's camera, input, physics, animation, audio, resources, and networking to work at the same time.
+
+<ProjectFigure
+  src={shooterGameplay}
+  alt="First-person gameplay from the 3Dzavr shooter, with a rifle, abstract arena geometry, ammunition, health, and a score display"
+  caption="The online FPS turned the renderer into a system: a world to load, a player to control, weapons to animate, collisions to resolve, and state to exchange over the network."
+/>
+
+## The performance result was part of the lesson
+
+The original 3D pipeline was intentionally CPU-side. That was a good way to learn the transformations and visibility logic and a bad way to hide their cost.
+
+I eventually added an optional OpenGL rendering path behind a runtime toggle. A repository comparison records about **80 fps** for the original path and **1,100 fps** for the OpenGL path in one development scene. This was not a controlled benchmark and should not be read as a universal ratio; it was a development snapshot. Still, it made the architectural lesson impossible to miss: a graphics API and GPU are not incidental conveniences once the scene becomes demanding.
+
+<ProjectFigure
+  src={rendererComparison}
+  alt="Side-by-side frame-rate comparison of the same shooter scene rendered by the original 3Dzavr path at 80 fps and its OpenGL path at 1100 fps"
+  caption="One development comparison—not a general benchmark—between the original CPU-side pipeline and the optional OpenGL path. The experiment explained both how rendering works and why production engines delegate it to the GPU."
+/>
+
+The slower result did not invalidate the from-scratch work. It completed the experiment. I could now point to the exact work performed by the camera, clipping, projection, visibility, and triangle-ordering stages, then measure what changed when the GPU took over.
+
+## From an SFML prototype to a small engine
+
+3Dzavr continued evolving after the shooter release. The current public version moved the platform layer from SFML to SDL while preserving the engine's own scene and rendering ideas. It added a custom CPU rasterizer with textures, depth testing, lighting, transparency, and material support; directional, point, and spot lights; a component and attachment hierarchy; a world editor; resource management; and screenshot and video capture.
+
+Collision work also became more rigorous. The engine implemented GJK for detecting intersections between convex shapes and EPA for finding the penetration information needed to resolve them. Test scenes for animation, physics, and collision lived beside the main engine instead of inside the shooter.
+
+The repository now contains more than 200 commits across that evolution. Community contributors also helped with performance, portability, build fixes, and the SDL version, so the later project was no longer mine alone. That is one of the quiet successes of publishing an educational experiment as real open-source software: other people can inspect the same abstractions, disagree with them, and improve them.
+
+## What came out of the project
+
+- **A working engine and a real game.** 3Dzavr progressed from a course submission to a reusable C++ engine, while the shooter exercised it as a complete networked application.
+- **A release people downloaded.** The 2022 macOS and Windows release assets have recorded **12,000+ downloads** on GitHub.
+- **An open-source audience.** The engine and shooter repositories have accumulated **200+ GitHub stars** together, with forks and contributions extending the work beyond its original codebase.
+- **A widely watched explanation.** My build-story video has passed **500,000 views**. Explaining the failures, trade-offs, and strange bugs reached far more people than the original university assignment ever could.
+- **A durable way of learning.** The same habit—make an abstract mathematical operation visible, then let someone manipulate it—later shaped how I taught linear algebra and graphics in [Vectozavr Academy](/projects/vectozavr-academy/).
+
+## Links
+
+- [Explore the current 3Dzavr engine](https://github.com/vectozavr/3dzavr)
+- [Browse the online shooter source](https://github.com/vectozavr/shooter)
+- [Download the 2022 shooter release](https://github.com/vectozavr/shooter/releases/tag/0.1.0)
+- [Inspect the standalone shooter server](https://github.com/vectozavr/shooter_server)
+- [Watch the full build story](https://youtu.be/R61rhdDyiOE)

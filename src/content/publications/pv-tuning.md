@@ -13,7 +13,7 @@ year: 2024
 venue: NeurIPS 2024
 publicationType: Conference paper
 status: Published
-summary: Research on optimization beyond straight-through estimation for extreme language-model compression.
+summary: Studies how to fine-tune LLMs compressed to only one or two bits per parameter. PV-Tuning moves beyond the commonly used straight-through estimator through a more general optimization framework, improving compressed Llama and Mistral models for memory-limited devices.
 featured: true
 paperUrl: https://proceedings.neurips.cc/paper_files/paper/2024/hash/091166620a04a289c555f411d8899049-Abstract-Conference.html
 arxivUrl: https://arxiv.org/abs/2405.14852

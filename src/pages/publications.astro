@@ -33,6 +33,9 @@ const structuredData = publications.map((publication) => ({
 >
   <section class="content-section publications-index">
     <div class="shell">
+      <a class="button secondary page-back-button" href={sitePath('/')}>
+        <span aria-hidden="true">←</span> Back to the main page
+      </a>
       <header class="publications-intro">
         <h1>Publications</h1>
         <p>My complete publication list, newest first.</p>
@@ -62,7 +65,13 @@ const structuredData = publications.map((publication) => ({
         ))}
       </nav>
       <div class="publication-list">
-        {publications.map((publication) => <PublicationItem publication={publication} compact />)}
+        {publications.map((publication) => (
+          <PublicationItem
+            publication={publication}
+            compact
+            showSummary
+          />
+        ))}
       </div>
     </div>
   </section>

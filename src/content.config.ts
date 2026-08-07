@@ -35,6 +35,7 @@ const projects = defineCollection({
     z.object({
       title: z.string(),
       shortSummary: z.string(),
+      publishDate: z.coerce.date().optional(),
       year: z.number().int().optional(),
       status: z.string(),
       category: z.string(),
@@ -59,11 +60,12 @@ const publications = defineCollection({
   schema: z.object({
     title: z.string(),
     authors: z.array(z.string()).default([]),
+    publishDate: z.coerce.date().optional(),
     year: z.number().int().optional(),
     venue: z.string().optional(),
     publicationType: z.string(),
     status: z.string().optional(),
-    summary: z.string().optional(),
+    summary: z.string(),
     featured: z.boolean().default(false),
     paperUrl: optionalUrl,
     arxivUrl: optionalUrl,

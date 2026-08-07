@@ -1,0 +1,257 @@
+---
+title: Vectozavr Academy
+shortSummary: A visual mathematics school that became my first successful business—and then a long-running experiment in AI-assisted education.
+year: 2021
+status: Active · long-term project
+category: Education / AI
+topics:
+  - Online education
+  - AI-assisted learning
+  - Course authoring
+  - Product development
+featured: false
+demoUrl: https://vectozavr.ru
+demoLabel: Explore Vectozavr
+image: ../../assets/projects/vectozavr-academy.webp
+imageAlt: Ivan Ilin building the early Vectozavr Academy at a laptop beside a microphone
+imageFit: cover
+youtubeVideoId: igufdeNIYNs
+relatedPublications: []
+---
+
+import ProjectFigure from '../../components/ProjectFigure.astro';
+import originalVisualLessons from '../../assets/projects/vectozavr-academy/original-visual-lessons.webp';
+import lessonAssistant from '../../assets/projects/vectozavr-academy/lesson-assistant.webp';
+import coursegptStudio from '../../assets/projects/vectozavr-academy/coursegpt-studio.webp';
+import egeTutor from '../../assets/projects/vectozavr-academy/ege-tutor.webp';
+
+Vectozavr is not a clean startup success story, and it is not a post-mortem. It began as a handcrafted online school, became the first business I built that earned meaningful money, spent several years largely unchanged while I moved into research, and later grew into a series of experiments with AI-assisted education. The original school worked commercially. The AI products, so far, have not.
+
+I started working on the project in 2021. On April 10, 2022, I publicly launched **Vectozavr Academy**: a paid online school built around a handcrafted course in linear algebra and 3D graphics for game developers. Years later, I rebuilt the platform, added an assistant inside lessons, launched a standalone AI chat, experimented with generating complete courses, and created an AI tutor for exam preparation.
+
+Those products eventually forced a less technical question: was I willing to leave my PhD and make Vectozavr a full-time startup? Without enough traction, a team, or a clear advantage in an already crowded market, I decided that an all-or-nothing bet would be irrational. Vectozavr continued—but at a different pace.
+
+Through all of these stages, the central question has stayed surprisingly stable: **how can software help someone move from seeing an idea to genuinely understanding it?**
+
+<aside class="project-callout vectozavr-principle">
+  <strong>The thread running through the project</strong>
+  <p>Make abstract ideas visible, let learners interact with them, and offer help at the exact moment where understanding breaks down.</p>
+</aside>
+
+## The first idea: make mathematics visible
+
+The original motivation came from computer graphics. A formula for a change of basis can look remote on a whiteboard; the same operation becomes intuitive when a camera turns, an object moves, or a scene changes in front of you. I wanted each mathematical idea to lead to something a student could see and eventually build.
+
+The first course therefore connected linear algebra directly to graphics programming. It moved from vectors, matrices, bases, and transformations into cameras, projection, clipping, animation, simple physics, and small game-like experiments. The visualizations were not decorative illustrations added after the lesson. They were part of the explanation.
+
+<ProjectFigure
+  src={originalVisualLessons}
+  alt="A collage of the original Vectozavr Academy visual lessons, including vectors, coordinate systems, transformations, camera geometry, terrain, and 3D scenes"
+  caption="The original Academy was built around handcrafted mathematical visualizations. AI-generated courses came much later and were a separate product direction."
+/>
+
+## From educational videos to a real school
+
+Before the Academy, I was already publishing videos about programming, graphics, physics, and unusual technical experiments on the [Vectozavr YouTube Channel](/projects/vectozavr-youtube/). A video can make one idea memorable, but it does not provide a curriculum, practice, progress, or a clear route from one concept to the next. The Academy was my attempt to turn that style of explanation into a complete learning product.
+
+The school [launched publicly on April 10, 2022](https://youtu.be/XYupMsNQ6KM). It was no longer only a collection of content: people could join a structured course and pay for access. I had to think about the curriculum and the software together—how lessons were presented, how progress was recorded, how the next concept followed from the previous one, and how the whole experience felt to a learner.
+
+Over its first years, the Academy generated roughly **₽3 million in cumulative sales**. This is a retrospective estimate, not a claim about profit or venture-scale growth, but it made the project important to me in a new way. It was the first business I had built that brought in meaningful money. A course, a website, and a style of teaching I had created myself had become something people genuinely chose to buy. I still consider that first version of Vectozavr a successful project.
+
+The first platform was intentionally close to the first course. That helped me ship it, but it also encoded nearly every assumption of that course into the software: one main subject, one content structure, and one way of learning. The original school proved that the idea could become a real product. It also showed me why the next version would have to be much broader.
+
+## The project went quiet, but it did not disappear
+
+The launch coincided with a much larger disruption in my life. The full-scale war that began in 2022 made the future in Russia far less predictable for me. I left the country and chose to pursue science abroad—a path that offered more stability and a chance to grow as a researcher. I first worked on optimization and then moved toward LLMs, pruning, and quantization.
+
+The Academy did not close. The original course remained online and continued to sell, but while I focused on relocation, papers, and eventually a PhD, I was no longer developing the school as an active startup. For several years, Vectozavr was simultaneously a successful product in maintenance mode and an unfinished idea I kept returning to.
+
+<ol class="vectozavr-timeline" aria-label="Vectozavr product timeline">
+  <li>
+    <time>2021</time>
+    <div><strong>The project begins</strong><span>I start turning visual explanations of mathematics and graphics into a structured course.</span></div>
+  </li>
+  <li>
+    <time>10 Apr 2022</time>
+    <div><strong>Vectozavr Academy launches</strong><span>The handcrafted linear algebra and 3D graphics course becomes a public, paid online school.</span></div>
+  </li>
+  <li>
+    <time>2022–2024</time>
+    <div><strong>The school stays alive</strong><span>The original course continues operating while I move abroad and shift my attention toward research and a PhD.</span></div>
+  </li>
+  <li>
+    <time>2025</time>
+    <div><strong>The platform is rebuilt</strong><span>A new React and Laravel foundation replaces the course-specific first version and makes room for new learning formats.</span></div>
+  </li>
+  <li>
+    <time>16–19 Sep 2025</time>
+    <div><strong>AI Chat becomes its own product</strong><span>A multi-model chat launches, then moves into a separate application within the Vectozavr ecosystem.</span></div>
+  </li>
+  <li>
+    <time>Late 2025</time>
+    <div><strong>CourseGPT grows into Vectozavr Studio</strong><span>Automatic course generation evolves into a workspace for creating and editing educational material.</span></div>
+  </li>
+  <li>
+    <time>15 Jan 2026</time>
+    <div><strong>The AI tutor launches</strong><span>An exam-preparation product begins guiding learners with progressive hints instead of immediately revealing answers.</span></div>
+  </li>
+  <li>
+    <time>2026 onward</time>
+    <div><strong>A slower path forward</strong><span>I prioritize research while continuing Vectozavr as a long-term project rather than an all-or-nothing startup.</span></div>
+  </li>
+</ol>
+
+## Starting over in 2025
+
+While working on papers and later beginning my PhD, I kept thinking about the Academy. Learners still encountered difficult passages and sent me questions about the material. I could answer them, but I could not be available at the exact moment every student became stuck.
+
+That suggested a concrete use for AI: an assistant that already knew the course, the current lesson, and the precise passage the student was reading. A learner should be able to select something confusing and ask a question without copying the material into a separate chatbot or reconstructing all of its context.
+
+Once I started building that assistant, the limitations of the old platform became impossible to ignore. I rebuilt Vectozavr around React and Laravel, with reusable courses, chapters, lessons, tests, progress, achievements, subscriptions, and authoring tools. I released the new version on [September 1, 2025](https://t.me/vectozavr/439).
+
+What began as a solution to one recurring student problem reopened the entire project. This was effectively Vectozavr's second launch: it stopped being software for one course and became an environment in which I could test different ways of teaching.
+
+## Putting AI inside the lesson
+
+My first useful educational AI feature was not a general chatbot. It was an assistant attached to the lesson itself.
+
+A learner could select a confusing passage and ask for an explanation. The assistant received the selected text together with the lesson and course context, opened in a side conversation, and stayed available for follow-up questions. Instead of leaving the course, copying a paragraph into another app, and explaining the context from scratch, the learner could ask for help exactly where the difficulty appeared.
+
+That changed AI from a separate destination into part of the learning interface. As the platform evolved, the same assistant pattern expanded: it could connect concepts to related material and, inside the course-generation tools, help create or revise lessons and chapters. The important part was not that a model could produce text. It was that the model had a defined educational role and the right local context.
+
+<ProjectFigure
+  src={lessonAssistant}
+  alt="An experimental CourseGPT lesson with an advanced algebra curriculum on the left, lesson content in the center, and a course-aware AI assistant on the right"
+  caption="A late-2025 experiment with the course-aware assistant. The learner could stay inside the lesson while asking for a focused explanation of the material."
+/>
+
+## One platform became several products
+
+The rebuild made it easy to experiment, and those experiments gradually became distinct products rather than one increasingly crowded school interface.
+
+<div class="vectozavr-product-grid">
+  <a href="https://school.vectozavr.ru/3d" target="_blank" rel="noreferrer">
+    <span>Handcrafted course</span>
+    <h3>Vectozavr Academy</h3>
+    <p>The original visual course in linear algebra and 3D graphics, authored lesson by lesson.</p>
+    <b>Explore the course ↗</b>
+  </a>
+  <a href="https://chat.vectozavr.ru/" target="_blank" rel="noreferrer">
+    <span>Launched September 2025</span>
+    <h3>AI Chat</h3>
+    <p>One interface for working with different AI models, later separated into its own application.</p>
+    <b>Open AI Chat ↗</b>
+  </a>
+  <a href="https://studio.vectozavr.ru/" target="_blank" rel="noreferrer">
+    <span>CourseGPT → Studio</span>
+    <h3>Vectozavr Studio</h3>
+    <p>A workspace for generating, organizing, editing, and enriching courses with AI.</p>
+    <b>Open Studio ↗</b>
+  </a>
+  <a href="https://ege.vectozavr.ru/ege/choose" target="_blank" rel="noreferrer">
+    <span>Launched January 2026</span>
+    <h3>EGE Trainer</h3>
+    <p>Exam practice with a tutor that responds to the learner's reasoning and offers progressive help.</p>
+    <b>Try the trainer ↗</b>
+  </a>
+</div>
+
+### AI Chat: taking the assistant beyond one lesson
+
+The lesson assistant was intentionally tied to course context. AI Chat explored the opposite direction: a general-purpose product that could be useful without entering a course at all. Part of the motivation was practical—many people in Russia did not have convenient access to the latest models in one place. I launched the chat on [September 16, 2025](https://t.me/vectozavr/451) and separated it into its own application three days later.
+
+Over time, it gained conversation history, model choice, search, file and image input, and voice input while sharing accounts and infrastructure with the rest of Vectozavr. Technically, it became a substantial product. Commercially, as I would soon learn, shipping those features was not the same as finding a market.
+
+### CourseGPT became Vectozavr Studio
+
+CourseGPT started with an ambitious prompt: describe what you want to learn, answer a few clarifying questions, and let the system construct a curriculum with chapters, lessons, tests, covers, and achievements. I initially thought this might be the idea that broke through. By October 2025, I had a working flow that could generate complete course structures and let learners move through them.
+
+<ProjectFigure
+  src={coursegptStudio}
+  alt="An early CourseGPT interface showing a create-course card and generated courses for informatics and physics"
+  caption="An October 2025 CourseGPT build. The experiment later evolved into Vectozavr Studio and shifted toward tools for teachers and course authors."
+/>
+
+The working prototype exposed problems that the original idea had hidden. Fully generated lessons were not consistently trustworthy or pleasant to study. Generating them on demand made browsing a course slow and consumed tokens before a learner even knew whether the material was worth reading. Most importantly, people still wanted the judgment of a real author: someone who understood what to teach, in what order, and why.
+
+A fully generated course for an individual learner and an authoring tool for a teacher may share the same technology, but they are not the same promise. The more useful direction was to make generation editable: let an author inspect the structure, reorder it, rewrite lessons, add tests and interactive material, and use the assistant as a collaborator rather than accept a finished black box.
+
+That shift became **Vectozavr Studio**. It is less about pressing one button to manufacture a course and more about reducing the distance between an educational idea and a course that someone can actually refine and publish. Repositioning it was not the triumphant completion of the original plan; it was a response to what the first plan got wrong.
+
+### A tutor that does not rush to the answer
+
+The AI tutor began with a different constraint. In exam preparation, the fastest possible response is often the least educational one. If a student is given the full solution immediately, the task disappears before the reasoning happens.
+
+I designed the tutor to guide instead: acknowledge a correct step, point out the next relationship, ask a smaller question, or offer a progressively stronger hint. The learner remains responsible for completing the argument. The product launched on [January 15, 2026](https://t.me/vectozavr/463) and later became the **EGE Trainer**, with subject selection, topic-based practice, short quizzes, progress plans, streaks, and achievements around that central interaction.
+
+<ProjectFigure
+  src={egeTutor}
+  alt="The Vectozavr EGE Trainer showing a physics problem on the left and a step-by-step AI tutor conversation on the right"
+  caption="The tutor works beside the problem and responds to the learner's steps. Its purpose is to keep the reasoning moving—not to replace it with an instant solution."
+/>
+
+<aside class="project-note">
+  <strong>An important distinction:</strong> the original 3D graphics course remained human-authored. AI course generation was a later experiment and a separate product direction; it is not how the Academy's original material was created.
+</aside>
+
+## Shared infrastructure, separate promises
+
+For a while, all of these directions lived visibly inside one product. Technically, that made sense: courses, chat, accounts, progress, payments, and AI services could share one platform. Conceptually, it became harder to explain. A learner looking for my handcrafted 3D course had a different goal from a teacher creating a course with AI or a student practicing for an exam.
+
+The answer was to keep the shared foundation while giving each product a clear front door: `school`, `chat`, `studio`, and `ege`. That was an important product lesson for me: **shared infrastructure does not require shared positioning**. A product becomes easier to understand when its interface, language, and boundaries are built around one job.
+
+## Shipping products was not the same as building a business
+
+Read only as a release timeline, Chat, Studio, and the tutor can look like uninterrupted momentum. Commercially, they were not. When I recorded [a retrospective in February 2026](https://youtu.be/XlTGM3lTVB4?t=247), AI Chat had only **five paying subscribers**. Across the AI products, subscriptions had generated very little revenue. None had come close to the commercial proof of the original Academy.
+
+There is no contradiction between the Academy's roughly ₽3 million in cumulative sales and the much more difficult picture several years later. The first number accumulated over the life of the school. By early 2026, its current income was [lower than my university stipend and not enough to live on](https://youtu.be/XlTGM3lTVB4?t=921). The original course had proved that I could make and sell a real product; it had not given me a business that could safely support a full-time team or a leap into a new AI market.
+
+I do not interpret the weak AI sales as evidence that AI is a bad technology or that the educational ideas were pointless. I built these products mostly alone while pursuing a PhD, and I did not give enough time to the work that happens after a release: sustained marketing, customer conversations, support, distribution, and week-after-week product iteration. I was much faster at turning an idea into software than at establishing whether enough people needed it and how I would reach them.
+
+The market made that constraint sharper. AI products are relatively easy to start, surface-level features are easy to reproduce, and potential users are surrounded by similar claims, repetitive advertising, and low-quality generated content. At the same time, large companies can put far more engineering and marketing behind adjacent ideas. Access to a model is not a durable advantage.
+
+A worthwhile educational product needs something deeper: trusted content, thoughtful pedagogy, a workflow people return to, a community, or an experience that is genuinely difficult to replace. Building that takes a team—or at least sustained attention that I could not give while also doing serious research. A working AI feature is not yet a defensible product, and a release is not distribution.
+
+## The choice between a startup and a PhD
+
+Eventually, engineering stopped being the main constraint. The limiting resource was my own attention. Giving Vectozavr a genuine chance as a startup would require making it my primary occupation: marketing it, supporting users, improving it continuously, producing educational material, and probably building a team. A startup is not a side project with more code; it is an around-the-clock commitment.
+
+In practical terms, that meant deciding whether I was prepared to pause or leave my PhD. With uncertain demand, almost no AI subscription revenue, strong competition, and no team, I did not think that gamble was rational. My research and stipend gave me stability abroad, while the startup had not yet earned enough to replace either of them. I chose to continue the PhD.
+
+That decision changed the pace of Vectozavr, but it did not end the project. It also changed what I considered progress. Instead of betting everything on immediate growth, I could preserve what already worked, learn from the experiments that did not, and continue only at a pace I could sustain.
+
+## Continuing through research
+
+Choosing research did not mean leaving AI-assisted education behind. My work on LLMs is closely connected to the questions behind Vectozavr: how an assistant should use educational context, how it can guide rather than replace a learner, how generated material can remain grounded in reliable sources, and how such systems should be evaluated.
+
+My supervisor suggested that the product questions could become research questions, which led us toward AI for Education. I later became the primary author of a proposal for **TRACE—Transforming Textbooks into Verified, Interactive Courses using Retrieval-Augmented Generation**. The project [received a USD 100,000 KAUST Small Translational Research Grant](/blog/trace-strg-award/) for July 2026 through June 2027.
+
+TRACE is a university research project, not funding for the private Vectozavr platform. It does, however, give our team a lower-risk way to investigate the same broad direction: educational systems built around LLMs, interactive material, and verifiable sources. That work can produce useful research now and knowledge that may strengthen Vectozavr later.
+
+This is the path I have chosen for the moment: remain in the university, complete the PhD, pursue research I find genuinely interesting, and use grants and collaborations to explore ambitious AI-for-education ideas without requiring a small product to support my entire life immediately.
+
+## What building Vectozavr taught me
+
+Vectozavr has lasted long enough to show me several versions of the same idea—and several versions that needed to be replaced.
+
+- **A medium can be part of the explanation.** The early interactive graphics were not polish around the mathematics; they changed what could be explained.
+- **A successful first version can still be the wrong foundation for the second.** Rebuilding the platform was expensive, but it turned a course-specific site into something I could continue exploring with.
+- **AI is most useful when its job is constrained.** “Generate text” is not a learning design. Explain this passage, help improve this lesson, or give the next useful hint are much better product instructions.
+- **A release is not distribution.** I could build and ship several AI products, but reaching enough people and learning continuously from their use required sustained attention that I did not have.
+- **An AI feature is not a moat.** Durable value has to come from the pedagogy, workflow, content, or community around the model—not merely from placing a model behind an interface.
+- **Related products still need distinct identities.** The Academy, Chat, Studio, and EGE Trainer benefit from one technical ecosystem, but each should make sense on its own.
+- **A meaningful project does not have to be an all-or-nothing bet.** Choosing a slower pace can be more responsible than pretending every project must immediately become a full-time company.
+
+Today, I think of Vectozavr less as something I launched once and more as something I have been raising over time. It has passed through different stages alongside my own life: a YouTube channel, a school, my first successful business, a course in maintenance mode, a rebuilt AI platform, and now a long-term educational project. Its story is unfinished.
+
+My goal is no longer to force it into an overnight success. I want to keep building it deliberately, step by step, when I have the time and energy outside research—creating things I find useful, technically interesting, and educationally sound. I still see a possible international future for Vectozavr, but I do not need to pretend it has already arrived or sacrifice everything else to reach it immediately.
+
+Vectozavr continues not because every experiment worked, but because the central problem still feels worth pursuing: make difficult ideas easier to see, explore, and understand.
+
+## Project trail
+
+- [Watch the original Academy launch video](https://youtu.be/igufdeNIYNs)
+- [Read NSU's 2022 story about the school](https://www.nsu.ru/n/media/news/obrazovanie/onlayn-shkolu-matematiki-dlya-programmistov-i-razrabotchikov-igr-sozdal-student-ngu/)
+- [Read the September 2025 platform release](https://t.me/vectozavr/439)
+- [Watch my retrospective on building the startup](https://www.youtube.com/watch?v=XlTGM3lTVB4)
+- [Read about the TRACE AI-for-education grant](/blog/trace-strg-award/)

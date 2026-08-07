@@ -9,7 +9,7 @@ year: 2024
 venue: NeurIPS 2024
 publicationType: Conference paper
 status: Published
-summary: A distributed asynchronous SGD method analyzed under heterogeneous computation and communication.
+summary: Designs an asynchronous training method for systems whose workers differ in both computation and communication speed. Shadowheart compresses updates and avoids waiting for slow workers, with proofs that no comparable centralized compressed method can achieve a better overall training time.
 featured: false
 paperUrl: https://papers.nips.cc/paper_files/paper/2024/hash/06e2dd57e90a736a5a1fd3bb2bf95c6c-Abstract-Conference.html
 arxivUrl: https://arxiv.org/abs/2402.04785

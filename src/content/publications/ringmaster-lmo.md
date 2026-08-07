@@ -9,7 +9,7 @@ year: 2026
 venue: arXiv
 publicationType: Preprint
 status: Preprint
-summary: An asynchronous optimization method built around linear minimization oracles and momentum.
+summary: Adapts Muon-style momentum, a promising neural-network optimizer, to distributed systems where workers run at different speeds. By discarding updates that arrive too late, Ringmaster LMO avoids waiting for stragglers while retaining convergence guarantees and strong training performance.
 featured: false
 paperUrl: https://arxiv.org/abs/2605.18174
 arxivUrl: https://arxiv.org/abs/2605.18174

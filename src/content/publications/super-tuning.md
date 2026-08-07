@@ -8,8 +8,8 @@ year: 2026
 venue: arXiv
 publicationType: Preprint
 status: Preprint
-summary: A study connecting activation-aware pruning with sparse fine-tuning for language-model adaptation.
-featured: true
+summary: Repurposes activation-aware pruning scores to choose a small, fixed set of LLM weights for fine-tuning. A hybrid version adds LoRA without increasing the trainable-parameter budget, offering a memory-efficient adaptation strategy that performed strongly on arithmetic tasks.
+featured: false
 paperUrl: https://arxiv.org/abs/2607.09287
 arxivUrl: https://arxiv.org/abs/2607.09287
 codeUrl: https://github.com/vectozavr/SuperTuning

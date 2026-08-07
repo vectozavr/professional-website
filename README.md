@@ -130,6 +130,7 @@ Create a Markdown or MDX file in `src/content/projects/`. Put the long descripti
 ---
 title: Project name
 shortSummary: A short, factual summary.
+publishDate: 2026-08-07
 year: 2026
 status: Active
 category: Research / Optimization
@@ -149,7 +150,7 @@ relatedPublications:
 ---
 ```
 
-Remove unknown optional fields instead of publishing placeholders. Store project media in `src/assets/projects/`; use `imageFit: contain` for diagrams or transparent artwork and `imageFit: cover` for photographs and screenshots. When no image is available, omit the image fields and select one of the abstract `visual` options instead. Add a repository to `profile.repositories` if its stars, forks, language, and update time should be fetched during builds.
+Remove unknown optional fields instead of publishing placeholders. `publishDate` is optional for existing projects, but should be set for new projects so they are dated and ordered accurately in the RSS feed. Store project media in `src/assets/projects/`; use `imageFit: contain` for diagrams or transparent artwork and `imageFit: cover` for photographs and screenshots. When no image is available, omit the image fields and select one of the abstract `visual` options instead. Add a repository to `profile.repositories` if its stars, forks, language, and update time should be fetched during builds.
 
 ## Add a publication
 
@@ -161,6 +162,7 @@ title: "Verified paper title"
 authors:
   - Ivan Ilin
   - Coauthor Name
+publishDate: 2026-08-07
 year: 2026
 venue: arXiv
 publicationType: Preprint
@@ -182,7 +184,7 @@ tags:
 ---
 ```
 
-The publications page sorts by year, filters by type and topic, and exposes a client-side BibTeX copy action. Do not infer missing authors, venues, identifiers, or acceptance status.
+The publications page sorts by year, filters by type and topic, and exposes a client-side BibTeX copy action. `publishDate` is optional for existing records, but should be set to the first public-release date for new publications so they are dated and ordered accurately in the RSS feed. Do not infer missing authors, venues, identifiers, or acceptance status.
 
 ## Add a CV
 

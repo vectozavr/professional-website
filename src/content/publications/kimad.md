@@ -10,7 +10,7 @@ year: 2023
 venue: DistributedML 2023
 publicationType: Workshop paper
 status: Published
-summary: An adaptive gradient-compression method designed with network bandwidth awareness.
+summary: Monitors changing network bandwidth during distributed training and adjusts each worker's overall gradient-compression budget, then distributes that budget across neural-network layers to minimize compression error. This reduces communication time while retaining the convergence behavior of fixed-ratio compression.
 featured: false
 paperUrl: https://doi.org/10.1145/3630048.3630184
 arxivUrl: https://arxiv.org/abs/2312.08053

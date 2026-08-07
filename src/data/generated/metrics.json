@@ -3,19 +3,19 @@
     "account": {
       "username": "vectozavr",
       "url": "https://github.com/vectozavr",
-      "totalStars": 620,
+      "totalStars": 622,
       "followers": 448,
-      "publicRepositories": 24,
-      "originalRepositories": 20,
-      "updatedAt": "2026-08-03T21:26:30.053Z"
+      "publicRepositories": 25,
+      "originalRepositories": 21,
+      "updatedAt": "2026-08-07T18:11:59.344Z"
     },
     "repositories": {
       "vectozavr/voicecut": {
         "repository": "vectozavr/voicecut",
-        "stars": 7,
+        "stars": 8,
         "forks": 0,
         "language": "Python",
-        "updatedAt": "2026-08-03T12:56:52Z",
+        "updatedAt": "2026-08-07T09:41:20Z",
         "url": "https://github.com/vectozavr/voicecut"
       },
       "vectozavr/thanos": {
@@ -23,7 +23,7 @@
         "stars": 4,
         "forks": 0,
         "language": "Python",
-        "updatedAt": "2026-07-27T05:43:46Z",
+        "updatedAt": "2026-08-06T17:24:47Z",
         "url": "https://github.com/vectozavr/thanos"
       },
       "vectozavr/randomized-pipedream": {
@@ -31,7 +31,7 @@
         "stars": 0,
         "forks": 0,
         "language": "Jupyter Notebook",
-        "updatedAt": "2026-06-03T09:02:11Z",
+        "updatedAt": "2026-08-06T17:26:56Z",
         "url": "https://github.com/vectozavr/randomized-pipedream"
       },
       "vectozavr/supertuning": {
@@ -39,15 +39,15 @@
         "stars": 1,
         "forks": 0,
         "language": "Python",
-        "updatedAt": "2026-07-27T15:01:20Z",
+        "updatedAt": "2026-08-06T17:26:02Z",
         "url": "https://github.com/vectozavr/SuperTuning"
       },
       "vectozavr/3dzavr": {
         "repository": "vectozavr/3dzavr",
-        "stars": 114,
+        "stars": 115,
         "forks": 14,
         "language": "C++",
-        "updatedAt": "2026-08-01T12:33:12Z",
+        "updatedAt": "2026-08-04T23:47:45Z",
         "url": "https://github.com/vectozavr/3dzavr"
       },
       "vectozavr/gameboy_arduino": {
@@ -55,7 +55,7 @@
         "stars": 59,
         "forks": 6,
         "language": "C++",
-        "updatedAt": "2026-05-10T08:41:01Z",
+        "updatedAt": "2026-08-05T20:42:19Z",
         "url": "https://github.com/vectozavr/GameBoy_arduino"
       },
       "vectozavr/pseudo3dengine": {
@@ -63,19 +63,19 @@
         "stars": 182,
         "forks": 33,
         "language": "Makefile",
-        "updatedAt": "2026-06-12T22:09:08Z",
+        "updatedAt": "2026-08-06T08:23:47Z",
         "url": "https://github.com/vectozavr/pseudo3DEngine"
       }
     },
-    "repositoriesUpdatedAt": "2026-08-03T21:26:30.053Z"
+    "repositoriesUpdatedAt": "2026-08-07T18:11:59.344Z"
   },
   "citations": {
     "source": "Google Scholar",
     "authorId": "elw14gUAAAAJ",
     "url": "https://scholar.google.com/citations?user=elw14gUAAAAJ",
-    "citationCount": 129,
-    "hIndex": 4,
+    "citationCount": 130,
+    "hIndex": 5,
     "i10Index": 4,
-    "updatedAt": "2026-08-03T21:26:30.551Z"
+    "updatedAt": "2026-08-07T18:11:59.651Z"
   }
 }

@@ -11,8 +11,8 @@ year: 2025
 venue: NAACL 2025
 publicationType: Conference paper
 status: Published
-summary: Research on language-model quantization built around a linearity theorem.
-featured: true
+summary: Shows how errors from compressing each LLM layer increase perplexity, a measure of prediction quality. This result enables HIGGS, a quantization method needing no calibration data, and an optimal way to distribute bit widths across layers under a fixed budget.
+featured: false
 paperUrl: https://aclanthology.org/2025.naacl-long.543/
 arxivUrl: https://arxiv.org/abs/2411.17525
 bibtex: |-
