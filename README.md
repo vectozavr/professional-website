@@ -226,7 +226,7 @@ Google Scholar does not provide a supported public metrics API. The scheduled bu
 
 The parser accepts a refresh only when the expected profile and all three values are present. It can retry the same public profile through a small set of Google Scholar regional domains when one endpoint rejects a data-center request. Google Scholar may still rate-limit automated requests or change its HTML; in either case, the build preserves the last complete verified snapshot instead of publishing missing values or misleading zeros. No Google Scholar API key is required.
 
-Google Scholar currently rejects requests from GitHub-hosted runner networks. The Pages workflow therefore sets `SKIP_GOOGLE_SCHOLAR=1`, refreshes GitHub data, and deploys the last verified Scholar snapshot. Run `npm run metrics` from a trusted local environment to refresh Scholar; committing the generated JSON then triggers the normal Pages deployment. This avoids pretending that a blocked hosted request updated the citation timestamp.
+Google Scholar currently rejects requests from GitHub-hosted runner networks. The Pages workflow therefore sets `SKIP_GOOGLE_SCHOLAR=1`, refreshes GitHub data, and deploys the last verified Scholar snapshot committed in `src/data/generated/metrics.json`. Run `npm run metrics` from a trusted local environment to refresh Scholar; committing the generated JSON then triggers the normal Pages deployment. This avoids pretending that a blocked hosted request updated the citation timestamp.
 
 If no verified Google Scholar snapshot is available, the script can calculate a conservative fallback from exact DOI, arXiv, or Semantic Scholar paper identifiers in `semanticScholarPaperIds`:
 
@@ -254,7 +254,7 @@ An optional `SEMANTIC_SCHOLAR_API_KEY` increases fallback reliability. When eith
 
 ## GitHub Pages deployment
 
-`.github/workflows/deploy.yml` runs for pushes to `main`, manual dispatches, and a weekly metrics refresh. It restores the last successful metrics snapshot, refreshes GitHub and citation data, runs checks, builds the static site without a second API call, saves the new snapshot, uploads `dist/`, and deploys through the official Pages actions.
+`.github/workflows/deploy.yml` runs for pushes to `main`, manual dispatches, and a weekly metrics refresh. It starts from the committed verified Scholar snapshot, refreshes GitHub data, runs checks, builds the static site without a second API call, uploads `dist/`, and deploys through the official Pages actions.
 
 Repository configuration:
 
