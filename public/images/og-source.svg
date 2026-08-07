@@ -10,35 +10,37 @@
 
   <rect width="1200" height="630" fill="#f7f8fb"/>
 
-  <g filter="url(#portrait-shadow)">
-    <circle cx="286" cy="326" r="204" fill="#ffffff"/>
-    <image href="ivan-ilin.webp" x="96" y="136" width="380" height="380" preserveAspectRatio="xMidYMid slice" clip-path="url(#portrait-clip)"/>
-    <circle cx="286" cy="326" r="190" fill="none" stroke="#ffffff" stroke-width="3"/>
-  </g>
-
-  <g font-family="Inter, Arial, Helvetica, sans-serif">
-    <text x="546" y="190" fill="#0d1526" font-size="82" font-weight="700" letter-spacing="-3.4">Ivan Ilin</text>
-
-    <text x="550" y="249" fill="#3049bc" font-size="29" font-weight="700" letter-spacing="-0.8">Machine Learning Researcher</text>
-    <text x="950" y="249" fill="#8492c8" font-size="29" font-weight="450">·</text>
-    <text x="974" y="249" fill="#3049bc" font-size="29" font-weight="700" letter-spacing="-0.8">PhD Candidate</text>
-
-    <text x="550" y="326" fill="#465167" font-size="25" font-weight="450">
-      <tspan x="550" dy="0">I work on efficient optimization and compression</tspan>
-      <tspan x="550" dy="39">methods for large language models.</tspan>
-    </text>
-
-    <g font-size="20" font-weight="650" text-anchor="middle" fill="#3049bc">
-      <rect x="550" y="403" width="158" height="56" rx="28" fill="#eef1ff" stroke="#cfd7f7"/>
-      <text x="629" y="438.5">LLM pruning</text>
-
-      <rect x="720" y="403" width="226" height="56" rx="28" fill="#eef1ff" stroke="#cfd7f7"/>
-      <text x="833" y="438.5">Sparse fine-tuning</text>
-
-      <rect x="958" y="403" width="176" height="56" rx="28" fill="#eef1ff" stroke="#cfd7f7"/>
-      <text x="1046" y="438.5">Quantization</text>
+  <g transform="translate(-28 0)">
+    <g filter="url(#portrait-shadow)">
+      <circle cx="286" cy="326" r="204" fill="#ffffff"/>
+      <image href="ivan-ilin.webp" x="96" y="136" width="380" height="380" preserveAspectRatio="xMidYMid slice" clip-path="url(#portrait-clip)"/>
+      <circle cx="286" cy="326" r="190" fill="none" stroke="#ffffff" stroke-width="3"/>
     </g>
 
-    <text x="550" y="524" fill="#162033" font-size="25" font-weight="700">KAUST · Computer Science</text>
+    <g font-family="Inter, Arial, Helvetica, sans-serif">
+      <text x="546" y="190" fill="#0d1526" font-size="82" font-weight="700" letter-spacing="-3.4">Ivan Ilin</text>
+
+      <text x="550" y="249" fill="#3049bc" font-size="29" font-weight="700" letter-spacing="-0.8">Machine Learning Researcher</text>
+      <text x="950" y="249" fill="#8492c8" font-size="29" font-weight="450">·</text>
+      <text x="974" y="249" fill="#3049bc" font-size="29" font-weight="700" letter-spacing="-0.8">PhD Candidate</text>
+
+      <text x="550" y="326" fill="#465167" font-size="25" font-weight="450">
+        <tspan x="550" dy="0">I work on efficient optimization and compression</tspan>
+        <tspan x="550" dy="39">methods for large language models.</tspan>
+      </text>
+
+      <g font-size="20" font-weight="650" text-anchor="middle" fill="#3049bc">
+        <rect x="550" y="403" width="158" height="56" rx="28" fill="#eef1ff" stroke="#cfd7f7"/>
+        <text x="629" y="438.5">LLM pruning</text>
+
+        <rect x="720" y="403" width="226" height="56" rx="28" fill="#eef1ff" stroke="#cfd7f7"/>
+        <text x="833" y="438.5">Sparse fine-tuning</text>
+
+        <rect x="958" y="403" width="176" height="56" rx="28" fill="#eef1ff" stroke="#cfd7f7"/>
+        <text x="1046" y="438.5">Quantization</text>
+      </g>
+
+      <text x="550" y="524" fill="#162033" font-size="25" font-weight="700">KAUST · Computer Science</text>
+    </g>
   </g>
 </svg>
