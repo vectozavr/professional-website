@@ -226,7 +226,7 @@ Google Scholar does not provide a supported public metrics API. The scheduled bu
 
 The parser accepts a refresh only when the expected profile and all three values are present. It can retry the same public profile through a small set of Google Scholar regional domains when one endpoint rejects a data-center request. Google Scholar may still rate-limit automated requests or change its HTML; in either case, the build preserves the last complete verified snapshot instead of publishing missing values or misleading zeros. No Google Scholar API key is required.
 
-The Pages workflow attempts the same verified Google Scholar refresh from its hosted runner. Scholar may reject automated requests from data-center networks, so a failed attempt preserves the last verified snapshot committed in `src/data/generated/metrics.json`. Run `npm run metrics` from a trusted local environment and commit the generated JSON whenever a hosted refresh remains blocked. This avoids publishing missing values, zeros, or a false refresh timestamp.
+The Pages workflow first uses SerpApi's Google Scholar Author endpoint when a `SERPAPI_API_KEY` repository secret is configured, then falls back to a direct profile request. The free SerpApi plan is ample for the twice-weekly schedule. Scholar may reject direct automated requests from data-center networks, so a failed attempt preserves the last verified snapshot committed in `src/data/generated/metrics.json`. Run `npm run metrics` from a trusted local environment and commit the generated JSON whenever both hosted routes are unavailable. This avoids publishing missing values, zeros, or a false refresh timestamp.
 
 If no verified Google Scholar snapshot is available, the script can calculate a conservative fallback from exact DOI, arXiv, or Semantic Scholar paper identifiers in `semanticScholarPaperIds`:
 
@@ -261,6 +261,7 @@ Repository configuration:
 1. Push this repository to GitHub with `main` as the default branch.
 2. Open **Settings → Pages**.
 3. Under **Build and deployment**, choose **GitHub Actions** as the source.
+4. Add a `SERPAPI_API_KEY` Actions secret under **Settings → Secrets and variables → Actions** to enable automatic Google Scholar refreshes from hosted runners.
 
 ## License
 

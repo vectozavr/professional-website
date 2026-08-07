@@ -416,6 +416,86 @@ function parseGoogleScholarMetrics(html: string) {
   return { citationCount, hIndex, i10Index };
 }
 
+function parseSerpApiGoogleScholarMetrics(payload: unknown) {
+  if (!isRecord(payload)) {
+    throw new Error('SerpApi returned an unexpected response');
+  }
+  if (typeof payload.error === 'string') {
+    throw new Error(payload.error);
+  }
+  if (
+    !isRecord(payload.search_parameters) ||
+    payload.search_parameters.author_id !== profile.googleScholarAuthorId
+  ) {
+    throw new Error('SerpApi returned an unexpected Google Scholar profile');
+  }
+  if (
+    !isRecord(payload.author) ||
+    typeof payload.author.name !== 'string' ||
+    payload.author.name.toLocaleLowerCase('en') !== profile.name.toLocaleLowerCase('en')
+  ) {
+    throw new Error('SerpApi returned an unexpected Google Scholar author');
+  }
+  if (!isRecord(payload.cited_by) || !Array.isArray(payload.cited_by.table)) {
+    throw new Error('SerpApi response is missing the citation metrics table');
+  }
+
+  let citationCount: number | undefined;
+  let hIndex: number | undefined;
+  let i10Index: number | undefined;
+  for (const row of payload.cited_by.table) {
+    if (!isRecord(row)) continue;
+    const citations = isRecord(row.citations) ? row.citations.all : undefined;
+    const hIndexRecord = isRecord(row.h_index)
+      ? row.h_index
+      : isRecord(row.indice_h)
+        ? row.indice_h
+        : undefined;
+    const i10IndexRecord = isRecord(row.i10_index)
+      ? row.i10_index
+      : isRecord(row.indice_i10)
+        ? row.indice_i10
+        : undefined;
+
+    if (isNonNegativeInteger(citations)) citationCount = citations;
+    if (hIndexRecord && isNonNegativeInteger(hIndexRecord.all)) {
+      hIndex = hIndexRecord.all;
+    }
+    if (i10IndexRecord && isNonNegativeInteger(i10IndexRecord.all)) {
+      i10Index = i10IndexRecord.all;
+    }
+  }
+
+  if (
+    !isNonNegativeInteger(citationCount) ||
+    !isNonNegativeInteger(hIndex) ||
+    !isNonNegativeInteger(i10Index)
+  ) {
+    throw new Error('SerpApi response did not contain all three citation metrics');
+  }
+
+  return { citationCount, hIndex, i10Index };
+}
+
+async function fetchSerpApiGoogleScholarMetrics(authorId: string) {
+  const apiKey = process.env.SERPAPI_API_KEY?.trim();
+  if (!apiKey) return null;
+
+  const url = new URL('https://serpapi.com/search.json');
+  url.searchParams.set('engine', 'google_scholar_author');
+  url.searchParams.set('author_id', authorId);
+  url.searchParams.set('hl', 'en');
+  url.searchParams.set('api_key', apiKey);
+
+  const response = await fetchResponse(url.toString(), {
+    headers: {
+      Accept: 'application/json',
+      'User-Agent': 'ivan-ilin-website-build',
+    },
+  });
+  return parseSerpApiGoogleScholarMetrics(await response.json());
+}
+
 async function fetchGoogleScholarCitations(
   existing: StoredMetrics,
 ): Promise<GoogleScholarCitationMetric | null> {
@@ -435,10 +515,26 @@ async function fetchGoogleScholarCitations(
     return existingSnapshot;
   }
 
+  const failures: string[] = [];
   try {
-    const failures: string[] = [];
-    let parsed: ReturnType<typeof parseGoogleScholarMetrics> | null = null;
+    const parsed = await fetchSerpApiGoogleScholarMetrics(authorId);
+    if (parsed) {
+      return {
+        source: 'Google Scholar',
+        authorId,
+        url: profile.googleScholarUrl,
+        ...parsed,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  } catch (error) {
+    failures.push(
+      `SerpApi: ${error instanceof Error ? error.message : 'unknown error'}`,
+    );
+  }
 
+  try {
+    let parsed: ReturnType<typeof parseGoogleScholarMetrics> | null = null;
     for (const origin of [
       'https://scholar.google.com',
       'https://scholar.google.co.uk',
@@ -469,7 +565,7 @@ async function fetchGoogleScholarCitations(
     }
 
     if (!parsed) {
-      throw new Error(failures.join('; '));
+      throw new Error('all direct endpoints failed');
     }
 
     return {
@@ -480,8 +576,9 @@ async function fetchGoogleScholarCitations(
       updatedAt: new Date().toISOString(),
     };
   } catch (error) {
+    failures.push(error instanceof Error ? error.message : 'unknown direct-fetch error');
     console.warn(
-      `[metrics] Google Scholar data unavailable; preserving the previous verified profile snapshot. ${error instanceof Error ? error.message : ''}`,
+      `[metrics] Google Scholar data unavailable; preserving the previous verified profile snapshot. ${failures.join('; ')}`,
     );
     return existingSnapshot;
   }
