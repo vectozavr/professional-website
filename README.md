@@ -254,7 +254,7 @@ An optional `SEMANTIC_SCHOLAR_API_KEY` increases fallback reliability. When eith
 
 ## GitHub Pages deployment
 
-`.github/workflows/deploy.yml` runs for pushes to `main`, manual dispatches, and scheduled metrics refreshes every Monday and Thursday. It starts from the committed verified Scholar snapshot, refreshes GitHub and Google Scholar data when available, runs checks, builds the static site without a second API call, uploads `dist/`, and deploys through the official Pages actions.
+`.github/workflows/deploy.yml` runs for pushes to `main`, manual dispatches, and a scheduled metrics refresh every Monday. It starts from the committed verified Scholar snapshot, refreshes GitHub and Google Scholar data when available, runs checks, builds the static site without a second API call, uploads `dist/`, and deploys through the official Pages actions.
 
 Repository configuration:
 
