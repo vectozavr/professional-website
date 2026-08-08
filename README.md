@@ -226,7 +226,7 @@ Google Scholar does not provide a supported public metrics API. The scheduled bu
 
 The parser accepts a refresh only when the expected profile and all three values are present. It can retry the same public profile through a small set of Google Scholar regional domains when one endpoint rejects a data-center request. Google Scholar may still rate-limit automated requests or change its HTML; in either case, the build preserves the last complete verified snapshot instead of publishing missing values or misleading zeros. No Google Scholar API key is required.
 
-The Pages workflow first uses SearchApi's Google Scholar Author endpoint when a `SEARCHAPI_API_KEY` repository secret is configured. SerpApi remains an optional second hosted provider through `SERPAPI_API_KEY`, followed by a direct profile request. Scholar may reject direct automated requests from data-center networks, so a failed attempt preserves the last verified snapshot committed in `src/data/generated/metrics.json`. This avoids publishing missing values, zeros, or a false refresh timestamp.
+Scheduled and manually dispatched Pages workflows first use SearchApi's Google Scholar Author endpoint when a `SEARCHAPI_API_KEY` repository secret is configured. SerpApi remains an optional second hosted provider through `SERPAPI_API_KEY`, followed by a direct profile request. A successful scheduled refresh commits `src/data/generated/metrics.json` back to `main` with CI skipped, making it the durable snapshot used by later builds. Ordinary pushes preserve that snapshot without contacting any Scholar provider, so publishing site content does not consume a SearchApi request. Scholar may reject direct automated requests from data-center networks; a failed refresh preserves the last verified snapshot instead of publishing missing values, zeros, or a false citation timestamp.
 
 If no verified Google Scholar snapshot is available, the script can calculate a conservative fallback from exact DOI, arXiv, or Semantic Scholar paper identifiers in `semanticScholarPaperIds`:
 
@@ -254,7 +254,7 @@ An optional `SEMANTIC_SCHOLAR_API_KEY` increases fallback reliability. When eith
 
 ## GitHub Pages deployment
 
-`.github/workflows/deploy.yml` runs for pushes to `main`, manual dispatches, and a scheduled metrics refresh every Monday. It starts from the committed verified Scholar snapshot, refreshes GitHub and Google Scholar data when available, runs checks, builds the static site without a second API call, uploads `dist/`, and deploys through the official Pages actions.
+`.github/workflows/deploy.yml` runs for pushes to `main`, manual dispatches, and a scheduled metrics refresh every Monday. Scheduled and manual runs refresh GitHub and Google Scholar data, persist the generated snapshot, run checks, build the static site without a second API call, upload `dist/`, and deploy through the official Pages actions. Push-triggered runs refresh GitHub data but reuse the committed Scholar snapshot without spending a hosted Scholar request.
 
 Repository configuration:
 

@@ -8,7 +8,7 @@ on:
     - cron: '23 4 * * 1'
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -41,9 +41,24 @@ jobs:
         run: npm run metrics
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          SKIP_GOOGLE_SCHOLAR: ${{ github.event_name == 'push' && '1' || '0' }}
           SEARCHAPI_API_KEY: ${{ secrets.SEARCHAPI_API_KEY }}
           SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
+
+      - name: Persist scheduled metrics snapshot
+        if: github.event_name != 'push'
+        run: |
+          if git diff --quiet -- src/data/generated/metrics.json; then
+            echo "Metrics snapshot is already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/generated/metrics.json
+          git commit -m "chore: refresh profile metrics [skip ci]"
+          git push origin HEAD:main
 
       - name: Run Astro and TypeScript checks
         run: npm run check
