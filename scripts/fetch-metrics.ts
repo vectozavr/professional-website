@@ -477,6 +477,92 @@ function parseSerpApiGoogleScholarMetrics(payload: unknown) {
   return { citationCount, hIndex, i10Index };
 }
 
+function parseSearchApiMetric(value: unknown) {
+  if (isNonNegativeInteger(value)) return value;
+  if (typeof value !== 'string') return undefined;
+
+  const normalized = value.replace(/[,\s]/g, '');
+  if (!/^\d+$/.test(normalized)) return undefined;
+
+  const parsed = Number.parseInt(normalized, 10);
+  return isNonNegativeInteger(parsed) ? parsed : undefined;
+}
+
+function parseSearchApiGoogleScholarMetrics(payload: unknown) {
+  if (!isRecord(payload)) {
+    throw new Error('SearchApi returned an unexpected response');
+  }
+  if (typeof payload.error === 'string') {
+    throw new Error(payload.error);
+  }
+  if (
+    !isRecord(payload.search_parameters) ||
+    payload.search_parameters.author_id !== profile.googleScholarAuthorId
+  ) {
+    throw new Error('SearchApi returned an unexpected Google Scholar profile');
+  }
+  if (
+    !isRecord(payload.author) ||
+    typeof payload.author.name !== 'string' ||
+    payload.author.name.toLocaleLowerCase('en') !== profile.name.toLocaleLowerCase('en')
+  ) {
+    throw new Error('SearchApi returned an unexpected Google Scholar author');
+  }
+  if (
+    !isRecord(payload.cited_by) ||
+    !isRecord(payload.cited_by.table) ||
+    !Array.isArray(payload.cited_by.table.rows)
+  ) {
+    throw new Error('SearchApi response is missing the citation metrics table');
+  }
+
+  const metrics = new Map<string, number>();
+  for (const row of payload.cited_by.table.rows) {
+    if (!Array.isArray(row) || typeof row[0] !== 'string') continue;
+
+    const label = row[0].trim().toLocaleLowerCase('en');
+    if (!['citations', 'h-index', 'i10-index'].includes(label)) continue;
+
+    const value = parseSearchApiMetric(row[1]);
+    if (!isNonNegativeInteger(value)) {
+      throw new Error(`SearchApi returned an invalid ${label}`);
+    }
+    metrics.set(label, value);
+  }
+
+  const citationCount = metrics.get('citations');
+  const hIndex = metrics.get('h-index');
+  const i10Index = metrics.get('i10-index');
+  if (
+    !isNonNegativeInteger(citationCount) ||
+    !isNonNegativeInteger(hIndex) ||
+    !isNonNegativeInteger(i10Index)
+  ) {
+    throw new Error('SearchApi response did not contain all three citation metrics');
+  }
+
+  return { citationCount, hIndex, i10Index };
+}
+
+async function fetchSearchApiGoogleScholarMetrics(authorId: string) {
+  const apiKey = process.env.SEARCHAPI_API_KEY?.trim();
+  if (!apiKey) return null;
+
+  const url = new URL('https://www.searchapi.io/api/v1/search');
+  url.searchParams.set('engine', 'google_scholar_author');
+  url.searchParams.set('author_id', authorId);
+  url.searchParams.set('hl', 'en');
+
+  const response = await fetchResponse(url.toString(), {
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+      'User-Agent': 'ivan-ilin-website-build',
+    },
+  });
+  return parseSearchApiGoogleScholarMetrics(await response.json());
+}
+
 async function fetchSerpApiGoogleScholarMetrics(authorId: string) {
   const apiKey = process.env.SERPAPI_API_KEY?.trim();
   if (!apiKey) return null;
@@ -516,6 +602,23 @@ async function fetchGoogleScholarCitations(
   }
 
   const failures: string[] = [];
+  try {
+    const parsed = await fetchSearchApiGoogleScholarMetrics(authorId);
+    if (parsed) {
+      return {
+        source: 'Google Scholar',
+        authorId,
+        url: profile.googleScholarUrl,
+        ...parsed,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  } catch (error) {
+    failures.push(
+      `SearchApi: ${error instanceof Error ? error.message : 'unknown error'}`,
+    );
+  }
+
   try {
     const parsed = await fetchSerpApiGoogleScholarMetrics(authorId);
     if (parsed) {
