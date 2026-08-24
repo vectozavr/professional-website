@@ -3,11 +3,11 @@
     "account": {
       "username": "vectozavr",
       "url": "https://github.com/vectozavr",
-      "totalStars": 623,
+      "totalStars": 622,
       "followers": 448,
       "publicRepositories": 25,
       "originalRepositories": 21,
-      "updatedAt": "2026-08-17T05:02:22.333Z"
+      "updatedAt": "2026-08-24T05:06:08.381Z"
     },
     "repositories": {
       "vectozavr/voicecut": {
@@ -44,10 +44,10 @@
       },
       "vectozavr/3dzavr": {
         "repository": "vectozavr/3dzavr",
-        "stars": 115,
+        "stars": 114,
         "forks": 14,
         "language": "C++",
-        "updatedAt": "2026-08-04T23:47:45Z",
+        "updatedAt": "2026-08-18T06:46:12Z",
         "url": "https://github.com/vectozavr/3dzavr"
       },
       "vectozavr/gameboy_arduino": {
@@ -67,15 +67,15 @@
         "url": "https://github.com/vectozavr/pseudo3DEngine"
       }
     },
-    "repositoriesUpdatedAt": "2026-08-17T05:02:22.333Z"
+    "repositoriesUpdatedAt": "2026-08-24T05:06:08.381Z"
   },
   "citations": {
     "source": "Google Scholar",
     "authorId": "elw14gUAAAAJ",
     "url": "https://scholar.google.com/citations?user=elw14gUAAAAJ",
-    "citationCount": 134,
+    "citationCount": 135,
     "hIndex": 5,
     "i10Index": 4,
-    "updatedAt": "2026-08-17T05:02:22.190Z"
+    "updatedAt": "2026-08-24T05:06:08.705Z"
   }
 }
