@@ -3,19 +3,19 @@
     "account": {
       "username": "vectozavr",
       "url": "https://github.com/vectozavr",
-      "totalStars": 622,
-      "followers": 448,
+      "totalStars": 623,
+      "followers": 450,
       "publicRepositories": 25,
       "originalRepositories": 21,
-      "updatedAt": "2026-08-24T05:06:08.381Z"
+      "updatedAt": "2026-08-31T10:56:58.505Z"
     },
     "repositories": {
       "vectozavr/voicecut": {
         "repository": "vectozavr/voicecut",
-        "stars": 8,
+        "stars": 9,
         "forks": 0,
         "language": "Python",
-        "updatedAt": "2026-08-07T09:41:20Z",
+        "updatedAt": "2026-08-31T07:55:49Z",
         "url": "https://github.com/vectozavr/voicecut"
       },
       "vectozavr/thanos": {
@@ -61,13 +61,13 @@
       "vectozavr/pseudo3dengine": {
         "repository": "vectozavr/pseudo3DEngine",
         "stars": 182,
-        "forks": 33,
+        "forks": 34,
         "language": "Makefile",
         "updatedAt": "2026-08-06T08:23:47Z",
         "url": "https://github.com/vectozavr/pseudo3DEngine"
       }
     },
-    "repositoriesUpdatedAt": "2026-08-24T05:06:08.381Z"
+    "repositoriesUpdatedAt": "2026-08-31T10:56:58.505Z"
   },
   "citations": {
     "source": "Google Scholar",
@@ -76,6 +76,6 @@
     "citationCount": 135,
     "hIndex": 5,
     "i10Index": 4,
-    "updatedAt": "2026-08-24T05:06:08.705Z"
+    "updatedAt": "2026-08-31T10:56:58.686Z"
   }
 }
