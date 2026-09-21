@@ -3,11 +3,11 @@
     "account": {
       "username": "vectozavr",
       "url": "https://github.com/vectozavr",
-      "totalStars": 623,
+      "totalStars": 622,
       "followers": 449,
       "publicRepositories": 25,
       "originalRepositories": 21,
-      "updatedAt": "2026-09-14T09:58:19.746Z"
+      "updatedAt": "2026-09-21T10:02:24.717Z"
     },
     "repositories": {
       "vectozavr/voicecut": {
@@ -60,22 +60,22 @@
       },
       "vectozavr/pseudo3dengine": {
         "repository": "vectozavr/pseudo3DEngine",
-        "stars": 182,
+        "stars": 181,
         "forks": 34,
         "language": "Makefile",
-        "updatedAt": "2026-08-06T08:23:47Z",
+        "updatedAt": "2026-09-19T19:17:43Z",
         "url": "https://github.com/vectozavr/pseudo3DEngine"
       }
     },
-    "repositoriesUpdatedAt": "2026-09-14T09:58:19.746Z"
+    "repositoriesUpdatedAt": "2026-09-21T10:02:24.717Z"
   },
   "citations": {
     "source": "Google Scholar",
     "authorId": "elw14gUAAAAJ",
     "url": "https://scholar.google.com/citations?user=elw14gUAAAAJ",
-    "citationCount": 141,
+    "citationCount": 142,
     "hIndex": 5,
     "i10Index": 4,
-    "updatedAt": "2026-09-14T09:58:19.652Z"
+    "updatedAt": "2026-09-21T10:02:24.588Z"
   }
 }
