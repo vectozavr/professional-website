@@ -24,7 +24,7 @@ import QKWandaResults from '../../components/QKWandaResults.astro';
 
 Wanda scores weights in each linear projection independently. But in attention, a query matters through the keys it meets, and a key matters through the queries. Can we use that interaction when deciding which weights to remove?
 
-With [Peter Richtárik](https://richtarik.org/), we introduce **QK-Wanda**: a simple extension of Wanda that measures the effect of a deletion on query–key dot products. The method uses calibration forward passes, keeps surviving weights fixed, and needs no gradients or retraining.
+**QK-Wanda** is a simple extension of Wanda that measures how weight deletions affect query–key dot products. The method uses calibration forward passes, keeps surviving weights fixed, and needs no gradients or retraining.
 
 ## From Wanda to query–key reconstruction
 
