@@ -1,0 +1,129 @@
+---
+import { Image } from 'astro:assets';
+import wikitext from '../assets/projects/qk-wanda/wikitext.svg';
+import c4 from '../assets/projects/qk-wanda/c4.svg';
+import accuracy from '../assets/projects/qk-wanda/accuracy.svg';
+import qkError from '../assets/projects/qk-wanda/qk-error.svg';
+
+const panels = [
+  {
+    title: 'WikiText-2 perplexity ↓',
+    image: wikitext,
+    alt: 'Wanda → QK-Wanda perplexity: Llama 2 70B, 4.55 → 3.63; Qwen2.5 72B, 4.55 → 4.23; Llama 3.1 70B, 4.98 → 18.89. Lower is better.',
+  },
+  {
+    title: 'C4 perplexity ↓',
+    image: c4,
+    alt: 'Wanda → QK-Wanda perplexity: Llama 2 70B, 6.91 → 5.97; Qwen2.5 72B, 9.87 → 9.52; Llama 3.1 70B, 9.89 → 32.59. Lower is better.',
+  },
+  {
+    title: 'Mean zero-shot accuracy (%) ↑',
+    image: accuracy,
+    alt: 'Wanda → QK-Wanda mean accuracy: Llama 2 70B, 65.85% → 71.79%; Qwen2.5 72B, 73.44% → 74.00%; Llama 3.1 70B, 66.64% → 65.93%. Higher is better.',
+  },
+  {
+    title: 'Relative squared QK error (%) ↓',
+    image: qkError,
+    alt: 'Wanda → QK-Wanda reconstruction error: Llama 2 70B, 7.40% → 1.00%; Qwen2.5 72B, 1.30% → 0.62%; Llama 3.1 70B, 5.27% → 3.27%. Lower is better.',
+  },
+];
+---
+
+<figure class="qk-results" aria-labelledby="qk-results-title">
+  <div class="qk-results-heading">
+    <h3 id="qk-results-title">Wanda vs QK-Wanda</h3>
+    <div class="qk-results-legend" aria-label="Chart legend">
+      <span><i class="wanda" aria-hidden="true"></i>Wanda</span>
+      <span><i class="qk-wanda" aria-hidden="true"></i>QK-Wanda</span>
+    </div>
+  </div>
+  <p class="qk-results-setting">80% query–key sparsity · all other parameters stay dense</p>
+  <div class="qk-results-grid">
+    {panels.map((panel) => (
+      <div class="qk-results-panel">
+        <h4>{panel.title}</h4>
+        <Image src={panel.image} alt={panel.alt} width={panel.image.width} height={panel.image.height} loading="lazy" />
+      </div>
+    ))}
+  </div>
+  <figcaption>
+    Each metric uses a shared scale across the three models, starting at zero.
+    Values from <a href="https://arxiv.org/html/2610.01554v1#S4.T2">Table 2 of the preprint</a>.
+  </figcaption>
+</figure>
+
+<style>
+  .qk-results-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+  }
+
+  .qk-results-heading h3 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .qk-results-legend,
+  .qk-results-legend span {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .qk-results-legend {
+    gap: 1rem;
+    color: var(--muted-strong);
+    font-size: 0.85rem;
+  }
+
+  .qk-results-legend i {
+    width: 0.85rem;
+    height: 0.6rem;
+    border-radius: 2px;
+  }
+
+  .wanda { background: #98a3b6; }
+  .qk-wanda { background: #415ccf; }
+
+  .qk-results-setting {
+    margin: 0.4rem 0 1.1rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .qk-results-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .qk-results-panel {
+    min-width: 0;
+    padding: 1rem 0.25rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #fff;
+  }
+
+  .qk-results-panel h4 {
+    margin: 0 0.7rem 0.4rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .qk-results-panel img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  @media (max-width: 40rem) {
+    .qk-results-grid { grid-template-columns: 1fr; }
+  }
+</style>

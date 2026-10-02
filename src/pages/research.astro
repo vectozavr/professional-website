@@ -52,10 +52,18 @@ import { sitePath } from '../utils/urls';
           <p>
             Pruning removes model weights that contribute less to a chosen objective.
             The difficult part is not producing zeros; it is deciding what to remove
-            and compensating for the combined effect. My work studies layer-wise and
-            block-wise methods that use second-order information for this decision.
+            and accounting for the combined effect. My work studies query–key
+            interactions for choosing pruning masks, alongside layer-wise and
+            block-wise methods that use second-order information to compensate for
+            removals.
           </p>
           <div class="related-links">
+            <a class="related-link" href={sitePath('/projects/qk-wanda/')}>
+              <span>Project</span><strong>QK-Wanda</strong>
+            </a>
+            <a class="related-link" href="https://arxiv.org/abs/2610.01554">
+              <span>Preprint</span><strong>QK-Wanda: Coupling Queries and Keys</strong>
+            </a>
             <a class="related-link" href={sitePath('/projects/thanos/')}>
               <span>Project</span><strong>Pruning LLMs with Thanos</strong>
             </a>

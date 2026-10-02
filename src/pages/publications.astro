@@ -3,20 +3,18 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PublicationItem from '../components/PublicationItem.astro';
 import { researchProfileLinks } from '../data/profile';
+import { comparePublications } from '../utils/content';
 import { sitePath } from '../utils/urls';
 
-const publications = (await getCollection('publications')).sort(
-  (a, b) =>
-    (b.data.year ?? 0) - (a.data.year ?? 0) ||
-    a.data.title.localeCompare(b.data.title),
-);
+const publications = (await getCollection('publications')).sort(comparePublications);
 
 const structuredData = publications.map((publication) => ({
   '@context': 'https://schema.org',
   '@type': 'ScholarlyArticle',
   headline: publication.data.title,
   author: publication.data.authors.map((name) => ({ '@type': 'Person', name })),
-  datePublished: publication.data.year?.toString(),
+  datePublished: publication.data.publishDate?.toISOString().slice(0, 10) ??
+    publication.data.year?.toString(),
   isPartOf: publication.data.venue
     ? { '@type': 'CreativeWorkSeries', name: publication.data.venue }
     : undefined,

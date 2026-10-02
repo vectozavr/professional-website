@@ -3,10 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { researchProfileLinks, socialMediaLinks } from '../../data/profile';
+import { compareProjectPriority } from '../../utils/content';
 import { sitePath } from '../../utils/urls';
 
 const projects = (await getCollection('projects')).sort(
   (a, b) =>
+    compareProjectPriority(a, b) ||
     Number(b.data.featured) - Number(a.data.featured) ||
     a.data.title.localeCompare(b.data.title),
 );

@@ -1,3 +1,38 @@
+import type { CollectionEntry } from 'astro:content';
+
+const projectOrder = [
+  'qk-wanda',
+  'pipeline-parallelism-theory',
+  'thanos',
+  'sparse-fine-tuning',
+];
+
+export function compareProjectPriority(
+  a: CollectionEntry<'projects'>,
+  b: CollectionEntry<'projects'>,
+) {
+  const priority = (project: CollectionEntry<'projects'>) => {
+    const index = projectOrder.indexOf(project.id);
+    return index >= 0 ? index : projectOrder.length;
+  };
+
+  return priority(a) - priority(b);
+}
+
+export function comparePublications(
+  a: CollectionEntry<'publications'>,
+  b: CollectionEntry<'publications'>,
+) {
+  const publicationDate = (publication: CollectionEntry<'publications'>) =>
+    publication.data.publishDate?.valueOf() ??
+    (publication.data.year
+      ? Date.UTC(publication.data.year, 0, 1)
+      : Number.NEGATIVE_INFINITY);
+
+  return publicationDate(b) - publicationDate(a) ||
+    a.data.title.localeCompare(b.data.title);
+}
+
 export function formatDate(date: Date, style: 'long' | 'short' = 'long') {
   return new Intl.DateTimeFormat('en', {
     year: 'numeric',

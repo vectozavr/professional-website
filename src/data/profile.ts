@@ -54,6 +54,7 @@ export const profile = {
   cvUrl: '/cv/ivan-ilin-cv.pdf',
   location: '',
   repositories: [
+    'vectozavr/qk-wanda',
     'vectozavr/voicecut',
     'vectozavr/thanos',
     'vectozavr/randomized-pipedream',

@@ -14,15 +14,15 @@ import {
   socialMediaLinks,
 } from '../data/profile';
 import { researchAreas } from '../data/research';
+import { compareProjectPriority, comparePublications } from '../utils/content';
 import { sitePath } from '../utils/urls';
 
 const projects = (await getCollection('projects')).sort((a, b) =>
+  compareProjectPriority(a, b) ||
   a.data.title.localeCompare(b.data.title),
 );
 const featuredProjects = projects.filter((project) => project.data.featured);
-const publications = (await getCollection('publications')).sort(
-  (a, b) => (b.data.year ?? 0) - (a.data.year ?? 0),
-);
+const publications = (await getCollection('publications')).sort(comparePublications);
 const featuredPublications = publications
   .filter((publication) => publication.data.featured)
   .slice(0, 5);

@@ -1,0 +1,105 @@
+---
+title: QK-Wanda
+shortSummary: We couple query and key pruning by extending Wanda scores with opposite-projection activation energies and sharing the pruning budget across Q and K.
+publishDate: 2026-10-01
+year: 2026
+status: Research project · Preprint
+category: Research / LLM Pruning
+topics:
+  - LLM pruning
+  - Attention
+  - Model compression
+featured: true
+githubUrl: https://github.com/vectozavr/qk-wanda
+paperUrl: https://arxiv.org/abs/2610.01554
+image: ../../assets/projects/qk-wanda-cover.svg
+imageAlt: QK-Wanda multiplies weight magnitudes by input and opposite-projection norms, then removes four of eight weights using a shared query–key budget
+imageFit: cover
+metricsRepository: vectozavr/qk-wanda
+relatedPublications:
+  - qk-wanda
+---
+
+import QKWandaResults from '../../components/QKWandaResults.astro';
+
+Wanda scores weights in each linear projection independently. But in attention, a query matters through the keys it meets, and a key matters through the queries. Can we use that interaction when deciding which weights to remove?
+
+With [Peter Richtárik](https://richtarik.org/), we introduce **QK-Wanda**: a simple extension of Wanda that measures the effect of a deletion on query–key dot products. The method uses calibration forward passes, keeps surviving weights fixed, and needs no gradients or retraining.
+
+## From Wanda to query–key reconstruction
+
+Let $X\in\mathbb{R}^{d\times T}$ contain one calibration sequence, with one token per column. For a linear projection $O=WX$, Wanda measures the cost of deleting $W_{ij}$ through its change to the projection output:
+
+$$
+\mathcal{L}_{W}=\lVert(\widehat W-W)X\rVert_F^2.
+$$
+
+Deleting just that weight changes output row $i$ by $-W_{ij}X_{j:}$. Its exact squared cost is
+
+$$
+S^{\mathrm{Wanda}}_{ij}=W_{ij}^2\lVert X_{j:}\rVert_2^2.
+$$
+
+This is the square of Wanda's familiar score $|W_{ij}|\lVert X_{j:}\rVert_2$, so it produces the same ordering. Standard Wanda removes the lowest-scoring weights within each output row.
+
+Now consider one query–key head pair in ordinary multi-head attention, with head width $m$. Write
+
+$$
+Q=W^QX,\qquad K=W^KX,
+\qquad W^Q,W^K\in\mathbb{R}^{m\times d}.
+$$
+
+The dot products $Q^\top K$ determine how queries and keys interact. For this simple case, we reconstruct those products directly:
+
+$$
+\mathcal{L}=\left\lVert
+\widehat Q^{\top}\widehat K-Q^{\top}K
+\right\rVert_F^2.
+$$
+
+Hats denote pruned projections evaluated on the same inputs. We use raw dot products here; including the usual $1/\sqrt m$ attention scale would divide every squared deletion cost by $m$ and preserve the ranking.
+
+## The score gains one factor
+
+Delete $W^Q_{ij}$ while keeping the keys and all other weights fixed. The change to the product is an outer product:
+
+$$
+\widehat Q^{\top}K-Q^{\top}K
+=-W^Q_{ij}\,X_{j:}^{\top}K_{i:}.
+$$
+
+The squared Frobenius norm of an outer product is the product of the squared vector norms. Thus the query deletion cost, and the symmetric key deletion cost, are
+
+$$
+\boxed{
+S^Q_{ij}=\underbrace{(W^Q_{ij})^2\left\lVert X_{j:}\right\rVert_2^2}_{\text{Wanda}}
+\left\lVert K_{i:}\right\rVert_2^2,
+\qquad
+S^K_{ij}=\underbrace{(W^K_{ij})^2\left\lVert X_{j:}\right\rVert_2^2}_{\text{Wanda}}
+\left\lVert Q_{i:}\right\rVert_2^2.
+}
+$$
+
+**QK-Wanda is Wanda multiplied by the energy of the opposite projection.** A query weight receives a larger score when its coordinate interacts with strong keys; a key weight receives a larger score when it interacts with strong queries.
+
+Both costs measure damage to the same objective, so we can pool them and remove the smallest scores under **one shared QK budget per transformer block**. The surviving values stay unchanged.
+
+For this single-sequence example, the extra factor is constant within each row. With the same row quotas and nonzero opposite-projection energies, the ordering—and therefore the mask—would match Wanda. The new factor matters when comparing weights across rows and between Q and K. With several independent calibration sequences, we average their deletion costs before selecting the mask.
+
+The cover uses the repository's one-token example, $X=(1,2)^\top$. Both methods remove four of eight weights. Wanda removes half of each row; QK-Wanda removes three query weights and one key weight. The resulting squared QK error is **81 with Wanda and 9 with QK-Wanda**. The illustrated scores are square roots of the costs above, which preserves their ordering.
+
+## Results against Wanda
+
+We evaluate 15 checkpoints from TinyLlama, Llama 2, Llama 3, and Qwen2.5, spanning 0.5B–72B parameters. The main comparison uses the same C4 calibration tokens for both methods and prunes **only query and key weights**; all other parameters stay dense. Wanda uses row budgets, while QK-Wanda shares a QK budget per block.
+
+Across the 15 checkpoints, the mean relative reduction in QK reconstruction error is **60.35% at 50% QK sparsity** and **44.70% at 80%**. The following results show the three largest checkpoints at 80% QK sparsity:
+
+<QKWandaResults />
+
+Accuracy is the unweighted mean over seven zero-shot tasks; QK error is the block-mean relative **squared** reconstruction error. These benchmarks include architectures beyond the ordinary MHA example derived above.
+
+On Llama 2 70B, this gives **20.3% lower WikiText-2 perplexity**, **13.5% lower C4 perplexity**, and a **5.94 percentage-point gain** in mean accuracy relative to Wanda. The method is also inexpensive: full-block pruning, using QK-Wanda for Q/K and Wanda for the other projections, took 1.3% longer than Wanda on A100 and 3.1% longer on H200 with the main calibration setup.
+
+Better local reconstruction does not guarantee a better complete model. Llama 3.1 70B illustrates that clearly: its QK error improves while perplexity worsens. The scores are exact for an individual deletion with everything else fixed; selecting many deletions uses an additive surrogate, whose costs need not equal their joint error.
+
+The [arXiv preprint](https://arxiv.org/abs/2610.01554) contains the full derivations, architecture extensions, ablations, and evaluation details. The [GitHub repository](https://github.com/vectozavr/qk-wanda) provides the implementation and reproduction instructions.

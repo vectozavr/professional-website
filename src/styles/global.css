@@ -2664,7 +2664,7 @@
     border: 0;
   }
 
-  .accent {
+  .accent:not(.katex *) {
     color: var(--accent-strong);
   }
 }
