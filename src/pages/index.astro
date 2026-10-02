@@ -21,7 +21,9 @@ const projects = (await getCollection('projects')).sort((a, b) =>
   compareProjectPriority(a, b) ||
   a.data.title.localeCompare(b.data.title),
 );
-const featuredProjects = projects.filter((project) => project.data.featured);
+const featuredProjects = projects
+  .filter((project) => project.data.featured)
+  .slice(0, 4);
 const publications = (await getCollection('publications')).sort(comparePublications);
 const featuredPublications = publications
   .filter((publication) => publication.data.featured)
