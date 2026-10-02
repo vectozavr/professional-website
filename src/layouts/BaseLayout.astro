@@ -9,7 +9,11 @@ import 'katex/dist/katex.min.css';
 interface Props {
   title: string;
   description?: string;
-  image?: string;
+  image?: string | undefined;
+  imageWidth?: number | undefined;
+  imageHeight?: number | undefined;
+  imageAlt?: string | undefined;
+  imageType?: string | undefined;
   type?: 'website' | 'article';
   noindex?: boolean;
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
@@ -19,6 +23,10 @@ const {
   title,
   description = siteDescription,
   image = '/images/og.png',
+  imageWidth = 1200,
+  imageHeight = 630,
+  imageAlt = `${profile.name}, ${profile.professionalTitle}`,
+  imageType = 'image/png',
   type = 'website',
   noindex = false,
   structuredData,
@@ -51,14 +59,16 @@ const socialImage = absoluteSiteUrl(image);
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content={profile.name} />
     <meta property="og:image" content={socialImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${profile.name}, ${profile.professionalTitle}`} />
+    <meta property="og:image:type" content={imageType} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
     {structuredData && (
       <script

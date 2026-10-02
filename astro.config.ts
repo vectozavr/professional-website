@@ -14,6 +14,10 @@ export default defineConfig({
   site: siteUrl.origin,
   base,
   output: 'static',
+  image: {
+    // Rasterize the local SVG project covers for link previews.
+    dangerouslyProcessSVG: true,
+  },
   integrations: [mdx(), sitemap()],
   markdown: {
     processor: unified({
