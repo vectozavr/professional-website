@@ -1,6 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 const projectOrder = [
+  'local-work-global-progress',
   'qk-wanda',
   'pipeline-parallelism-theory',
   'thanos',

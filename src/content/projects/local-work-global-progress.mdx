@@ -1,0 +1,102 @@
+---
+title: Local Work, Global Progress
+shortSummary: A convergence theory for AI agent teams. Agents improve their own parts with corrections for the others, and a coordinator keeps only verified progress.
+publishDate: 2026-10-20
+year: 2026
+status: Research project · Preprint
+category: Research / AI Agents
+topics:
+  - LLM agents
+  - Multi-agent systems
+  - Block optimization
+featured: true
+githubUrl: https://github.com/vectozavr/local-work-global-progress
+paperUrl: https://arxiv.org/abs/2610.28286
+image: ../../assets/projects/local-work-global-progress-cover.svg
+imageAlt: Local work, global progress. Three agents search their own blocks of a shared solution with a local objective plus a correction; the coordinator merges the compatible proposals 2 and 3, and the global loss decreases
+imageFit: cover
+metricsRepository: vectozavr/local-work-global-progress
+relatedPublications:
+  - local-work-global-progress
+---
+
+import { Image } from 'astro:assets';
+import twoFloors from '../../assets/projects/local-work-global-progress/two-floors.svg';
+
+When a task is too large for one agent, we split it: one agent per module of a program, per component of a design, per group of robots. Each part becomes easier, and the parts can be searched in parallel. But the parts are coupled. A module can pass its own tests while breaking another module's interface; a robot can take a shortcut that collides with another agent's robot. Can a team of agents that only improves its own parts still be guaranteed to make global progress?
+
+**Local Work, Global Progress** answers this with a convergence theory for agent teams. The model is block optimization, the agents can be LLMs, and the guarantee depends on constants that we measure on real runs.
+
+## Blocks, local objectives and corrections
+
+The team improves a shared solution $x=(x_1,\ldots,x_m)$, and agent $b$ owns block $x_b$. An exact verifier returns the global loss $F(x)$, but an agent can cheaply evaluate only its local objective $L_b$, which may ignore the other blocks. What the local objective misses is the **exact correction**
+
+$$
+R_b(u;x)=\underbrace{F(x_{-b},u)-F(x)}_{\text{true change}}-\bigl[L_b(u)-L_b(x_b)\bigr].
+$$
+
+Each agent searches the **corrected objective** $\widehat f_b(u;x)=L_b(u)-L_b(x_b)+\widehat R_b(u;x)$, built from an approximation $\widehat R_b$ of this correction. For LLM agents, the correction does not have to be a formula. In robot routing, it is the collisions with other agents' robots that the verifier has already reported, shown in the agent's prompt.
+
+## One epoch
+
+All agents search in parallel from the same frozen solution, each for $H$ private steps. The verifier checks every proposal $U_b$ on its own and records its gain
+
+$$
+g_b=\max\{0,\;F(x)-F(x_{-b},U_b)\}.
+$$
+
+Proposals can interfere, so the coordinator cannot simply accept all of them. Blocks that share a term of the loss are joined in a dependency graph, and a proper coloring with $\kappa$ colors groups blocks that never interact. Gains within one color add exactly, so accepting the best color keeps at least the average gain of a color:
+
+$$
+F(x)-F(x^+)\;\ge\;\frac1\kappa\sum_b g_b .
+$$
+
+The cover shows one epoch: proposal 1 interacts with proposals 2 and 3, which share no term with each other, so the coordinator merges blocks 2 and 3 together and the global loss decreases.
+
+## The guarantee
+
+Three conditions are enough. The correction must be accurate where it matters, the local search must capture a fixed fraction $q(H)$ of the available corrected improvement, and single-block changes must be able to make progress, with a constant $\mu>0$. Then the expected gap $\Delta=F-F^*$ decreases linearly up to an error floor:
+
+$$
+\boxed{\;\mathbb E\,\Delta(x^K)\;\le\;(1-\alpha)^K\,\Delta(x^0)+\frac{B}{\alpha},
+\qquad \alpha=\frac{\mu\,q(H)}{\kappa}.\;}
+$$
+
+The rate has three factors: useful block directions ($\mu$), finding them ($q$), and keeping compatible gains ($1/\kappa$). The floor $B$ vanishes with exact corrections, and it depends on the correction error at only two candidates per agent: a true block minimizer and the proposal that the agent actually returns. This matters in practice. In robot routing, a uniform bound on the correction error over all routes exceeds $10^4$, while the error measured at these two points is zero and about 40.
+
+## Merging interfering proposals
+
+Accepting one color throws away the verified improvements of all other colors, even when they would combine well. Instead, the coordinator can check combinations of proposals and accept the one with the lowest loss, even if it contains proposals that interfere. This **best-combination merge** keeps the guarantee, and its rate depends on the realized number of colors
+
+$$
+\kappa^*_k=\frac{\sum_b g_b}{F(x^k)-F(x^{k+1})}\;\le\;\kappa,
+$$
+
+that is, on how well the proposals actually combine rather than on worst-case interactions. A greedy version needs far fewer checks when there are many agents.
+
+## Results with LLM agents
+
+We test the protocol with GPT-OSS-120B agents on robot routing: nine robots on a $16\times16$ grid with walls, three agents with three robots each, and a loss that adds arrival times and a penalty of 100 per collision. A larger task stacks two maps as the floors of one building, with 18 robots and six agents.
+
+<figure class="project-figure">
+  <Image
+    src={twoFloors}
+    alt="Mean gap to the optimum against search time on two floors, log scale. The team with best-combination merging falls fastest; the team with Algorithm 1 ends lowest, near 13; six parallel single agents end near 21 and the single agent near 29 after about 2000 seconds; the team without correction stalls near 500."
+    width={twoFloors.width}
+    height={twoFloors.height}
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>
+    Two floors, 18 robots: mean gap to the optimum against search time, 20 runs per curve (10 without correction). Dots mark where the last run stops.
+  </figcaption>
+</figure>
+
+- **Corrections matter.** The three-agent team finds collision-free plans in all 40 runs on two maps, with better final plans than a single agent that controls all robots. Without corrections, only 2 of 20 runs end without collisions.
+- **Teams scale.** On two floors, the six-agent team needs half the single agent's median search time (595 against 1200 seconds) and ends with better plans.
+- **Checked merging pays off.** Accepting the best checked combination cuts the team's search time by about 30% and reaches a safe plan first. Merging all proposals without a check does not help.
+- **The theory follows the runs.** With constants measured on the runs, the bound holds in every round of every run. With the realized number of colors it ends within a factor of 3 to 7 of the observed gap, instead of 30 to 60 with $\kappa=3$. The worst case $\kappa_k=3$ occurs in only 8 of the 105 rounds with several improving proposals.
+
+Two smaller studies test the theory where its constants can be measured or certified exactly: query planning in SQLite, where the correction is learned from the engine's execution counters, and a synthetic task with certified constants.
+
+The [arXiv preprint](https://arxiv.org/abs/2610.28286) contains the proofs, learned corrections, the cost of private work and the full experimental protocols. The [GitHub repository](https://github.com/vectozavr/local-work-global-progress) contains the agents, prompts and records of every run.
