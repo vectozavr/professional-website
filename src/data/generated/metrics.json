@@ -3,11 +3,11 @@
     "account": {
       "username": "vectozavr",
       "url": "https://github.com/vectozavr",
-      "totalStars": 625,
-      "followers": 450,
-      "publicRepositories": 26,
-      "originalRepositories": 22,
-      "updatedAt": "2026-10-19T10:02:06.913Z"
+      "totalStars": 628,
+      "followers": 452,
+      "publicRepositories": 28,
+      "originalRepositories": 24,
+      "updatedAt": "2026-10-26T10:16:13.303Z"
     },
     "repositories": {
       "vectozavr/qk-wanda": {
@@ -23,7 +23,7 @@
         "stars": 12,
         "forks": 0,
         "language": "Python",
-        "updatedAt": "2026-10-10T20:15:01Z",
+        "updatedAt": "2026-10-25T21:41:52Z",
         "url": "https://github.com/vectozavr/voicecut"
       },
       "vectozavr/thanos": {
@@ -52,10 +52,10 @@
       },
       "vectozavr/3dzavr": {
         "repository": "vectozavr/3dzavr",
-        "stars": 114,
-        "forks": 14,
+        "stars": 115,
+        "forks": 15,
         "language": "C++",
-        "updatedAt": "2026-08-18T06:46:12Z",
+        "updatedAt": "2026-10-24T00:53:59Z",
         "url": "https://github.com/vectozavr/3dzavr"
       },
       "vectozavr/gameboy_arduino": {
@@ -68,22 +68,22 @@
       },
       "vectozavr/pseudo3dengine": {
         "repository": "vectozavr/pseudo3DEngine",
-        "stars": 181,
+        "stars": 182,
         "forks": 34,
         "language": "Makefile",
-        "updatedAt": "2026-09-30T10:26:14Z",
+        "updatedAt": "2026-10-24T00:53:58Z",
         "url": "https://github.com/vectozavr/pseudo3DEngine"
       }
     },
-    "repositoriesUpdatedAt": "2026-10-19T10:02:06.913Z"
+    "repositoriesUpdatedAt": "2026-10-26T10:16:13.303Z"
   },
   "citations": {
     "source": "Google Scholar",
     "authorId": "elw14gUAAAAJ",
     "url": "https://scholar.google.com/citations?user=elw14gUAAAAJ",
-    "citationCount": 158,
+    "citationCount": 164,
     "hIndex": 5,
     "i10Index": 4,
-    "updatedAt": "2026-10-19T10:02:06.289Z"
+    "updatedAt": "2026-10-26T10:16:13.097Z"
   }
 }
