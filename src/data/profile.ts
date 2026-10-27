@@ -28,7 +28,7 @@ export const profile = {
   academicStatus: 'PhD Candidate',
   affiliation: 'PhD candidate in Computer Science at KAUST',
   shortBiography:
-    'Ivan Ilin is a machine learning researcher and PhD candidate in Computer Science at KAUST. His work focuses on efficient optimization and compression methods for large language models, including pruning, sparse fine-tuning, quantization, and pipeline parallelism. He also develops open-source tools that apply machine learning to practical workflows.',
+    'Ivan Ilin is a machine learning researcher and PhD candidate in Computer Science at KAUST. His work focuses on efficient optimization and compression methods for large language models, including pruning, sparse fine-tuning, quantization, and pipeline parallelism, and on convergence theory for collaborating AI agents. He also develops open-source tools that apply machine learning to practical workflows.',
   siteUrl: 'https://ivanilin.org/',
   portraitUrl: '/images/ivan-ilin.webp',
   githubUsername: 'vectozavr',

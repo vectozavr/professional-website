@@ -1300,7 +1300,8 @@
     padding-block: clamp(4.5rem, 10vw, 8rem) clamp(3.5rem, 7vw, 5.5rem);
   }
 
-  .projects-hero {
+  .projects-hero,
+  .research-hero {
     padding-bottom: clamp(1.75rem, 3vw, 2.5rem);
   }
 
@@ -1330,7 +1331,8 @@
     margin-top: 1.5rem;
   }
 
-  .projects-index {
+  .projects-index,
+  .research-index {
     padding-top: clamp(1rem, 2vw, 1.75rem);
     border-top: 0;
   }
