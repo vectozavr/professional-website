@@ -103,3 +103,18 @@ On Llama 2 70B, this gives **20.3% lower WikiText-2 perplexity**, **13.5% lower 
 Better local reconstruction does not guarantee a better complete model. Llama 3.1 70B illustrates that clearly: its QK error improves while perplexity worsens. The scores are exact for an individual deletion with everything else fixed; selecting many deletions uses an additive surrogate, whose costs need not equal their joint error.
 
 The [arXiv preprint](https://arxiv.org/abs/2610.01554) contains the full derivations, architecture extensions, ablations, and evaluation details. The [GitHub repository](https://github.com/vectozavr/qk-wanda) provides the implementation and reproduction instructions.
+
+## Citation
+
+```bibtex
+@misc{ilin2026qkwanda,
+  title={{QK-Wanda}: Coupling Queries and Keys for Unstructured Pruning},
+  author={Ilin, Ivan and Richt{\'a}rik, Peter},
+  year={2026},
+  eprint={2610.01554},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG},
+  doi={10.48550/arXiv.2610.01554},
+  url={https://arxiv.org/abs/2610.01554}
+}
+```
