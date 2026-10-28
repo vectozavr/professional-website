@@ -2197,13 +2197,19 @@
     transform: none;
   }
 
-  .prose .project-figure img {
+  .prose .project-figure img,
+  .prose .project-figure video {
     width: 100%;
     height: auto;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: #fff;
     box-shadow: var(--shadow-sm);
+  }
+
+  .prose .project-figure video {
+    display: block;
+    cursor: pointer;
   }
 
   .prose .project-figure figcaption {

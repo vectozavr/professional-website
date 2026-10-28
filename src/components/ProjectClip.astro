@@ -1,0 +1,73 @@
+---
+import { getImage } from 'astro:assets';
+
+interface Props {
+  poster: ImageMetadata;
+  mp4: string;
+  alt: string;
+  caption: string;
+}
+
+const { poster, mp4, alt, caption } = Astro.props;
+// The poster is the first frame of the loop. It is all a reader sees until the clip is on screen and loaded, and all
+// they see if the clip cannot play or they prefer reduced motion.
+const still = await getImage({ src: poster, width: Math.min(poster.width, 1600), format: 'webp' });
+---
+
+<figure class="project-figure project-clip">
+  <video
+    data-clip
+    muted
+    loop
+    playsinline
+    disablepictureinpicture
+    disableremoteplayback
+    preload="none"
+    poster={still.src}
+    width={still.attributes.width}
+    height={still.attributes.height}
+    aria-label={alt}
+    tabindex="0"
+  >
+    <source src={mp4} type="video/mp4" />
+  </video>
+  <figcaption>{caption}</figcaption>
+</figure>
+
+<script>
+  // A clip plays, muted and in a loop, while it is on screen, and pauses when it leaves. A click (or Enter) pauses it
+  // and plays it again. With reduced motion or data saving on, it stays a picture until the reader starts it.
+  const clips = document.querySelectorAll<HTMLVideoElement>('video[data-clip]');
+  const still =
+    matchMedia('(prefers-reduced-motion: reduce)').matches || Boolean((navigator as any).connection?.saveData);
+  const seen = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const v = e.target as HTMLVideoElement;
+        if (e.isIntersecting && !v.dataset.held) v.play().catch(() => {});
+        else v.pause();
+      }
+    },
+    { threshold: 0.35 },
+  );
+  for (const v of clips) {
+    if (still) v.dataset.held = '1';
+    seen.observe(v);
+    const toggle = () => {
+      if (v.paused) {
+        delete v.dataset.held;
+        v.play().catch(() => {});
+      } else {
+        v.dataset.held = '1';
+        v.pause();
+      }
+    };
+    v.addEventListener('click', toggle);
+    v.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle();
+      }
+    });
+  }
+</script>

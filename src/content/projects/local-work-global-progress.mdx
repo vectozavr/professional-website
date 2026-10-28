@@ -22,8 +22,15 @@ relatedPublications:
 ---
 
 import ProjectFigure from '../../components/ProjectFigure.astro';
+import ProjectClip from '../../components/ProjectClip.astro';
 import score from '../../assets/projects/local-work-global-progress/score.webp';
+import scoreMp4 from '../../assets/projects/local-work-global-progress/score.mp4';
 import optimum from '../../assets/projects/local-work-global-progress/optimum.webp';
+import optimumMp4 from '../../assets/projects/local-work-global-progress/optimum.mp4';
+import blocksMp4 from '../../assets/projects/local-work-global-progress/blocks.mp4';
+import noCorrectionMp4 from '../../assets/projects/local-work-global-progress/no-correction.mp4';
+import roundMp4 from '../../assets/projects/local-work-global-progress/round.mp4';
+import realizedColorsMp4 from '../../assets/projects/local-work-global-progress/realized-colors.mp4';
 import singleAgent from '../../assets/projects/local-work-global-progress/single-agent.webp';
 import blocks from '../../assets/projects/local-work-global-progress/blocks.webp';
 import noCorrection from '../../assets/projects/local-work-global-progress/no-correction.webp';
@@ -57,9 +64,10 @@ To guarantee anything, we first have to describe the task in the language of mat
 
 The agents do not need a formula for $F$. Usually something can simply tell you the score of a solution, like the tests of a program or a simulator for robots. We call it the **verifier**.
 
-<ProjectFigure
-  src={score}
-  alt="Two plans x and x' for two robots under the score F = total time + 100 × collisions; F(x) = 8 + 15 = 23 and F(x') = 8 + 10 + 100 = 118"
+<ProjectClip
+  poster={score}
+  mp4={scoreMp4}
+  alt="Two plans x and x' for two robots under the score F = total time + 100 × collisions; the robots drive both plans at once, and in x' they collide; F(x) = 8 + 15 = 23 and F(x') = 8 + 10 + 100 = 118"
   caption="The robot score: total arrival time plus 100 for every collision. In x the robots arrive after 8 and 15 ticks, so F(x) = 23. In x′ the orange robot arrives after 10 ticks but collides with the blue one, so F(x′) = 118."
 />
 
@@ -71,10 +79,11 @@ We wanted a task where real conflicts appear already with a few agents and that 
 
 The plans are written by a language model, GPT-OSS-120B. It runs no path-finding algorithm: it reads the map as text and writes the moves of every robot itself. With enough robots, it has to think for a while to find a good plan, and every plan is easy to check. Classical algorithms solve this problem exactly, and for us they are useful in another way: they give the best possible plan, so we always know how far the agents are from it.
 
-<ProjectFigure
-  src={optimum}
-  alt="Two warehouse plans side by side: a plan with collisions scored F = 544 and the best possible plan scored F* = 144, 400 points apart"
-  caption="Left: a plan with collisions, F = 544. Right: the best possible plan on this map, F* = 144, found by a classical algorithm. Knowing F* tells us how far any plan is from the best one."
+<ProjectClip
+  poster={optimum}
+  mp4={optimumMp4}
+  alt="Two warehouse plans played side by side: one of the agent's plans, where robots collide four times, scored F = 544, and the best possible plan, where every robot arrives without a collision, scored F* = 144, 400 points apart"
+  caption="Left: one of the agent's plans, F = 544; its robots collide four times. Right: the best possible plan on this map, F* = 144, found by a classical algorithm. Knowing F* tells us how far any plan is from the best one."
 />
 
 ## One agent, a growing warehouse
@@ -97,10 +106,11 @@ Three robots are easy for one agent, so we hire two more agents and give each of
 
 Blocks give the second assumption: **single blocks can make progress**. As long as the plan is not the best, at least one agent can improve it by changing only its own block, by an amount proportional to the gap. The constant of this proportionality is $\mu$. This is not always true. Sometimes the only way to improve the plan is for two agents to change their blocks together, and we call this a single-block trap. On the robot task, traps are rare, and they show up only at the very end, when a safe plan has already been found.
 
-<ProjectFigure
-  src={blocks}
-  alt="The plan x shown as three blocks of moves x1, x2, x3 in blue, orange and purple, next to three agents and the warehouse with their robots"
-  caption="The plan x split into three blocks, one per agent. Each block holds the moves of that agent's three robots."
+<ProjectClip
+  poster={blocks}
+  mp4={blocksMp4}
+  alt="The moves of the robots, drawn as arrows on the warehouse floor, fly up into three blocks x1, x2, x3 in blue, orange and purple, one block per agent, and back to the floor"
+  caption="The plan x split into three blocks, one per agent. Each block holds the moves of that agent's three robots: the arrows on the floor."
 />
 
 ## Everyone for themselves
@@ -109,9 +119,10 @@ At first, each agent could see only its own robots, just like in the small wareh
 
 This was not bad luck. Every run of this team on the first map ended with collisions, although a single agent with all nine robots found plans without collisions. All robots share the same floor, so it is not enough to tell each agent to take three robots from here to there. Each agent also needs to know where the other robots are going.
 
-<ProjectFigure
-  src={noCorrection}
-  alt="The warehouse with robots of three agents; each agent's own routes are collision-free, but three collisions between robots of different agents are marked +100"
+<ProjectClip
+  poster={noCorrection}
+  mp4={noCorrectionMp4}
+  alt="The warehouse with robots of three agents in blue, orange and purple driving their plans; each agent's own routes are collision-free, but robots of different agents collide three times, and each collision is marked +100"
   caption="A team whose agents see only their own robots. Every agent's plan is perfect for its own robots, but robots of different agents collide (+100 each), and no agent has a reason to change anything."
 />
 
@@ -168,10 +179,11 @@ Now each agent can plan its robots and still take the other robots into account.
 3. "Looks best" relies on the approximate correction, which can be wrong, so the verifier checks every proposal separately. It changes only this one block of the frozen plan and computes the real score. How much the score goes down is the **gain** $g_b=\max\{0,\,F(x)-F(x_{-b},U_b)\}$ of this proposal.
 4. The coordinator merges proposals into the next plan.
 
-<ProjectFigure
-  src={round}
-  alt="Round 1: the frozen plan x with blocks x1, x2, x3, the verifier, three agents with their proposals and a coordinator; the verified gains are g1 = 3, g2 = 4, g3 = 2"
-  caption="One round: the plan is frozen, every agent proposes a new block, and the verifier measures the gain of each proposal on its own, here 3, 4 and 2."
+<ProjectClip
+  poster={round}
+  mp4={roundMp4}
+  alt="Round 1: the frozen plan x with blocks x1, x2, x3, the verifier, three agents with their proposals and a coordinator; one at a time, each proposal replaces its block in the frozen plan, the verifier computes the score, and the gain goes back to the agent: g1 = 3, g2 = 4, g3 = 2"
+  caption="One round: the plan is frozen, and every agent proposes a new block. The verifier checks the proposals one at a time: it puts the new block into the frozen plan, computes the score and sends the gain back to the agent, here 3, 4 and 2."
 />
 
 Why not accept all three changes? Because two changes can each be good and still be bad together. Imagine two robots of different agents that both have a shortcut through the same narrow passage. If one robot takes it, it saves time, and so does the other one. But if both take it at the same tick, they collide.
@@ -233,10 +245,11 @@ $$
 
 We call it the **realized number of colors**. In the worst case it is three; in our runs it was about 1.5 on average.
 
-<ProjectFigure
-  src={realizedColors}
-  alt="Bars for the verified gains of three agents and their sum, next to the gain the coordinator kept; their ratio, the realized number of colors, is about 1.5"
-  caption="The realized number of colors: all verified gain of a round divided by the gain that the coordinator kept. It averaged about 1.5 in our runs, against the worst case κ = 3."
+<ProjectClip
+  poster={realizedColors}
+  mp4={realizedColorsMp4}
+  alt="Bars for the verified gains of three agents and their sum, next to the gain the coordinator kept; the gains switch between three equal gains, the worst case with ratio 3, and gains as in our runs, with ratio about 1.5"
+  caption="The realized number of colors: all verified gain of a round divided by the gain that the coordinator kept. When the three gains are equal, the worst case, it is 3; in our runs it averaged about 1.5."
 />
 
 The same measurement shows how to make the team faster. In most rounds that made progress (79 of 121 on the first map), at least one rejected proposal would also have improved the plan. And the conflicts turned out to be rare. Proposals get in each other's way mostly at the very start, when almost every agent improves and the new routes often collide. As the plan gets better, the parts interact less and less, and near the end they are almost independent. The worst case, where all improving proposals of a round conflict, happened in only 8 of 105 rounds with several improving proposals, 6 of them in the first round. Even changes that interact are sometimes worth combining. In 20 of the 82 rounds that accepted several changes, the changes together gained more than the sum of their gains: each new route alone hits the other agent's old route, but together they do not collide at all.
