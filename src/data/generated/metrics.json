@@ -3,11 +3,11 @@
     "account": {
       "username": "vectozavr",
       "url": "https://github.com/vectozavr",
-      "totalStars": 637,
+      "totalStars": 640,
       "followers": 456,
       "publicRepositories": 28,
       "originalRepositories": 24,
-      "updatedAt": "2026-11-02T12:37:31.569Z"
+      "updatedAt": "2026-11-09T13:01:27.921Z"
     },
     "repositories": {
       "vectozavr/qk-wanda": {
@@ -20,10 +20,10 @@
       },
       "vectozavr/voicecut": {
         "repository": "vectozavr/voicecut",
-        "stars": 12,
-        "forks": 1,
+        "stars": 13,
+        "forks": 2,
         "language": "Python",
-        "updatedAt": "2026-10-30T01:40:48Z",
+        "updatedAt": "2026-11-07T13:11:14Z",
         "url": "https://github.com/vectozavr/voicecut"
       },
       "vectozavr/thanos": {
@@ -68,22 +68,22 @@
       },
       "vectozavr/pseudo3dengine": {
         "repository": "vectozavr/pseudo3DEngine",
-        "stars": 182,
+        "stars": 181,
         "forks": 34,
         "language": "Makefile",
-        "updatedAt": "2026-10-24T00:53:58Z",
+        "updatedAt": "2026-11-08T09:24:26Z",
         "url": "https://github.com/vectozavr/pseudo3DEngine"
       }
     },
-    "repositoriesUpdatedAt": "2026-11-02T12:37:31.569Z"
+    "repositoriesUpdatedAt": "2026-11-09T13:01:27.921Z"
   },
   "citations": {
     "source": "Google Scholar",
     "authorId": "elw14gUAAAAJ",
     "url": "https://scholar.google.com/citations?user=elw14gUAAAAJ",
-    "citationCount": 168,
+    "citationCount": 172,
     "hIndex": 5,
     "i10Index": 4,
-    "updatedAt": "2026-11-02T12:37:33.577Z"
+    "updatedAt": "2026-11-09T13:01:28.101Z"
   }
 }
